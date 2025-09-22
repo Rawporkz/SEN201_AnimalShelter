@@ -1,9 +1,0 @@
-Prue:
-- Pizza
-- Pad Krapao
-- Boiled egg
-
-Jira:
-- Beef steak
-- Risotto
-- Blue cheese

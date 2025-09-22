@@ -1,8 +1,0 @@
-Win:
-- Mountains
-Non:
-- Beaches
-Prue:
-- Las Vegas
-Jira:
-- Shooting Range

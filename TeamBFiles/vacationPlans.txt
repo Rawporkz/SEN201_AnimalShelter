@@ -1,8 +1,0 @@
-Prue:
-- America
-Jira
-- Italy
-Win
-- Japan
-Non
-- Beaches
