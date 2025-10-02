@@ -6,7 +6,7 @@
 
 .auth-container {
   min-height: 100vh;
-  background: #003a62ff;
+  background: var(--color-blue-900);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -14,10 +14,10 @@
 }
 
 .auth-card {
-  background: white;
+  background: var(--color-white);
   border-radius: 25px;
   padding: 40px;
-  box-shadow: 4px 4px 4px 0px #00000033;
+  box-shadow: 4px 4px 4px 0px var(--color-shadow);
   width: 600px;
   height: 650px;
   text-align: center;
@@ -30,19 +30,19 @@
 .user-icon {
   width: 60px;
   height: 60px;
-  background: black;
+  background: var(--color-black);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 16px;
-  color: white;
+  color: var(--color-white);
 }
 
 .auth-header h1 {
   font-size: 24px;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--color-gray-800);
   margin: 0;
 }
 
@@ -61,7 +61,7 @@
 
 .form-group label {
   font-weight: 500;
-  color: #374151;
+  color: var(--color-gray-600);
   font-size: 14px;
 }
 
@@ -69,19 +69,19 @@
   display: flex;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-gray-300);
 }
 
 .role-btn {
   flex: 1;
   padding: 12px 16px;
   border: none;
-  background: white;
-  color: #6b7280;
+  background: var(--color-white);
+  color: var(--color-gray-500);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  border-right: 1px solid #d1d5db;
+  border-right: 1px solid var(--color-gray-300);
 }
 
 .role-btn:last-child {
@@ -89,17 +89,17 @@
 }
 
 .role-btn.active {
-  background: #003a62ff;
-  color: white;
+  background: var(--color-blue-900);
+  color: var(--color-white);
 }
 
 .role-btn:hover:not(.active) {
-  background: #f3f4f6;
+  background: var(--color-gray-100);
 }
 
 .form-input {
   padding: 12px 16px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-gray-300);
   border-radius: 8px;
   font-size: 14px;
   transition:
@@ -109,13 +109,13 @@
 
 .form-input:focus {
   outline: none;
-  border-color: #003a62ff;
-  box-shadow: 0 0 0 3px rgba(0, 58, 98, 0.1);
+  border-color: var(--color-blue-900);
+  box-shadow: 0 0 0 3px var(--color-blue-900-10);
 }
 
 .submit-btn {
-  background: #003a62ff;
-  color: white;
+  background: var(--color-blue-900);
+  color: var(--color-white);
   border: none;
   padding: 16px 24px;
   border-radius: 8px;
@@ -129,7 +129,7 @@
 }
 
 .submit-btn:hover {
-  background: #003a62ff;
+  background: var(--color-blue-900);
   transform: translateY(-1px);
 }
 
