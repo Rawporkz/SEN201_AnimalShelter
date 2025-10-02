@@ -1,0 +1,38 @@
+/*
+* lib/components/ClosePopupButton/style.css
+*
+* Styles for ClosePopupButton component.
+*/
+
+.close-popup-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background-color: #e53e3e;
+  border: none;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  color: white;
+  padding: 0;
+}
+
+.close-popup-button:hover {
+  background-color: #c53030;
+  transform: scale(1.05);
+}
+
+.close-popup-button:active {
+  background-color: #ea4444;
+}
+
+.close-popup-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.3);
+}
+
+.close-popup-button svg {
+  flex-shrink: 0;
+}

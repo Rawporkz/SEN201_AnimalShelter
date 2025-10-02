@@ -1,0 +1,138 @@
+/*
+* routes/authentication/style.css
+*
+* Styles for authentication page.
+*/
+
+.auth-container {
+  min-height: 100vh;
+  background: #003a62ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.auth-card {
+  background: white;
+  border-radius: 25px;
+  padding: 40px;
+  box-shadow: 4px 4px 4px 0px #00000033;
+  width: 600px;
+  height: 650px;
+  text-align: center;
+}
+
+.auth-header {
+  margin-bottom: 32px;
+}
+
+.user-icon {
+  width: 60px;
+  height: 60px;
+  background: black;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  color: white;
+}
+
+.auth-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  text-align: left;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #374151;
+  font-size: 14px;
+}
+
+.role-selector {
+  display: flex;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #d1d5db;
+}
+
+.role-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: white;
+  color: #6b7280;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-right: 1px solid #d1d5db;
+}
+
+.role-btn:last-child {
+  border-right: none;
+}
+
+.role-btn.active {
+  background: #003a62ff;
+  color: white;
+}
+
+.role-btn:hover:not(.active) {
+  background: #f3f4f6;
+}
+
+.form-input {
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #003a62ff;
+  box-shadow: 0 0 0 3px rgba(0, 58, 98, 0.1);
+}
+
+.submit-btn {
+  background: #003a62ff;
+  color: white;
+  border: none;
+  padding: 16px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    transform 0.1s ease;
+  margin-top: 8px;
+}
+
+.submit-btn:hover {
+  background: #003a62ff;
+  transform: translateY(-1px);
+}
+
+.submit-btn:active {
+  transform: translateY(0);
+}
