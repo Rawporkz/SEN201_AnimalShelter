@@ -5,7 +5,7 @@ This file defines the authentication page of the application.
 -->
 
 <script lang="ts">
-  import "./style.css";
+  import "./style.scss";
 
   // Currently selected user role for authentication (Staff or Customer)
   let selectedRole = $state("Staff");

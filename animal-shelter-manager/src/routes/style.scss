@@ -1,16 +1,16 @@
-/*
-* routes/style.css
-*
-* Global styles for the this application.
-*/
+//
+// routes/style.scss
+//
+// Global styles for the this application.
+//
 
-/* Import Poppins font from Google Fonts */
+// Import centralized color variables
+@use "../lib/styles/colors.scss" as colors;
+
+// Import Poppins font from Google Fonts
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 
-/* Import centralized color variables */
-@import "../lib/styles/colors.css";
-
-/* CSS Reset to remove default margins and padding */
+// CSS Reset to remove default margins and padding
 * {
   margin: 0;
   padding: 0;
@@ -34,7 +34,7 @@ body {
     Roboto,
     sans-serif;
   line-height: 24px;
-  background-color: var(--color-white);
+  background-color: white;
   font-synthesis: none;
   font-style: normal;
   font-weight: 400;

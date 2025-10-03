@@ -5,7 +5,7 @@ This file defines a reusable ClosePopupButton component.
 -->
 
 <script lang="ts">
-  import "./style.css";
+  import "./style.scss";
 
   // Optional callback function to handle button click events
   export let onclick: (() => void) | undefined = undefined;
