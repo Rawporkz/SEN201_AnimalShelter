@@ -87,12 +87,10 @@ impl FileService {
                 // Copy the selected file to our storage location
                 fs::copy(&selected_path_buf, &destination_path)
                     .await
-                    .with_context(|| {
-                        format!(
-                            "Failed to copy file from {:?} to {:?}",
-                            selected_path_buf, destination_path
-                        )
-                    })?;
+                    .context(format!(
+                        "Failed to copy file from {:?} to {:?}",
+                        selected_path_buf, destination_path
+                    ))?;
 
                 log::info!(
                     "File uploaded successfully: {:?} -> {:?}",
