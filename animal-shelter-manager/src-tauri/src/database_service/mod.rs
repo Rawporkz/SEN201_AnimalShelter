@@ -91,7 +91,7 @@ impl DatabaseService {
                 tel_number TEXT NOT NULL,
                 address TEXT NOT NULL,
                 occupation TEXT NOT NULL,
-                birth_year INTEGER NOT NULL,
+                annual_income TEXT NOT NULL,
                 num_people INTEGER NOT NULL,
                 num_children INTEGER NOT NULL,
                 request_timestamp INTEGER NOT NULL,
@@ -354,7 +354,7 @@ impl DatabaseService {
         request_id: &str,
     ) -> Result<Option<AdoptionRequest>> {
         let mut statement = self.connection.prepare(
-            "SELECT id, animal_id, name, email, tel_number, address, occupation, birth_year, num_people, num_children, request_timestamp, adoption_timestamp, status FROM adoption_requests WHERE id = ?1"
+            "SELECT id, animal_id, name, email, tel_number, address, occupation, annual_income, num_people, num_children, request_timestamp, adoption_timestamp, status FROM adoption_requests WHERE id = ?1"
         ).context("Failed to prepare query for adoption request by ID")?;
 
         let mut rows = statement
@@ -367,7 +367,7 @@ impl DatabaseService {
                     tel_number: row.get(4)?,
                     address: row.get(5)?,
                     occupation: row.get(6)?,
-                    birth_year: row.get(7)?,
+                    annual_income: row.get(7)?,
                     num_people: row.get(8)?,
                     num_children: row.get(9)?,
                     request_timestamp: row.get(10)?,
@@ -399,7 +399,7 @@ impl DatabaseService {
     /// * `Result<()>` - Success or error
     pub fn insert_adoption_request(&self, request: &AdoptionRequest) -> Result<()> {
         let rows_affected = self.connection.execute(
-            "INSERT INTO adoption_requests (id, animal_id, name, email, tel_number, address, occupation, birth_year, num_people, num_children, request_timestamp, adoption_timestamp, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
+            "INSERT INTO adoption_requests (id, animal_id, name, email, tel_number, address, occupation, annual_income, num_people, num_children, request_timestamp, adoption_timestamp, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
             params![
                 request.id,
                 request.animal_id,
@@ -408,7 +408,7 @@ impl DatabaseService {
                 request.tel_number,
                 request.address,
                 request.occupation,
-                request.birth_year,
+                request.annual_income,
                 request.num_people,
                 request.num_children,
                 request.request_timestamp,
@@ -440,7 +440,7 @@ impl DatabaseService {
     /// * `Result<bool>` - True if request was found and updated, false if not found
     pub fn update_adoption_request(&self, request: &AdoptionRequest) -> Result<bool> {
         let rows_affected = self.connection.execute(
-            "UPDATE adoption_requests SET animal_id = ?2, name = ?3, email = ?4, tel_number = ?5, address = ?6, occupation = ?7, birth_year = ?8, num_people = ?9, num_children = ?10, request_timestamp = ?11, adoption_timestamp = ?12, status = ?13 WHERE id = ?1",
+            "UPDATE adoption_requests SET animal_id = ?2, name = ?3, email = ?4, tel_number = ?5, address = ?6, occupation = ?7, annual_income = ?8, num_people = ?9, num_children = ?10, request_timestamp = ?11, adoption_timestamp = ?12, status = ?13 WHERE id = ?1",
             params![
                 request.id,
                 request.animal_id,
@@ -449,7 +449,7 @@ impl DatabaseService {
                 request.tel_number,
                 request.address,
                 request.occupation,
-                request.birth_year,
+                request.annual_income,
                 request.num_people,
                 request.num_children,
                 request.request_timestamp,

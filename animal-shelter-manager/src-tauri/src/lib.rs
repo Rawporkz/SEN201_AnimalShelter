@@ -10,8 +10,9 @@ mod database_service;
 mod file_service;
 
 use anyhow::Result;
+use authentication_service::{AuthenticationService, CurrentUser};
 use database_service::{
-    types::{AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary},
+    types::{AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary, UserRole},
     DatabaseService,
 };
 use file_service::FileService;
@@ -26,6 +27,8 @@ struct AppState {
     file_service: Option<FileService>,
     /// Service for handling database operations
     database_service: Option<DatabaseService>,
+    /// Service for handling authentication operations
+    authentication_service: Option<AuthenticationService>,
 }
 
 /// Lazily initializes the FileService if it hasn't been created yet
@@ -76,6 +79,18 @@ async fn lazy_init_database_service(
             Ok(service) => state.database_service = Some(service),
             Err(e) => return Err(format!("Failed to create DatabaseService: {}", e)),
         }
+    }
+    Ok(())
+}
+
+/// Lazily initializes the AuthenticationService if it hasn't been created yet
+///
+/// # Arguments
+/// * `state` - Mutable reference to the application state
+async fn lazy_init_authentication_service(state: &mut AppState) -> Result<(), String> {
+    if state.authentication_service.is_none() {
+        log::info!("Initializing AuthenticationService");
+        state.authentication_service = Some(AuthenticationService::new());
     }
     Ok(())
 }
@@ -410,6 +425,141 @@ async fn delete_adoption_request(
     }
 }
 
+// ==================== AUTHENTICATION COMMANDS ====================
+
+/// Command to register a new user account
+///
+/// # Arguments
+/// * `username` - Username for the new account
+/// * `password` - Password for the new account
+/// * `role` - Role to assign to the user (Staff or Customer)
+///
+/// # Returns
+/// * `Ok(())` - If the user was successfully registered and logged in
+/// * `Err(String)` - An error message if registration fails
+#[tauri::command]
+async fn sign_up(
+    state: State<'_, Mutex<AppState>>,
+    app_handle: AppHandle,
+    username: String,
+    password: String,
+    role: UserRole,
+) -> Result<(), String> {
+    // Lock the state for safe concurrent access
+    let mut state_guard = state.lock().await;
+
+    // Lazily initialize the database service
+    lazy_init_database_service(&mut state_guard, &app_handle).await?;
+
+    // Lazily initialize the authentication service
+    lazy_init_authentication_service(&mut state_guard).await?;
+
+    // Get references to services
+    let db_service = state_guard.database_service.as_ref().unwrap();
+    let auth_service = state_guard.authentication_service.as_mut().unwrap();
+
+    // Register user with new account
+    let result = auth_service.sign_up(db_service, &username, &password, role);
+
+    match result {
+        Ok(()) => Ok(()),
+        Err(e) => Err(format!("Failed to register user: {}", e)),
+    }
+}
+
+/// Command to log in an existing user
+///
+/// # Arguments
+/// * `username` - Username to log in
+/// * `password` - Password for authentication
+///
+/// # Returns
+/// * `Ok(bool)` - True if login successful, false if credentials invalid
+/// * `Err(String)` - An error message if login process fails
+#[tauri::command]
+async fn log_in(
+    state: State<'_, Mutex<AppState>>,
+    app_handle: AppHandle,
+    username: String,
+    password: String,
+) -> Result<bool, String> {
+    // Lock the state for safe concurrent access
+    let mut state_guard = state.lock().await;
+
+    // Lazily initialize the database service
+    lazy_init_database_service(&mut state_guard, &app_handle).await?;
+
+    // Lazily initialize the authentication service
+    lazy_init_authentication_service(&mut state_guard).await?;
+
+    // Get references to services
+    let db_service = state_guard.database_service.as_ref().unwrap();
+    let auth_service = state_guard.authentication_service.as_mut().unwrap();
+
+    // Authenticate user credentials
+    let result = auth_service.log_in(db_service, &username, &password);
+
+    match result {
+        Ok(success) => Ok(success),
+        Err(e) => Err(format!("Failed to log in: {}", e)),
+    }
+}
+
+/// Command to get current logged-in user information
+///
+/// # Returns
+/// * `Ok(Some(CurrentUser))` - Current user info if logged in
+/// * `Ok(None)` - If no user is currently logged in
+/// * `Err(String)` - An error message if retrieval fails
+#[tauri::command]
+async fn get_current_user(
+    state: State<'_, Mutex<AppState>>,
+    app_handle: AppHandle,
+) -> Result<Option<CurrentUser>, String> {
+    // Lock the state for safe concurrent access
+    let mut state_guard = state.lock().await;
+
+    // Lazily initialize the database service
+    lazy_init_database_service(&mut state_guard, &app_handle).await?;
+
+    // Lazily initialize the authentication service
+    lazy_init_authentication_service(&mut state_guard).await?;
+
+    // Get references to services
+    let db_service = state_guard.database_service.as_ref().unwrap();
+    let auth_service = state_guard.authentication_service.as_ref().unwrap();
+
+    // Get current user
+    let result = auth_service.get_current_user(db_service);
+    
+    match result {
+        Ok(user) => Ok(user),
+        Err(e) => Err(format!("Failed to get current user: {}", e)),
+    }
+}
+
+/// Command to log out the current user
+///
+/// # Returns
+/// * `Ok(())` - Always succeeds
+#[tauri::command]
+async fn log_out(state: State<'_, Mutex<AppState>>) -> Result<(), String> {
+    // Lock the state for safe concurrent access
+    let mut state_guard = state.lock().await;
+
+    // Lazily initialize the authentication service
+    lazy_init_authentication_service(&mut state_guard).await?;
+
+    // Log out user
+    state_guard
+        .authentication_service
+        .as_mut()
+        .unwrap()
+        .log_out();
+    
+    Ok(())
+}
+
 // ==================== FILE SERVICE COMMANDS ====================
 
 /// Command to upload a file selected by the user
@@ -478,6 +628,11 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .manage(Mutex::new(AppState::default()))
         .invoke_handler(tauri::generate_handler![
+            // Authentication commands
+            sign_up,
+            log_in,
+            get_current_user,
+            log_out,
             // Animal commands
             get_all_animals,
             get_animal_by_id,

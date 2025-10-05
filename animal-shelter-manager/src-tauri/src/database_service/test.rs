@@ -79,7 +79,7 @@ mod database_service_tests {
             tel_number: "0123456789".to_string(),
             address: "Bangkok, Thailand".to_string(),
             occupation: "Software Engineer".to_string(),
-            birth_year: 2004,
+            annual_income: "50000".to_string(),
             num_people: 2,
             num_children: 0,
             request_timestamp: Utc::now().timestamp(),
@@ -443,7 +443,7 @@ mod database_service_tests {
         request2.name = "Non Prajogo".to_string();
         request2.email = "non.prajogo@gmail.com".to_string();
         request2.tel_number = "9876543210".to_string();
-        request2.birth_year = 2005;
+        request2.annual_income = "50000".to_string();
 
         db.insert_animal(&animal).unwrap();
         db.insert_adoption_request(&request1).unwrap();

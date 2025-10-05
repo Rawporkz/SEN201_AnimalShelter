@@ -130,8 +130,8 @@ pub struct AdoptionRequest {
     pub address: String,
     /// Occupation of the requester
     pub occupation: String,
-    /// Birth year of the requester
-    pub birth_year: i32,
+    /// Annual income of the requester
+    pub annual_income: String,
     /// Number of people in the household
     pub num_people: i32,
     /// Number of children in the household
