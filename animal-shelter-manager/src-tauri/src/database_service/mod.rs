@@ -13,7 +13,7 @@ use anyhow::{bail, Context, Result};
 use rusqlite::{params, Connection};
 use std::path::Path;
 use types::{
-    AdoptionRequest, AdoptionRequestSummary, Animal, AnimalStatus, AnimalSummary, RequestStatus,
+    AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary, UserAuthentication, UserRole,
 };
 
 /// Service for handling database operations in the animal shelter application
@@ -103,6 +103,20 @@ impl DatabaseService {
                 [],
             )
             .context("Failed to create adoption_requests table")?;
+
+        // Create user_authentication table
+        self.connection
+            .execute(
+                "
+            CREATE TABLE IF NOT EXISTS user_authentication (
+                username TEXT PRIMARY KEY,
+                password_hash TEXT NOT NULL,
+                role TEXT NOT NULL
+            )
+            ",
+                [],
+            )
+            .context("Failed to create user_authentication table")?;
 
         log::debug!("Database tables initialized successfully");
         Ok(())
@@ -502,6 +516,138 @@ impl DatabaseService {
             _ => {
                 bail!(
                     "Unexpected number of rows affected when deleting adoption request: {}",
+                    rows_affected
+                );
+            }
+        }
+    }
+
+    // ==================== USER_AUTHENTICATION TABLE OPERATIONS ====================
+
+    /// Retrieves the password hash for a specific username
+    ///
+    /// # Arguments
+    /// * `username` - The username to look up
+    ///
+    /// # Returns
+    /// * `Result<Option<String>>` - Password hash if user exists, None if not found
+    pub fn get_password_hash(&self, username: &str) -> Result<Option<String>> {
+        let mut statement = self
+            .connection
+            .prepare("SELECT password_hash FROM user_authentication WHERE username = ?1")
+            .context("Failed to prepare query for password hash")?;
+
+        let mut rows = statement
+            .query_map(params![username], |row| {
+                let password_hash: String = row.get(0)?;
+                Ok(password_hash)
+            })
+            .context("Failed to execute query for password hash")?;
+
+        match rows.next() {
+            Some(row) => {
+                let password_hash = row.context("Failed to parse password hash row")?;
+                log::debug!("Retrieved password hash for username: {}", username);
+                Ok(Some(password_hash))
+            }
+            None => {
+                log::debug!("No user found with username: {}", username);
+                Ok(None)
+            }
+        }
+    }
+
+    /// Inserts a new user authentication record into the database
+    ///
+    /// # Arguments
+    /// * `user_auth` - The user authentication data to insert
+    ///
+    /// # Returns
+    /// * `Result<()>` - Success or error
+    pub fn insert_user(&self, user_auth: &UserAuthentication) -> Result<()> {
+        let rows_affected = self
+            .connection
+            .execute(
+                "INSERT INTO user_authentication (username, password_hash, role) VALUES (?1, ?2, ?3)",
+                params![user_auth.username, user_auth.password_hash, user_auth.role],
+            )
+            .context("Failed to insert user into database")?;
+
+        if rows_affected == 1 {
+            log::info!(
+                "Successfully inserted user with username: {}",
+                user_auth.username
+            );
+            Ok(())
+        } else {
+            bail!(
+                "Unexpected number of rows affected when inserting user: {}",
+                rows_affected
+            );
+        }
+    }
+
+    /// Retrieves the role for a specific username
+    ///
+    /// # Arguments
+    /// * `username` - The username to look up
+    ///
+    /// # Returns
+    /// * `Result<Option<UserRole>>` - User role if user exists, None if not found
+    pub fn get_user_role(&self, username: &str) -> Result<Option<UserRole>> {
+        let mut statement = self
+            .connection
+            .prepare("SELECT role FROM user_authentication WHERE username = ?1")
+            .context("Failed to prepare query for user role")?;
+
+        let mut rows = statement
+            .query_map(params![username], |row| {
+                let role: UserRole = row.get(0)?;
+                Ok(role)
+            })
+            .context("Failed to execute query for user role")?;
+
+        match rows.next() {
+            Some(row) => {
+                let role = row.context("Failed to parse user role row")?;
+                log::debug!("Retrieved role for username: {}", username);
+                Ok(Some(role))
+            }
+            None => {
+                log::debug!("No user found with username: {}", username);
+                Ok(None)
+            }
+        }
+    }
+
+    /// Deletes a user authentication record from the database by username
+    ///
+    /// # Arguments
+    /// * `username` - The username of the user to delete
+    ///
+    /// # Returns
+    /// * `Result<bool>` - True if user was found and deleted, false if not found
+    pub fn delete_user(&self, username: &str) -> Result<bool> {
+        let rows_affected = self
+            .connection
+            .execute(
+                "DELETE FROM user_authentication WHERE username = ?1",
+                params![username],
+            )
+            .context("Failed to delete user from database")?;
+
+        match rows_affected {
+            1 => {
+                log::info!("Successfully deleted user with username: {}", username);
+                Ok(true)
+            }
+            0 => {
+                log::warn!("No user found with username: {} for deletion", username);
+                Ok(false)
+            }
+            _ => {
+                bail!(
+                    "Unexpected number of rows affected when deleting user: {}",
                     rows_affected
                 );
             }
