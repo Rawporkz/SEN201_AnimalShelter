@@ -43,7 +43,7 @@ This file defines the authentication page of the application.
     <div class="auth-header">
       <div class="user-icon">
         <!-- TODO: Use imported icon -->
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
           <circle cx="12" cy="8" r="4" />
           <path d="M12 14c-6 0-8 2.5-8 6v2h16v-2c0-3.5-2-6-8-6z" />
         </svg>
@@ -54,17 +54,25 @@ This file defines the authentication page of the application.
     <form onsubmit={(event) => handleSubmit(event)} class="auth-form">
       <div class="form-group">
         <label for="role">Role</label>
-        <div class="role-selector">
+        <div class="role-selector" role="tablist" aria-label="Role selector">
+          <div
+            class="selector-slider {selectedRole === 'Customer' ? 'right' : ''}"
+            aria-hidden="true"
+          ></div>
           <button
             type="button"
+            role="tab"
             class="role-btn {selectedRole === 'Staff' ? 'active' : ''}"
+            aria-selected={selectedRole === 'Staff'}
             onclick={() => selectRole("Staff")}
           >
             Staff
           </button>
           <button
             type="button"
+            role="tab"
             class="role-btn {selectedRole === 'Customer' ? 'active' : ''}"
+            aria-selected={selectedRole === 'Customer'}
             onclick={() => selectRole("Customer")}
           >
             Customer
@@ -78,7 +86,7 @@ This file defines the authentication page of the application.
           type="text"
           id="username"
           bind:value={username}
-          class="form-input"
+          class="form-input {username ? 'has-value' : ''}"
           required
         />
       </div>
@@ -89,7 +97,7 @@ This file defines the authentication page of the application.
           type="password"
           id="password"
           bind:value={password}
-          class="form-input"
+          class="form-input {password ? 'has-value' : ''}"
           required
         />
       </div>
