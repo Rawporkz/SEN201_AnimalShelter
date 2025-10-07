@@ -10,9 +10,9 @@ mod database_service;
 mod file_service;
 
 use anyhow::Result;
-use authentication_service::{AuthenticationService, CurrentUser};
+use authentication_service::{types::UserRole, AuthenticationService, CurrentUser};
 use database_service::{
-    types::{AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary, UserRole},
+    types::{AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary},
     DatabaseService,
 };
 use file_service::FileService;
@@ -87,10 +87,25 @@ async fn lazy_init_database_service(
 ///
 /// # Arguments
 /// * `state` - Mutable reference to the application state
-async fn lazy_init_authentication_service(state: &mut AppState) -> Result<(), String> {
+/// * `app_handle` - Reference to the Tauri application handle
+async fn lazy_init_authentication_service(
+    state: &mut AppState,
+    app_handle: &AppHandle,
+) -> Result<(), String> {
     if state.authentication_service.is_none() {
         log::info!("Initializing AuthenticationService");
-        state.authentication_service = Some(AuthenticationService::new());
+
+        // Initialize AuthenticationService with its own database in app data directory
+        let app_data_dir = app_handle
+            .path()
+            .app_data_dir()
+            .map_err(|e| e.to_string())?;
+        let auth_db_path = app_data_dir.join("authentication.db");
+
+        match AuthenticationService::new(auth_db_path) {
+            Ok(service) => state.authentication_service = Some(service),
+            Err(e) => return Err(format!("Failed to create AuthenticationService: {}", e)),
+        }
     }
     Ok(())
 }
@@ -448,18 +463,14 @@ async fn sign_up(
     // Lock the state for safe concurrent access
     let mut state_guard = state.lock().await;
 
-    // Lazily initialize the database service
-    lazy_init_database_service(&mut state_guard, &app_handle).await?;
-
     // Lazily initialize the authentication service
-    lazy_init_authentication_service(&mut state_guard).await?;
+    lazy_init_authentication_service(&mut state_guard, &app_handle).await?;
 
-    // Get references to services
-    let db_service = state_guard.database_service.as_ref().unwrap();
+    // Get reference to authentication service
     let auth_service = state_guard.authentication_service.as_mut().unwrap();
 
     // Register user with new account
-    let result = auth_service.sign_up(db_service, &username, &password, role);
+    let result = auth_service.sign_up(&username, &password, role);
 
     match result {
         Ok(()) => Ok(()),
@@ -486,18 +497,14 @@ async fn log_in(
     // Lock the state for safe concurrent access
     let mut state_guard = state.lock().await;
 
-    // Lazily initialize the database service
-    lazy_init_database_service(&mut state_guard, &app_handle).await?;
-
     // Lazily initialize the authentication service
-    lazy_init_authentication_service(&mut state_guard).await?;
+    lazy_init_authentication_service(&mut state_guard, &app_handle).await?;
 
-    // Get references to services
-    let db_service = state_guard.database_service.as_ref().unwrap();
+    // Get reference to authentication service
     let auth_service = state_guard.authentication_service.as_mut().unwrap();
 
     // Authenticate user credentials
-    let result = auth_service.log_in(db_service, &username, &password);
+    let result = auth_service.log_in(&username, &password);
 
     match result {
         Ok(success) => Ok(success),
@@ -519,19 +526,15 @@ async fn get_current_user(
     // Lock the state for safe concurrent access
     let mut state_guard = state.lock().await;
 
-    // Lazily initialize the database service
-    lazy_init_database_service(&mut state_guard, &app_handle).await?;
-
     // Lazily initialize the authentication service
-    lazy_init_authentication_service(&mut state_guard).await?;
+    lazy_init_authentication_service(&mut state_guard, &app_handle).await?;
 
-    // Get references to services
-    let db_service = state_guard.database_service.as_ref().unwrap();
+    // Get reference to authentication service
     let auth_service = state_guard.authentication_service.as_ref().unwrap();
 
     // Get current user
-    let result = auth_service.get_current_user(db_service);
-    
+    let result = auth_service.get_current_user();
+
     match result {
         Ok(user) => Ok(user),
         Err(e) => Err(format!("Failed to get current user: {}", e)),
@@ -543,12 +546,12 @@ async fn get_current_user(
 /// # Returns
 /// * `Ok(())` - Always succeeds
 #[tauri::command]
-async fn log_out(state: State<'_, Mutex<AppState>>) -> Result<(), String> {
+async fn log_out(state: State<'_, Mutex<AppState>>, app_handle: AppHandle) -> Result<(), String> {
     // Lock the state for safe concurrent access
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the authentication service
-    lazy_init_authentication_service(&mut state_guard).await?;
+    lazy_init_authentication_service(&mut state_guard, &app_handle).await?;
 
     // Log out user
     state_guard
@@ -556,7 +559,7 @@ async fn log_out(state: State<'_, Mutex<AppState>>) -> Result<(), String> {
         .as_mut()
         .unwrap()
         .log_out();
-    
+
     Ok(())
 }
 
