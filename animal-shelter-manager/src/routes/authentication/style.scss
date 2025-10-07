@@ -78,7 +78,7 @@ $control-height: 56px;
   padding: 4px;
   background: white;
   border: 2px solid colors.$blue-main;
-  border-radius: 15px;
+  border-radius: 20px;
 }
 
 .selector-slider {
@@ -88,7 +88,7 @@ $control-height: 56px;
   left: 4px;
   width: calc(50% - 4px);
   background: colors.$blue-main;
-  border-radius: 10px;
+  border-radius: 18px;
   transition: transform 0.25s ease;
 }
 
@@ -107,7 +107,7 @@ $control-height: 56px;
   font-size: 18px;
   cursor: pointer;
   height: 100%;
-  border-radius: 15px;
+  border-radius: 20px;
   padding: 0 18px;
   transition: color 0.2s ease;
   text-align: center;
@@ -121,7 +121,7 @@ $control-height: 56px;
   height: $control-height;
   padding: 0 16px;
   border: 1px solid colors.$grey-border;
-  border-radius: 12px;
+  border-radius: 20px;
   font-size: 16px;
   box-sizing: border-box;
   transition:
@@ -145,7 +145,7 @@ $control-height: 56px;
   border: none;
   height: 60px;
   padding: 0 28px;
-  border-radius: 15px;
+  border-radius: 20px;
   font-size: 18px;
   font-weight: 700;
   cursor: pointer;
