@@ -2,11 +2,9 @@
 
 
 .input-field{
-    box-sizing: border-box;
+    // box-sizing: border-box;
     margin: 10px;
 }
-
-
 
 /* The Label */
 .label {
@@ -51,6 +49,8 @@
     background: transparent;
     overflow: hidden; /* prevent showing any extra partial line */
 }
+
+
 
 .has-content {
   border-color: colors.$blue-main; // change

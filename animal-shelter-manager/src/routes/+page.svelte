@@ -11,7 +11,7 @@ or the customer's home page based on the user's authentication status and role.
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import "./style.scss";
-  import ClosePopupButton from "$lib/components/ClosePopupButton/ClosePopupButton.svelte";
+  import TextBox from "$lib/components/InputText/InputText.svelte";
 
   // Current authenticated user object, null if not logged in
   let currentUser = $state(null);
@@ -28,4 +28,5 @@ or the customer's home page based on the user's authentication status and role.
   //
 </script>
 
-<ClosePopupButton></ClosePopupButton>
+<TextBox label="Name" placeholder="Enter Name" boxWidth="310px" rows={1}/>
+<TextBox label="Street address" placeholder="Enter Street Address" boxWidth="653px" rows={3}/>

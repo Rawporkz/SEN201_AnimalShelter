@@ -38,11 +38,11 @@
 </script>
 
 <div class="input-field" style="width:{boxWidth};">
-  <label for="textbox-input" class="label">{label}</label>
+  <label for="text-field" class="label">{label}</label>
   <div class="box {value ? 'has-content' : ''}">
     <textarea
-      id="textbox-input"
-      class="text-box {value ? 'has-content' : ''}"
+      id="text-field"
+      class="text-field {value ? 'has-content' : ''}"
       placeholder={placeholder}
       rows={rows}
       bind:this={textareaEl}
