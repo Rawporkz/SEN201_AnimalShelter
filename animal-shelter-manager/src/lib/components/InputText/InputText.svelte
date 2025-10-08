@@ -37,12 +37,12 @@
   }
 </script>
 
-<div class="modern-style" style="width:{boxWidth};">
-  <label for="textbox-input" class="modern-style__label">{label}</label>
-  <div class="modern-style__box {value ? 'has-content' : ''}">
+<div class="input-field" style="width:{boxWidth};">
+  <label for="textbox-input" class="label">{label}</label>
+  <div class="box {value ? 'has-content' : ''}">
     <textarea
       id="textbox-input"
-      class="modern-style__box--field {value ? 'has-content' : ''}"
+      class="text-box {value ? 'has-content' : ''}"
       placeholder={placeholder}
       rows={rows}
       bind:this={textareaEl}
