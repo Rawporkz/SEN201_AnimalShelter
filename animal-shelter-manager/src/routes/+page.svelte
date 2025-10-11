@@ -12,6 +12,7 @@ or the customer's home page based on the user's authentication status and role.
   import { onMount } from "svelte";
   import "./style.scss";
   import ClosePopupButton from "$lib/components/ClosePopupButton/ClosePopupButton.svelte";
+  import SideBar from "$lib/components/SideBar/SideBar.svelte";
 
   // Current authenticated user object, null if not logged in
   let currentUser = $state(null);
@@ -29,3 +30,4 @@ or the customer's home page based on the user's authentication status and role.
 </script>
 
 <ClosePopupButton></ClosePopupButton>
+<SideBar username="John Doe" role="as Staff"></SideBar>
