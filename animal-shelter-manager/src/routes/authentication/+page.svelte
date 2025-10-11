@@ -15,25 +15,25 @@ This file defines the authentication page of the application.
   import { info, warn, error } from "@tauri-apps/plugin-log";
   import "./style.scss";
 
-  // Currently selected user role for authentication (staff or customer)
+  /** Currently selected user role for authentication (staff or customer) */
   let selectedRole = $state("staff");
 
-  // Username entered by the user in the authentication form
+  /** Username entered by the user in the authentication form */
   let username = $state("");
 
-  // Password entered by the user in the authentication form
+  /** Password entered by the user in the authentication form */
   let password = $state("");
 
-  // Error message to display when authentication fails
+  /** Error message to display when authentication fails */
   let errorMessage = $state("");
 
-  // Flag to indicate if username field should show error state (red border)
+  /** Flag to indicate if username field should show error state (red border) */
   let hasUsernameError = $state(false);
 
-  // Flag to indicate if password field should show error state (red border)
+  /** Flag to indicate if password field should show error state (red border) */
   let hasPasswordError = $state(false);
 
-  // Flag to indicate if authentication is in progress
+  /** Flag to indicate if authentication is in progress */
   let isAuthenticating = $state(false);
 
   /**

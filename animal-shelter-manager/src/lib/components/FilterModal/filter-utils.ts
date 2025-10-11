@@ -5,7 +5,7 @@
  * component system, including filter criteria definitions and selection handling.
  */
 
-// Available filter criteria that can be shown in the modal
+/** Available filter criteria that can be shown in the modal */
 export enum FilterCriteria {
   STATUS = "status",
   SEX = "sex",
@@ -14,27 +14,27 @@ export enum FilterCriteria {
   ADOPTION_DATE = "adoption_date",
 }
 
-// Types of filter components available
+/** Types of filter components available */
 export enum FilterType {
   CHOOSE_ONE = "choose_one",
   CHOOSE_MANY = "choose_many",
   NESTED_CHOOSE_MANY = "nested_choose_many",
 }
 
-// Configuration for each filter criteria
+/** Configuration for each filter criteria */
 export interface FilterCriteriaConfig {
   criteria: FilterCriteria;
   type: FilterType;
   displayName: string;
 }
 
-// Selected values for different filter types
+/** Selected values for different filter types */
 export type FilterValue = string | string[] | Record<string, string[]>;
 
-// Complete filter selections mapped by criteria
+/** Complete filter selections mapped by criteria */
 export type FilterSelections = Record<FilterCriteria, FilterValue | null>;
 
-// Configuration mapping for each criteria
+/** Configuration mapping for each criteria */
 export const FILTER_CRITERIA_CONFIGS: Record<
   FilterCriteria,
   FilterCriteriaConfig

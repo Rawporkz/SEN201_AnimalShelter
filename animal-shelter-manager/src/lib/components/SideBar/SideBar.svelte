@@ -8,11 +8,24 @@ This file defines a reusable SideBar component.
   import "./style.scss";
   import { User } from "@lucide/svelte";
 
-  // Fields
-  export let username: string = "Username";
-  export let role: string = "as Staff";
-  export let onSignOut: (() => void) | undefined = undefined;
-  export let onNavigate: ((item: string) => void) | undefined = undefined;
+  // Props
+  interface Props {
+    /** The username to display */
+    username?: string;
+    /** The user role to display */
+    role?: string;
+    /** Optional callback function to handle sign out events */
+    onSignOut?: (() => void) | undefined;
+    /** Optional callback function to handle navigation events */
+    onNavigate?: ((item: string) => void) | undefined;
+  }
+
+  const {
+    username = "Username",
+    role = "as Staff",
+    onSignOut = undefined,
+    onNavigate = undefined,
+  }: Props = $props();
 
   // Array of navigation items
   const navItems = ["All Animals", "Adoption Requests", "Adoption Reports"];
@@ -53,8 +66,8 @@ This file defines a reusable SideBar component.
     {#each navItems as item}
       <div
         class="nav-item"
-        on:click={() => handleNavClick(item)}
-        on:keydown={(e) => e.key === "Enter" && handleNavClick(item)}
+        onclick={() => handleNavClick(item)}
+        onkeydown={(e) => e.key === "Enter" && handleNavClick(item)}
         role="button"
         tabindex="0"
       >
@@ -63,7 +76,7 @@ This file defines a reusable SideBar component.
     {/each}
   </nav>
 
-  <button class="sign-out-btn" on:click={handleSignOut} type="button">
+  <button class="sign-out-btn" onclick={handleSignOut} type="button">
     Sign Out
   </button>
 </div>
