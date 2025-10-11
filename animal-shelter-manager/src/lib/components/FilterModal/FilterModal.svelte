@@ -19,9 +19,12 @@
     ANIMAL_STATUS_OPTIONS,
     ANIMAL_SEX_OPTIONS,
     DATE_RANGE_FILTER_OPTIONS,
+    ANIMAL_BREED_OPTIONS,
+    ANIMAL_SPECIES_OPTIONS,
   } from "$lib/config/animal-options";
   import ChooseMultiFilter from "./ChooseMultiFilter/ChooseMuliFilter.svelte";
   import ChooseOneFilter from "./ChooseOneFilter/ChooseOneFilter.svelte";
+  import NestedChooseManyFilter from "./NestedChooseManyFilter/NestedChooseManyFilter.svelte";
   import "./style.scss";
 
   // Props
@@ -194,6 +197,85 @@
       [criteria]: selectedValue,
     };
   }
+
+  /**
+   * Gets nested options for hierarchical filter criteria.
+   *
+   * @param criteria - The criteria to get nested options for
+   * @returns Record of categories with their labels and items
+   */
+  function getNestedOptionsForCriteria(
+    criteria: FilterCriteria,
+  ): Record<string, { label: string; items: string[] }> {
+    if (criteria === FilterCriteria.SPECIES_AND_BREEDS) {
+      const nestedOptions: Record<string, { label: string; items: string[] }> = {};
+      
+      for (const speciesOption of ANIMAL_SPECIES_OPTIONS) {
+        nestedOptions[speciesOption.value] = {
+          label: speciesOption.label,
+          items: ANIMAL_BREED_OPTIONS[speciesOption.value] || [],
+        };
+      }
+      
+      return nestedOptions;
+    }
+    
+    return {};
+  }
+
+  /**
+   * Gets currently selected nested values for a criteria.
+   *
+   * @param criteria - The criteria to get selections for
+   * @returns Record of selected values per category
+   */
+  function getSelectedNestedValuesForCriteria(
+    criteria: FilterCriteria,
+  ): Record<string, string[]> {
+    const value = workingSelections[criteria];
+    
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      return value as Record<string, string[]>;
+    }
+    
+    // If value is null, return all options selected (everything selected)
+    if (value === null) {
+      const nestedOptions = getNestedOptionsForCriteria(criteria);
+      const allSelected: Record<string, string[]> = {};
+      
+      for (const category in nestedOptions) {
+        allSelected[category] = [...nestedOptions[category].items];
+      }
+      
+      return allSelected;
+    }
+    
+    // Return empty selections for each category
+    const nestedOptions = getNestedOptionsForCriteria(criteria);
+    const emptySelections: Record<string, string[]> = {};
+    
+    for (const category in nestedOptions) {
+      emptySelections[category] = [];
+    }
+    
+    return emptySelections;
+  }
+
+  /**
+   * Handles selection changes from nested filter components.
+   *
+   * @param criteria - The criteria being updated
+   * @param selectedValues - The new selected nested values
+   */
+  function handleNestedFilterSelectionChange(
+    criteria: FilterCriteria,
+    selectedValues: Record<string, string[]>,
+  ): void {
+    workingSelections = {
+      ...workingSelections,
+      [criteria]: selectedValues,
+    };
+  }
 </script>
 
 {#if isVisible}
@@ -242,6 +324,14 @@
               selectedValue={getSelectedValueForCriteria(selectedCriteria)}
               onSelect={(value) =>
                 handleSingleFilterSelectionChange(selectedCriteria!, value)}
+            />
+          {:else if getFilterType(selectedCriteria) === FilterType.NESTED_CHOOSE_MANY}
+            <NestedChooseManyFilter
+              title={getFilterDisplayName(selectedCriteria)}
+              nestedOptions={getNestedOptionsForCriteria(selectedCriteria)}
+              selectedValues={getSelectedNestedValuesForCriteria(selectedCriteria)}
+              onSelect={(values) =>
+                handleNestedFilterSelectionChange(selectedCriteria!, values)}
             />
           {:else}
             <div class="filter-content-placeholder">
