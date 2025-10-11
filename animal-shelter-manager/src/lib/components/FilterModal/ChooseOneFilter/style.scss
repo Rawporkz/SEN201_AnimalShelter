@@ -7,54 +7,53 @@
 @use "../../../styles/colors.scss" as colors;
 
 .choose-one-filter {
-    padding: 20px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .filter-header {
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 2px solid colors.$grey-light;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid colors.$grey-light;
 }
 
 .filter-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0;
-    color: black;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+  color: black;
 }
 
 .options-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    overflow-y: auto;
-    flex: 1;
-    align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  flex: 1;
+  align-items: flex-start;
 }
 
 .option-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    padding: 8px 0;
-    width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 8px 0;
+  width: 100%;
 }
 
 .option-radio {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    accent-color: colors.$blue-main;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: colors.$blue-main;
 }
 
 .option-label {
-    font-size: 14px;
-    color: black;
-    cursor: pointer;
-    user-select: none;
+  font-size: 14px;
+  color: black;
+  cursor: pointer;
+  user-select: none;
 }
-

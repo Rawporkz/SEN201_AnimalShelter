@@ -129,4 +129,3 @@ export function validateCriteriaList(
     Object.values(FilterCriteria).includes(criteria as FilterCriteria),
   );
 }
-

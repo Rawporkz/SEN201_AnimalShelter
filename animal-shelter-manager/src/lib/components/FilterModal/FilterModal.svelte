@@ -48,7 +48,7 @@
 
   // Currently selected criteria for showing in the content area
   let selectedCriteria: FilterCriteria | null = $state(
-    criteriaList.length > 0 ? criteriaList[0] : null
+    criteriaList.length > 0 ? criteriaList[0] : null,
   );
 
   // Filter selections being built in the modal
@@ -142,7 +142,7 @@
     }
     // If value is null, return all available options (everything selected)
     if (value === null) {
-      return getOptionsForCriteria(criteria).map(option => option.value);
+      return getOptionsForCriteria(criteria).map((option) => option.value);
     }
     return [];
   }
@@ -153,9 +153,11 @@
    * @param criteria - The criteria to get selection for
    * @returns Selected value or null if none selected
    */
-  function getSelectedValueForCriteria(criteria: FilterCriteria): string | null {
+  function getSelectedValueForCriteria(
+    criteria: FilterCriteria,
+  ): string | null {
     const value = workingSelections[criteria];
-    if (typeof value === 'string') {
+    if (typeof value === "string") {
       return value;
     }
     // If value is null, return the first option (default selection)
@@ -208,18 +210,19 @@
     criteria: FilterCriteria,
   ): Record<string, { label: string; items: string[] }> {
     if (criteria === FilterCriteria.SPECIES_AND_BREEDS) {
-      const nestedOptions: Record<string, { label: string; items: string[] }> = {};
-      
+      const nestedOptions: Record<string, { label: string; items: string[] }> =
+        {};
+
       for (const speciesOption of ANIMAL_SPECIES_OPTIONS) {
         nestedOptions[speciesOption.value] = {
           label: speciesOption.label,
           items: ANIMAL_BREED_OPTIONS[speciesOption.value] || [],
         };
       }
-      
+
       return nestedOptions;
     }
-    
+
     return {};
   }
 
@@ -233,31 +236,31 @@
     criteria: FilterCriteria,
   ): Record<string, string[]> {
     const value = workingSelections[criteria];
-    
-    if (value && typeof value === 'object' && !Array.isArray(value)) {
+
+    if (value && typeof value === "object" && !Array.isArray(value)) {
       return value as Record<string, string[]>;
     }
-    
+
     // If value is null, return all options selected (everything selected)
     if (value === null) {
       const nestedOptions = getNestedOptionsForCriteria(criteria);
       const allSelected: Record<string, string[]> = {};
-      
+
       for (const category in nestedOptions) {
         allSelected[category] = [...nestedOptions[category].items];
       }
-      
+
       return allSelected;
     }
-    
+
     // Return empty selections for each category
     const nestedOptions = getNestedOptionsForCriteria(criteria);
     const emptySelections: Record<string, string[]> = {};
-    
+
     for (const category in nestedOptions) {
       emptySelections[category] = [];
     }
-    
+
     return emptySelections;
   }
 
@@ -329,7 +332,9 @@
             <NestedChooseManyFilter
               title={getFilterDisplayName(selectedCriteria)}
               nestedOptions={getNestedOptionsForCriteria(selectedCriteria)}
-              selectedValues={getSelectedNestedValuesForCriteria(selectedCriteria)}
+              selectedValues={getSelectedNestedValuesForCriteria(
+                selectedCriteria,
+              )}
               onSelect={(values) =>
                 handleNestedFilterSelectionChange(selectedCriteria!, values)}
             />
