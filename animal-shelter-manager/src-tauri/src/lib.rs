@@ -10,7 +10,10 @@ mod database_service;
 mod file_service;
 
 use anyhow::Result;
-use authentication_service::{types::UserRole, AuthenticationService, CurrentUser};
+use authentication_service::{
+    types::{LoginResult, UserRole},
+    AuthenticationService, CurrentUser,
+};
 use database_service::{
     types::{AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary},
     DatabaseService,
@@ -485,7 +488,7 @@ async fn sign_up(
 /// * `password` - Password for authentication
 ///
 /// # Returns
-/// * `Ok(bool)` - True if login successful, false if credentials invalid
+/// * `Ok(LoginResult)` - Login result indicating success, invalid password, or user not found
 /// * `Err(String)` - An error message if login process fails
 #[tauri::command]
 async fn log_in(
@@ -493,7 +496,7 @@ async fn log_in(
     app_handle: AppHandle,
     username: String,
     password: String,
-) -> Result<bool, String> {
+) -> Result<LoginResult, String> {
     // Lock the state for safe concurrent access
     let mut state_guard = state.lock().await;
 
@@ -507,7 +510,7 @@ async fn log_in(
     let result = auth_service.log_in(&username, &password);
 
     match result {
-        Ok(success) => Ok(success),
+        Ok(login_result) => Ok(login_result),
         Err(e) => Err(format!("Failed to log in: {}", e)),
     }
 }
@@ -627,6 +630,7 @@ async fn delete_file(
 /// Runs the Tauri application
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_log::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .manage(Mutex::new(AppState::default()))
