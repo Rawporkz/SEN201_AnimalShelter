@@ -13,17 +13,23 @@ This file defines a reusable SideBar component.
   export let onSignOut: (() => void) | undefined = undefined;
   export let onNavigate: ((item: string) => void) | undefined = undefined;
 
-  // Navigation items
+  // Array of navigation items
   const navItems = ["All Animals", "Adoption Requests", "Adoption Reports"];
 
-  // Handles sign out button click
+  /*
+   * Handles the sign-out button click
+   * @param item
+   */
   function handleSignOut() {
     if (onSignOut) {
       onSignOut();
     }
   }
 
-  // Handles navigation item clicks
+  /*
+   * Handles navigation item clicks
+   * Calls the provided onNavigate callback function with the clicked item if it exists.
+   */
   function handleNavClick(item: string) {
     if (onNavigate) {
       onNavigate(item);
