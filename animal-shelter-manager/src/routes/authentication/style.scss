@@ -7,9 +7,10 @@
 @use "../../lib/styles/colors.scss" as colors;
 @use "sass:color";
 
-$control-height: 56px;
+// Height for input fields and buttons
+$field-height: 56px;
 
-.auth-container {
+.container {
   min-height: 100vh;
   background: colors.$blue-main;
   display: flex;
@@ -21,7 +22,7 @@ $control-height: 56px;
 .auth-card {
   background: white;
   border-radius: 30px;
-  padding: 56px 64px;
+  padding: 48px 64px;
   box-shadow: 0 10px 30px 0 color.adjust(black, $alpha: -0.85);
   width: min(640px, 92vw);
   text-align: center;
@@ -31,23 +32,15 @@ $control-height: 56px;
   margin-bottom: 26px;
 }
 
-.user-icon {
-  width: 100px;
-  height: 100px;
-  background: black;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 18px;
-  color: white;
-}
-
 .auth-header h1 {
-  font-size: 32px;
+  font-size: 24px;
   font-weight: 700;
   color: black;
-  margin: 0;
+}
+
+.user-icon {
+  color: black;
+  margin-bottom: 12px;
 }
 
 .auth-form {
@@ -57,13 +50,13 @@ $control-height: 56px;
   text-align: left;
 }
 
-.form-group {
+.auth-form-field {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.form-group label {
+.auth-form-field label {
   font-weight: 500;
   color: colors.$grey-text;
   font-size: 18px;
@@ -74,14 +67,13 @@ $control-height: 56px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: stretch;
-  height: $control-height;
-  padding: 4px;
+  height: $field-height;
   background: white;
   border: 2px solid colors.$blue-main;
   border-radius: 20px;
 }
 
-.selector-slider {
+.role-selector-slider {
   position: absolute;
   top: 4px;
   bottom: 4px;
@@ -92,7 +84,7 @@ $control-height: 56px;
   transition: transform 0.25s ease;
 }
 
-.selector-slider.right {
+.role-selector-slider.right {
   transform: translateX(100%);
 }
 
@@ -117,8 +109,8 @@ $control-height: 56px;
   }
 }
 
-.form-input {
-  height: $control-height;
+.auth-form-field-input {
+  height: $field-height;
   padding: 0 16px;
   border: 1px solid colors.$grey-border;
   border-radius: 20px;
@@ -137,6 +129,10 @@ $control-height: 56px;
   &.has-value {
     border: 2px solid colors.$blue-main;
   }
+
+  &.has-error {
+    border: 2px solid colors.$red-vibrant;
+  }
 }
 
 .submit-btn {
@@ -153,7 +149,20 @@ $control-height: 56px;
   margin-top: 20px;
   align-self: center;
 
-  &:hover {
-    background: color.adjust(colors.$blue-main, $lightness: -10%);
+  &:hover:not(:disabled) {
+    background: color.adjust(colors.$blue-main, $lightness: +10%);
   }
+
+  &:disabled {
+    background: colors.$grey-light;
+    cursor: not-allowed;
+  }
+}
+
+.error-message {
+  color: colors.$red-vibrant;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 4px;
+  font-weight: 500;
 }

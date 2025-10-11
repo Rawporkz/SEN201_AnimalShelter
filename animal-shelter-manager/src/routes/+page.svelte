@@ -7,11 +7,9 @@ or the customer's home page based on the user's authentication status and role.
 -->
 
 <script lang="ts">
-  import { invoke } from "@tauri-apps/api/core";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import "./style.scss";
-  import ClosePopupButton from "$lib/components/ClosePopupButton/ClosePopupButton.svelte";
 
   // Current authenticated user object, null if not logged in
   let currentUser = $state(null);

@@ -6,7 +6,10 @@
 
 #[cfg(test)]
 mod authentication_service_tests {
-    use super::super::{types::UserRole, AuthenticationService};
+    use super::super::{
+        types::{LoginResult, UserRole},
+        AuthenticationService,
+    };
     use std::fs;
     use std::path::PathBuf;
 
@@ -45,7 +48,7 @@ mod authentication_service_tests {
         // Verify user can now log in (implicit verification that user was created)
         let login_result = auth_service.log_in("testuser", "password123");
         assert!(login_result.is_ok());
-        assert!(login_result.unwrap());
+        assert_eq!(login_result.unwrap(), LoginResult::Success);
     }
 
     #[test]
@@ -101,7 +104,7 @@ mod authentication_service_tests {
 
         // Test successful login
         let login_result = auth_service.log_in("testuser", "password123").unwrap();
-        assert!(login_result);
+        assert_eq!(login_result, LoginResult::Success);
 
         // Verify user is now logged in
         let current_user = auth_service.get_current_user().unwrap().unwrap();
@@ -123,7 +126,7 @@ mod authentication_service_tests {
 
         // Test login with wrong password
         let login_result = auth_service.log_in("testuser", "wrongpassword").unwrap();
-        assert!(!login_result);
+        assert_eq!(login_result, LoginResult::InvalidPassword);
 
         // Verify no user is logged in
         let current_user = auth_service.get_current_user().unwrap();
@@ -136,7 +139,7 @@ mod authentication_service_tests {
 
         // Test login with non-existent username
         let login_result = auth_service.log_in("nonexistent", "password123").unwrap();
-        assert!(!login_result);
+        assert_eq!(login_result, LoginResult::UserNotFound);
 
         // Verify no user is logged in
         let current_user = auth_service.get_current_user().unwrap();
@@ -160,7 +163,8 @@ mod authentication_service_tests {
         auth_service
             .sign_up("testuser", "password123", UserRole::Staff)
             .unwrap();
-        auth_service.log_in("testuser", "password123").unwrap();
+        let login_result = auth_service.log_in("testuser", "password123").unwrap();
+        assert_eq!(login_result, LoginResult::Success);
 
         // Test current user retrieval
         let current_user = auth_service.get_current_user().unwrap().unwrap();
@@ -176,7 +180,8 @@ mod authentication_service_tests {
         auth_service
             .sign_up("testuser", "password123", UserRole::Customer)
             .unwrap();
-        auth_service.log_in("testuser", "password123").unwrap();
+        let login_result = auth_service.log_in("testuser", "password123").unwrap();
+        assert_eq!(login_result, LoginResult::Success);
 
         // Verify user is logged in
         let current_user_before = auth_service.get_current_user().unwrap();
