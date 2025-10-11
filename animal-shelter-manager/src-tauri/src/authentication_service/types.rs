@@ -37,6 +37,18 @@ impl FromSql for UserRole {
     }
 }
 
+/// Result of a login attempt
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum LoginResult {
+    /// Login was successful
+    Success,
+    /// User exists but password is incorrect
+    InvalidPassword,
+    /// Username does not exist in the system
+    UserNotFound,
+}
+
 /// Represents user authentication data in the system
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserAuthentication {
@@ -47,4 +59,3 @@ pub struct UserAuthentication {
     /// User role in the system
     pub role: UserRole,
 }
-
