@@ -5,17 +5,17 @@
  * used throughout the animal shelter management system.
  */
 
-// Animal status options for tracking adoption lifecycle
+/** Animal status options for tracking adoption lifecycle */
 export type AnimalStatus =
   | "available"
   | "requested"
   | "adopted"
   | "passed away";
 
-// Animal sex options for biological classification
+/** Animal sex options for biological classification */
 export type AnimalSex = "male" | "female";
 
-// Animal species supported by the shelter system
+/** Animal species supported by the shelter system */
 export type AnimalSpecies =
   | "dog"
   | "cat"
@@ -30,10 +30,10 @@ export type AnimalSpecies =
   | "goat"
   | "pig";
 
-// Neutered status options for spay/neuter tracking
+/** Neutered status options for spay/neuter tracking */
 export type NeuteredStatus = "yes" | "no";
 
-// Available animal status options with display labels
+/** Available animal status options with display labels */
 export const ANIMAL_STATUS_OPTIONS: Array<{
   value: AnimalStatus;
   label: string;
@@ -44,7 +44,7 @@ export const ANIMAL_STATUS_OPTIONS: Array<{
   { value: "passed away", label: "Passed Away" },
 ];
 
-// Available animal sex options with display labels
+/** Available animal sex options with display labels */
 export const ANIMAL_SEX_OPTIONS: Array<{
   value: AnimalSex;
   label: string;
@@ -53,7 +53,7 @@ export const ANIMAL_SEX_OPTIONS: Array<{
   { value: "female", label: "Female" },
 ];
 
-// Available animal species options with display labels
+/** Available animal species options with display labels */
 export const ANIMAL_SPECIES_OPTIONS: Array<{
   value: AnimalSpecies;
   label: string;
@@ -72,7 +72,7 @@ export const ANIMAL_SPECIES_OPTIONS: Array<{
   { value: "pig", label: "Pig" },
 ];
 
-// Available neutered status options with display labels
+/** Available neutered status options with display labels */
 export const NEUTERED_STATUS_OPTIONS: Array<{
   value: NeuteredStatus;
   label: string;
@@ -81,7 +81,7 @@ export const NEUTERED_STATUS_OPTIONS: Array<{
   { value: "no", label: "No" },
 ];
 
-// Date range filter options for admission and adoption date filtering
+/** Date range filter options for admission and adoption date filtering */
 export const DATE_RANGE_FILTER_OPTIONS: Array<{
   value: string;
   label: string;
@@ -93,7 +93,7 @@ export const DATE_RANGE_FILTER_OPTIONS: Array<{
   { value: "this_year", label: "This year" },
 ];
 
-// Comprehensive breed options organized by species
+/** Comprehensive breed options organized by species */
 export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
   dog: [
     "Labrador Retriever",

@@ -8,8 +8,13 @@ This file defines a reusable ClosePopupButton component.
   import "./style.scss";
   import { X } from "@lucide/svelte";
 
-  // Optional callback function to handle button click events
-  export let onclick: (() => void) | undefined = undefined;
+  // Props
+  interface Props {
+    /** Optional callback function to handle button click events */
+    onclick?: (() => void) | undefined;
+  }
+
+  const { onclick = undefined }: Props = $props();
 
   /**
    * Handles the click event for the close button.
@@ -24,7 +29,7 @@ This file defines a reusable ClosePopupButton component.
 
 <button
   class="close-popup-button"
-  on:click={handleClick}
+  onclick={handleClick}
   type="button"
   title="Close"
 >

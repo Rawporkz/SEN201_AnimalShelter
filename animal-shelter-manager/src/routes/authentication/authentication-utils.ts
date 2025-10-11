@@ -8,13 +8,13 @@
 import { invoke } from "@tauri-apps/api/core";
 import { info, error } from "@tauri-apps/plugin-log";
 
-// User role type matching the Rust backend enum
+/** User role type matching the Rust backend enum */
 export type UserRole = "staff" | "customer";
 
-// Login result enum matching Tauri backend
+/** Login result enum matching Tauri backend */
 export type LoginResult = "success" | "invalid-password" | "user-not-found";
 
-// Authentication result interface
+/** Authentication result interface */
 export interface AuthResult {
   success: boolean;
   message: string;
@@ -22,7 +22,7 @@ export interface AuthResult {
   invalidPassword?: boolean;
 }
 
-// User credentials interface
+/** User credentials interface */
 export interface UserCredentials {
   username: string;
   password: string;
@@ -36,7 +36,7 @@ export interface UserCredentials {
  * @returns boolean - True if username is valid format, false otherwise
  */
 export function validateUsername(username: string): boolean {
-  // Username must not be empty and have at least 3 characters
+  /** Username must not be empty and have at least 3 characters */
   const trimmedUsername: string = username.trim();
   return trimmedUsername.length >= 3;
 }
@@ -48,7 +48,7 @@ export function validateUsername(username: string): boolean {
  * @returns boolean - True if password meets requirements, false otherwise
  */
 export function validatePassword(password: string): boolean {
-  // Password must be at least 6 characters long
+  /** Password must be at least 6 characters long */
   const minLength: number = 6;
   return password.length >= minLength;
 }
@@ -199,7 +199,7 @@ export async function createUserAccount(
       };
     }
 
-    // Convert role to match backend enum format (keep lowercase)
+    /** Convert role to match backend enum format (keep lowercase) */
     const rustRole: string = credentials.role;
 
     // Create account via Tauri backend
@@ -216,7 +216,7 @@ export async function createUserAccount(
   } catch (e) {
     error(`Account creation error: ${e}`);
 
-    // Handle specific error cases
+    /** Handle specific error cases */
     const errorMessage: string = e as string;
     if (errorMessage.includes("already exists")) {
       return {
