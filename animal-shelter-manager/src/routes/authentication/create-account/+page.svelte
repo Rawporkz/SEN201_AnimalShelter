@@ -116,8 +116,8 @@ Displays a card for password confirmation during account creation.
       );
 
       if (result.success) {
-        // TODO: Navigate to main dashboard page
         info("Account created successfully!");
+        goto("/");
       } else {
         // Account creation failed - show general error
         setGeneralError(result.message);

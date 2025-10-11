@@ -141,8 +141,8 @@ This file defines the authentication page of the application.
 
       // Handle authentication result
       if (result.success) {
-        // TODO: Navigate to main dashboard page
         info("Authentication successful!");
+        goto("/");
       } else if (result.requiresAccountCreation) {
         // Username doesn't exist - navigate to create account page
         info("Username doesn't exist, navigating to create account...");
