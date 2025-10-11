@@ -1,0 +1,80 @@
+<!--
+  InputText.svelte
+
+  Reusable textarea component used across the app. Presents a labeled textarea
+  with a fixed width (prop) and configurable number of visible rows.
+-->
+
+<script lang="ts">
+    import "./style.scss";
+
+    // Props
+    /** The visible label shown above the textarea */
+    export let label: string;
+    /** Placeholder text shown when the field is empty */
+    export let placeholder: string = '';
+    /** Two-way bound value of the textarea */
+    export let value: string = '';
+    /** Width of the component (CSS value, e.g. '350px' or '100%') */
+    export let boxWidth: string = '350px';
+    /** Number of visible rows for the textarea (controls height) */
+    export let rows: number = 3;
+
+    // Internal references
+    let textareaEl: HTMLTextAreaElement;
+    // Last accepted value that fit within the visible rows; used to reject overflow input
+    let prevValue: string = value;
+
+    /**
+     * Handle input events. If the new content causes the textarea to overflow
+     * its visible area, revert to the previously accepted value to enforce
+     * the visual limit.
+     *
+     * @param e - Input event from the textarea
+     */
+    function handleInput(e: Event): void {
+        const el = e.target as HTMLTextAreaElement;
+        // If new content causes overflow, revert completely
+        if (el.scrollHeight > el.clientHeight) {
+            const cursor = el.selectionStart;
+            el.value = prevValue; // revert
+            // place cursor at end of allowed content
+            el.selectionStart = el.selectionEnd = Math.min(cursor - 1, el.value.length);
+        } else {
+            prevValue = el.value; // accept new content
+            value = el.value;
+        }
+    }
+
+    /**
+     * Prevent adding newlines when the number of lines already equals the
+     * configured visible rows (hard stop behavior).
+     *
+     * @param e - Keyboard event from the textarea
+     */
+    function handleKeyDown(e: KeyboardEvent): void {
+        if (e.key === 'Enter') {
+            const el = e.currentTarget as HTMLTextAreaElement;
+            const lineCount = el.value.split(/\n/).length;
+            // If already at max visible rows, block new line
+            if (lineCount >= rows) {
+                e.preventDefault();
+            }
+        }
+    }
+</script>
+
+<div class="input-field" style="width:{boxWidth};">
+    <label for="text-field" class="label">{label}</label>
+
+    <textarea
+        id="text-field"
+        class="text-field {value ? 'has-content' : ''}"
+        placeholder={placeholder}
+        rows={rows}
+        bind:this={textareaEl}
+        bind:value={value}
+        on:input={handleInput}
+        on:keydown={handleKeyDown}
+    ></textarea>
+</div>
