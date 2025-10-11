@@ -41,7 +41,7 @@ This file defines a reusable SideBar component.
 <div class="sidebar">
   <div class="user-profile">
     <div class="user-icon">
-      <User size="56" class="user-icon" />
+      <User size="58" class="user-icon" color="white" />
     </div>
     <div class="user-info">
       <h2>{username}</h2>

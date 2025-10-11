@@ -34,12 +34,13 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  stroke-width: 1;
+  
 }
 
 .user-icon svg {
   width: 56px;
   height: 56px;
-  fill: white;
 }
 
 .user-info h2 {
