@@ -19,8 +19,6 @@
   /** Number of visible rows for the textarea (controls height) */
   export let rows: number = 3;
 
-  // Internal references
-  let textareaEl: HTMLTextAreaElement;
   // Last accepted value that fit within the visible rows; used to reject overflow input
   let prevValue: string = value;
 
@@ -74,7 +72,6 @@
     class="text-field {value ? 'has-content' : ''}"
     {placeholder}
     {rows}
-    bind:this={textareaEl}
     bind:value
     on:input={handleInput}
     on:keydown={handleKeyDown}
