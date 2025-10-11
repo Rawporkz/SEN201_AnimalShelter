@@ -81,6 +81,18 @@ export const NEUTERED_STATUS_OPTIONS: Array<{
   { value: "no", label: "No" },
 ];
 
+// Date range filter options for admission and adoption date filtering
+export const DATE_RANGE_FILTER_OPTIONS: Array<{
+  value: string;
+  label: string;
+}> = [
+  { value: "all_time", label: "All time" },
+  { value: "today", label: "Today" },
+  { value: "this_week", label: "This week" },
+  { value: "this_month", label: "This month" },
+  { value: "this_year", label: "This year" },
+];
+
 // Comprehensive breed options organized by species
 export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
   dog: [

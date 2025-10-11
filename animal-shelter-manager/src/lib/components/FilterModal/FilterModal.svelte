@@ -7,14 +7,21 @@
 -->
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte";
-  import ClosePopupButton from "../ClosePopupButton/ClosePopupButton.svelte";
   import {
     FilterCriteria,
+    FilterType,
     getFilterDisplayName,
+    getFilterType,
     createEmptyFilterSelections,
     type FilterSelections,
   } from "./filter-utils";
+  import {
+    ANIMAL_STATUS_OPTIONS,
+    ANIMAL_SEX_OPTIONS,
+    DATE_RANGE_FILTER_OPTIONS,
+  } from "$lib/config/animal-options";
+  import ChooseMultiFilter from "./ChooseMultiFilter/ChooseMuliFilter.svelte";
+  import ChooseOneFilter from "./ChooseOneFilter/ChooseOneFilter.svelte";
   import "./style.scss";
 
   // Props
@@ -25,25 +32,25 @@
     criteriaList?: FilterCriteria[];
     /** Current filter selections (for pre-populating the modal) */
     currentSelections?: FilterSelections | null;
+    /** Callback function called when modal closes with filter selections */
+    onclose?: (selections: FilterSelections) => void;
   }
 
-  const { 
-    isVisible = false, 
-    criteriaList = [], 
-    currentSelections = null 
+  const {
+    isVisible = false,
+    criteriaList = [],
+    currentSelections = null,
+    onclose,
   }: Props = $props();
 
-  // Event dispatcher for communicating with parent components
-  const dispatch = createEventDispatcher<{
-    close: FilterSelections;
-  }>();
-
   // Currently selected criteria for showing in the content area
-  let selectedCriteria: FilterCriteria | null = $state(null);
-  
+  let selectedCriteria: FilterCriteria | null = $state(
+    criteriaList.length > 0 ? criteriaList[0] : null
+  );
+
   // Filter selections being built in the modal
   let workingSelections: FilterSelections = $state(
-    currentSelections || createEmptyFilterSelections(criteriaList)
+    currentSelections || createEmptyFilterSelections(criteriaList),
   );
 
   /**
@@ -59,7 +66,9 @@
    * Handles closing the modal and returning the current selections.
    */
   function handleClose(): void {
-    dispatch("close", workingSelections);
+    if (onclose) {
+      onclose(workingSelections);
+    }
     resetModal();
   }
 
@@ -82,68 +91,171 @@
     }
   }
 
+  // Update working selections when currentSelections prop changes
+  $effect(() => {
+    workingSelections =
+      currentSelections || createEmptyFilterSelections(criteriaList);
+  });
+
+  // Update selected criteria when criteriaList changes
+  $effect(() => {
+    if (criteriaList.length > 0 && selectedCriteria === null) {
+      selectedCriteria = criteriaList[0];
+    }
+  });
+
   /**
-   * Handles keyboard events for modal accessibility.
+   * Gets options for a specific filter criteria.
    *
-   * @param event - Keyboard event
+   * @param criteria - The criteria to get options for
+   * @returns Array of option objects with value and label
    */
-  function handleKeydown(event: KeyboardEvent): void {
-    if (event.key === "Escape") {
-      handleClose();
+  function getOptionsForCriteria(
+    criteria: FilterCriteria,
+  ): Array<{ value: string; label: string }> {
+    switch (criteria) {
+      case FilterCriteria.STATUS:
+        return ANIMAL_STATUS_OPTIONS;
+      case FilterCriteria.SEX:
+        return ANIMAL_SEX_OPTIONS;
+      case FilterCriteria.ADMISSION_DATE:
+      case FilterCriteria.ADOPTION_DATE:
+        return DATE_RANGE_FILTER_OPTIONS;
+      default:
+        return [];
     }
   }
 
-  // Update working selections when currentSelections prop changes
-  $effect(() => {
-    workingSelections = currentSelections || createEmptyFilterSelections(criteriaList);
-  });
+  /**
+   * Gets currently selected values for a criteria.
+   *
+   * @param criteria - The criteria to get selections for
+   * @returns Array of selected values
+   */
+  function getSelectedValuesForCriteria(criteria: FilterCriteria): string[] {
+    const value = workingSelections[criteria];
+    if (Array.isArray(value)) {
+      return value;
+    }
+    // If value is null, return all available options (everything selected)
+    if (value === null) {
+      return getOptionsForCriteria(criteria).map(option => option.value);
+    }
+    return [];
+  }
+
+  /**
+   * Gets currently selected value for single-selection criteria.
+   *
+   * @param criteria - The criteria to get selection for
+   * @returns Selected value or null if none selected
+   */
+  function getSelectedValueForCriteria(criteria: FilterCriteria): string | null {
+    const value = workingSelections[criteria];
+    if (typeof value === 'string') {
+      return value;
+    }
+    // If value is null, return the first option (default selection)
+    if (value === null) {
+      const options = getOptionsForCriteria(criteria);
+      return options.length > 0 ? options[0].value : null;
+    }
+    return null;
+  }
+
+  /**
+   * Handles selection changes from multi-select filter components.
+   *
+   * @param criteria - The criteria being updated
+   * @param selectedValues - The new selected values
+   */
+  function handleFilterSelectionChange(
+    criteria: FilterCriteria,
+    selectedValues: string[],
+  ): void {
+    workingSelections = {
+      ...workingSelections,
+      [criteria]: selectedValues,
+    };
+  }
+
+  /**
+   * Handles selection changes from single-select filter components.
+   *
+   * @param criteria - The criteria being updated
+   * @param selectedValue - The new selected value
+   */
+  function handleSingleFilterSelectionChange(
+    criteria: FilterCriteria,
+    selectedValue: string | null,
+  ): void {
+    workingSelections = {
+      ...workingSelections,
+      [criteria]: selectedValue,
+    };
+  }
 </script>
 
-<!-- Modal backdrop and container -->
 {#if isVisible}
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
-  <div 
+  <!-- svelte-ignore a11y_click_events_have_key_events -->
+  <div
     class="modal-backdrop"
     onclick={handleBackdropClick}
-    onkeydown={handleKeydown}
     role="dialog"
     aria-modal="true"
     aria-labelledby="filter-modal-title"
+    tabindex="-1"
   >
     <div class="modal-container">
-      <!-- Modal header with title and close button -->
       <div class="modal-header">
-        <h2 id="filter-modal-title" class="modal-title">Filters</h2>
-        <ClosePopupButton onclick={handleClose} />
+        <h2 class="modal-title">Filters</h2>
       </div>
 
-      <!-- Modal body with criteria menu and content area -->
-      <div class="modal-body">
-        <!-- Left side: Criteria menu -->
-        <div class="criteria-menu">
-          {#each criteriaList as criteria (criteria)}
-            <button
-              type="button"
-              class="criteria-item {selectedCriteria === criteria ? 'active' : ''}"
-              onclick={() => handleCriteriaClick(criteria)}
-            >
-              {getFilterDisplayName(criteria)}
-            </button>
-          {/each}
-        </div>
+      <div class="criteria-menu">
+        {#each criteriaList as criteria (criteria)}
+          <button
+            type="button"
+            class="criteria-item {selectedCriteria === criteria
+              ? 'active'
+              : ''}"
+            onclick={() => handleCriteriaClick(criteria)}
+          >
+            {getFilterDisplayName(criteria)}
+          </button>
+        {/each}
+      </div>
 
-        <!-- Right side: Filter content area -->
-        <div class="filter-content">
-          {#if selectedCriteria}
-            <div class="filter-content-placeholder">
-              <p>Filter options for {getFilterDisplayName(selectedCriteria)} will appear here</p>
-            </div>
+      <div class="filter-content">
+        {#if selectedCriteria}
+          {#if getFilterType(selectedCriteria) === FilterType.CHOOSE_MANY}
+            <ChooseMultiFilter
+              title={getFilterDisplayName(selectedCriteria)}
+              options={getOptionsForCriteria(selectedCriteria)}
+              selectedValues={getSelectedValuesForCriteria(selectedCriteria)}
+              onSelect={(values) =>
+                handleFilterSelectionChange(selectedCriteria!, values)}
+            />
+          {:else if getFilterType(selectedCriteria) === FilterType.CHOOSE_ONE}
+            <ChooseOneFilter
+              title={getFilterDisplayName(selectedCriteria)}
+              options={getOptionsForCriteria(selectedCriteria)}
+              selectedValue={getSelectedValueForCriteria(selectedCriteria)}
+              onSelect={(value) =>
+                handleSingleFilterSelectionChange(selectedCriteria!, value)}
+            />
           {:else}
             <div class="filter-content-placeholder">
-              <p>Select a filter criteria from the left menu</p>
+              <p>
+                Filter options for {getFilterDisplayName(selectedCriteria)} will
+                appear here
+              </p>
             </div>
           {/if}
-        </div>
+        {:else}
+          <div class="filter-content-placeholder">
+            <p>Select a filter criteria from the left menu</p>
+          </div>
+        {/if}
       </div>
     </div>
   </div>

@@ -1,8 +1,7 @@
 <!--
   InputText.svelte
 
-  Reusable textarea component used across the app. Presents a labeled textarea
-  with a fixed width (prop) and configurable number of visible rows.
+  Reusable textarea component with configurable number of visible rows and width.
 -->
 
 <script lang="ts">
@@ -81,4 +80,3 @@
     on:keydown={handleKeyDown}
   ></textarea>
 </div>
-

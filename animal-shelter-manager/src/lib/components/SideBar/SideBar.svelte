@@ -1,5 +1,5 @@
 <!-- 
-lib/components/SideBar.svelte
+SideBar.svelte
 
 This file defines a reusable SideBar component.
 -->

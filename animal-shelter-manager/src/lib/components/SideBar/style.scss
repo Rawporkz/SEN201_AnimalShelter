@@ -1,4 +1,5 @@
-// lib/components/SideBar/style.scss
+//
+// SideBar/style.scss
 //
 // Styles for SideBar component.
 //
@@ -35,11 +36,6 @@
   justify-content: center;
   flex-shrink: 0;
   stroke-width: 1;
-}
-
-.user-icon svg {
-  width: 56px;
-  height: 56px;
 }
 
 .user-info h2 {

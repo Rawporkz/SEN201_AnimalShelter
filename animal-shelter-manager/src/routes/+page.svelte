@@ -10,7 +10,10 @@ or the customer's home page based on the user's authentication status and role.
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import FilterModal from "$lib/components/FilterModal/FilterModal.svelte";
-  import { FilterCriteria, type FilterSelections } from "$lib/components/FilterModal/filter-utils";
+  import {
+    FilterCriteria,
+    type FilterSelections,
+  } from "$lib/components/FilterModal/filter-utils";
   import "./style.scss";
 
   // Current authenticated user object, null if not logged in
@@ -18,7 +21,7 @@ or the customer's home page based on the user's authentication status and role.
 
   // Filter modal state for testing
   let isFilterModalVisible: boolean = $state(false);
-  
+
   // Current filter selections
   let currentFilterSelections: FilterSelections | null = $state(null);
 
@@ -52,38 +55,29 @@ or the customer's home page based on the user's authentication status and role.
   /**
    * Handles closing the filter modal and receiving the selections.
    *
-   * @param event - Custom event containing the filter selections
+   * @param selections - The filter selections from the modal
    */
-  function handleFilterModalClose(event: CustomEvent<FilterSelections>): void {
-    currentFilterSelections = event.detail;
+  function handleFilterModalClose(selections: FilterSelections): void {
+    currentFilterSelections = selections;
     isFilterModalVisible = false;
-    console.log("Filter selections received:", currentFilterSelections);
   }
 </script>
 
 <div class="root-page">
-  <h1>Animal Shelter Manager</h1>
-  
   <div class="test-section">
-    <h2>Filter Modal Test</h2>
-    <button 
-      type="button" 
-      onclick={handleOpenFilterModal}
-    >
+    <button type="button" onclick={handleOpenFilterModal}>
       Open Filter Modal
     </button>
-    
+
     {#if currentFilterSelections}
       <div class="filter-results">
-        <h3>Current Filter Selections:</h3>
         <pre>{JSON.stringify(currentFilterSelections, null, 2)}</pre>
       </div>
     {/if}
   </div>
 </div>
 
-<!-- Filter Modal -->
-<FilterModal 
+<FilterModal
   isVisible={isFilterModalVisible}
   criteriaList={testCriteriaList}
   currentSelections={currentFilterSelections}
