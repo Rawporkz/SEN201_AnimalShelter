@@ -11,8 +11,7 @@ or the customer's home page based on the user's authentication status and role.
   import { onMount } from "svelte";
   import "./style.scss";
   import SaveFormButton from "$lib/components/SaveFormButton/SaveFormButton.svelte";
-
-
+  import { info } from "@tauri-apps/plugin-log";
 
   /** Current authenticated user object, null if not logged in */
   let currentUser = $state(null);
@@ -26,8 +25,7 @@ or the customer's home page based on the user's authentication status and role.
   //     // TODO: Handle authenticated user - show appropriate dashboard
   //   }
   // });
-
-
 </script>
 
-<SaveFormButton on:click={() => console.log("✅ raw button clicked")} />
+<SaveFormButton onclick={() => info("✅ raw button clicked")} />
+

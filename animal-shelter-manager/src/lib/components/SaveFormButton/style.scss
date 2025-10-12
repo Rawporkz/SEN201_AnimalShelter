@@ -1,56 +1,42 @@
-// SaveFormButton component styles
 //
-// This file contains component-scoped styles for the SaveFormButton.
+// SaveFormButton/style.scss
+//
+// Styles for SaveFormButton component.
+//
 
 @use "../../styles/colors.scss" as colors;
 @use "sass:color" as color;
 
-// Save button
 .save-button {
-    box-sizing: border-box;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 98px;
-    height: 31px;
-    background: colors.$green-vibrant; /* button color */
-    color: white;
-    border: none;
-    border-radius: 10px;
-    padding: 0 10px; /* compact horizontal padding */
-    font-size: 14px;
-    line-height: 1;
-    cursor: pointer;
-    box-shadow: none;
-    position: absolute;
-}
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 98px;
+  height: 31px;
+  background: colors.$green-vibrant;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0 10px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: none;
+  position: absolute;
 
-
-// Button press animation
-.save-button:active:not(:disabled) {
+  &:active:not(:disabled) {
     transform: translateY(1px);
-}
+  }
 
-// Button disabled
-.save-button:disabled {
+  &:disabled {
     background: colors.$grey-light;
     color: white;
     cursor: not-allowed;
-    pointer-events: none; /* prevent interaction */
+    pointer-events: none;
     filter: grayscale(60%) opacity(0.95);
     box-shadow: none;
     transform: none;
+  }
 }
-
-// Icon inside button
-.save-button__icon {
-    display: inline-flex;
-    width: 21px; /* icon sizing*/
-    height: 21px; /* icon sizing*/
-    align-items: center;
-    justify-content: center;
-    color: #ffffff; /* icon color */
-}
-
-
