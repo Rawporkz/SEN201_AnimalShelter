@@ -10,6 +10,8 @@ adoption information with tabbed navigation between animal and adopter views.
   import AdopterInfo from "./AdopterInfo/AdopterInfo.svelte";
   import AnimalInfo from "./AnimalInfo/AnimalInfo.svelte";
   import ClosePopupButton from "../ClosePopupButton/ClosePopupButton.svelte";
+  import { AnimalStatus } from "$lib/utils/animal-utils";
+  import { RequestStatus } from "$lib/utils/animal-utils";
 
   /** Type definition for tab selection in the adoption info popup */
   type Tab = "animal" | "adopter";
@@ -76,31 +78,42 @@ adoption information with tabbed navigation between animal and adopter views.
       <div class="tab-content">
         {#if activeTab === "adopter"}
           <AdopterInfo
-            name="John Doe"
-            occupation="Software Engineer"
-            annualIncome="100k-150k THB"
-            email="john.doe@example.com"
-            phoneNumber="081-234-5678"
-            streetAddress="123 Main St, Bangkok"
-            country="Thailand"
-            numOfHousehold={4}
-            numOfChildren={1}
+            adopter={{
+              id: "adopter-001",
+              name: "John Doe",
+              occupation: "Software Engineer",
+              annual_income: "150K - 200K THB",
+              email: "john.doe@example.com",
+              tel_number: "081-234-5678",
+              address: "123 Main St, Bangkok",
+              country: "Thailand",
+              num_people: 4,
+              num_children: 1,
+              status: RequestStatus.PENDING,
+              adoption_timestamp: 20250115,
+              request_timestamp: 20240115,
+              animal_id: "animal-001",
+            }}
           />
         {:else}
           <AnimalInfo
-            animalName="Buddy"
-            birthMonth="4/2023"
-            age="2 years old"
-            species="Dog"
-            breed="Beagle"
-            sex="Male"
-            neutered="Yes"
-            imageUrl="https://example.com/buddy.jpg"
-            status="Adopted"
-            admissionDate="1/10/2024"
-            adoptionDate="1/10/2025"
-            appearance="Big brown eyes, Black back and tail, White legs, Has a white dot on the back near its tail"
-            bioCharacteristics="A classic tri-color Beagle, this sweet boy is a perfect example of his breed: curious, friendly, and always ready for adventure. Great with kids, so he loves to follow his nose! He is excellent with children and other pets, thriving on companionship and daily walks."
+            animal={{
+              id: "animal-001",
+              name: "Buddy",
+              birth_month: 4,
+              birth_year: 2021,
+              specie: "Dog",
+              breed: "Beagle",
+              sex: "Male",
+              neutered: true,
+              image_path: "https://example.com/buddy.jpg",
+              status: AnimalStatus.ADOPTED,
+              admission_timestamp: 20240110,
+              adoption_timestamp: 20250110,
+              appearance:
+                "Big brown eyes, Black back and tail, White legs, Has a white dot on the back near its tail",
+              bio: "A classic tri-color Beagle, this sweet boy is a perfect example of his breed: curious, friendly, and always ready for adventure. Great with kids, so he loves to follow his nose! He is excellent with children and other pets, thriving on companionship and daily walks.",
+            }}
           />
         {/if}
       </div>
