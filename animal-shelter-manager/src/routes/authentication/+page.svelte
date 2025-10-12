@@ -13,7 +13,6 @@ This file defines the authentication page of the application.
     type UserRole,
   } from "./authentication-utils";
   import { info, warn, error } from "@tauri-apps/plugin-log";
-  import "./style.scss";
 
   /** Currently selected user role for authentication (staff or customer) */
   let selectedRole = $state("staff");
@@ -173,7 +172,7 @@ This file defines the authentication page of the application.
 <div class="container">
   <div class="auth-card">
     <div class="auth-header">
-      <User size="64" class="user-icon" />
+      <User size="64" />
       <h1>Sign Up / Log In</h1>
     </div>
 
@@ -251,3 +250,7 @@ This file defines the authentication page of the application.
     {/if}
   </div>
 </div>
+
+<style lang="scss">
+  @use "./style.scss";
+</style>
