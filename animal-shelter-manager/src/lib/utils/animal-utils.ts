@@ -107,6 +107,8 @@ export interface AdoptionRequest {
   adoption_timestamp: number;
   /** Current status of the request */
   status: RequestStatus;
+  /** Country of the requester */
+  country: string;
 }
 
 /** Simplified adoption request information for listing views */
