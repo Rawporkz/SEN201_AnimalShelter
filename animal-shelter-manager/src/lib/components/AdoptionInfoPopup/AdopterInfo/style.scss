@@ -3,32 +3,26 @@
 // Styles for AdopterInfo component.
 //
 
-@use "../../styles/colors.scss" as colors;
+@use "../../../styles/colors.scss" as colors;
 @use "sass:color";
 
-.adopter-info-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 80%;
-  height: 80%;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
 
 .adopter-info-modal {
   position: relative;
   background-color: white;
-  border-radius: 12px;
+  border-radius: 15px;
   padding: 40px 0px 0px 48px;
-  width: 68%;
+  width: 80%;
   height: 87%;
   max-height: 699px;
   overflow-y: auto;
   box-shadow: 4px 4px 4px 0px colors.$grey-text;
+
+  .close-button-wrapper {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+  }
 
   h1 {
     font-size: 36px;
@@ -75,8 +69,8 @@
   }
   
   .divider {
-  width: 100%;
-  height: 1px;
-  background-color: colors.$grey-border;
+    width: 100%;
+    height: 1px;
+    background-color: colors.$grey-border;
   }
 }
