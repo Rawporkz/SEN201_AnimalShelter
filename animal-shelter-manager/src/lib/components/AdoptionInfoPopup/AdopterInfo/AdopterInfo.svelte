@@ -19,21 +19,9 @@ This file defines a reusable AdopterInfo component.
   export let country: string = "Thailand";
   export let numOfHousehold: number = 4;
   export let numOfChildren: number = 1;
-
-  const closeModal = () => {
-    emit("close-adopter-info");
-  };
 </script>
 
-<div
-  class="adopter-info-modal"
-  role="dialog"
-  aria-modal="true"
-  tabindex="0"
-  on:keydown={(e) => {
-    if (e.key === "Escape") closeModal();
-  }}
->
+<div class="adopter-info-modal" role="dialog" aria-modal="true" tabindex="0">
   <div class="adopter-info-header">
     <h1>Adopter Information</h1>
   </div>

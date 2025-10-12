@@ -31,6 +31,11 @@ This file defines a reusable AnimalInfo component.
   export let bioCharacteristics: string =
     "A classic tri-color Beagle, this sweet boy is a perfect example of his breed: curious, friendly, and always ready for adventure. Great with kids, so he loves to follow his nose! He is excellent with children and other pets, thriving on companionship and daily walks.";
 
+  /**
+   * Returns the appropriate CSS class for the animal's status
+   * @param status - The status of the animal
+   * @returns The CSS class for the status
+   */
   const getStatusClass = (status: string) => {
     return status.toLowerCase().replace(" ", "-");
   };
