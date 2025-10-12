@@ -11,7 +11,7 @@ This file defines the authentication page of the application.
     authenticateUser,
     type UserCredentials,
     type UserRole,
-  } from "./authentication-utils";
+  } from "$lib/utils/authentication-utils";
   import { info, warn, error } from "@tauri-apps/plugin-log";
 
   /** Currently selected user role for authentication (staff or customer) */

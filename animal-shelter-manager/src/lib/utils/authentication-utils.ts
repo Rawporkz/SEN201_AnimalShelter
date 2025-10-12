@@ -8,11 +8,15 @@
 import { invoke } from "@tauri-apps/api/core";
 import { info, error } from "@tauri-apps/plugin-log";
 
+// ==================== TYPES ====================
+
 /** User role type matching the Rust backend enum */
 export type UserRole = "staff" | "customer";
 
 /** Login result enum matching Tauri backend */
 export type LoginResult = "success" | "invalid-password" | "user-not-found";
+
+// ==================== INTERFACES ====================
 
 /** Authentication result interface */
 export interface AuthResult {
@@ -28,6 +32,8 @@ export interface UserCredentials {
   password: string;
   role: UserRole;
 }
+
+// ==================== VALIDATION FUNCTIONS ====================
 
 /**
  * Validates if a username is in valid format.
@@ -92,6 +98,8 @@ export function validateCredentials(credentials: UserCredentials): {
     errorMessage: "",
   };
 }
+
+// ==================== AUTHENTICATION API FUNCTIONS ====================
 
 /**
  * Attempts to log in a user with their credentials.
@@ -231,6 +239,8 @@ export async function createUserAccount(
     };
   }
 }
+
+// ==================== USER SESSION FUNCTIONS ====================
 
 /**
  * Gets the current logged-in user information.

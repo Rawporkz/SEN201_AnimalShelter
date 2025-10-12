@@ -11,7 +11,7 @@ Displays a card for password confirmation during account creation.
     createUserAccount,
     type UserCredentials,
     type UserRole,
-  } from "../authentication-utils";
+  } from "$lib/utils/authentication-utils";
   import { info, error } from "@tauri-apps/plugin-log";
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
