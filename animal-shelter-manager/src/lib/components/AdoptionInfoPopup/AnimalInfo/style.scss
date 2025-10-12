@@ -3,33 +3,28 @@
 // Styles for AnimalInfo component.
 //
 
-@use "../../styles/colors.scss" as colors;
-
-.animal-profile-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 80%;
-  height: 80%;
-  background-color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
+@use "../../../styles/colors.scss" as colors;
 
 .animal-info-modal {
   position: relative;
   background-color: white;
   border-radius: 12px;
   padding: 0px 48px 40px 0px;
-  width: 68%;
+  width: 80%;
   height: 87%;
   max-height: 699px;
+  max-width: 1000px;
   overflow-y: auto;
   box-shadow: 4px 4px 4px 0px colors.$grey-text;
   display: flex;
+  border-radius: 15px;
   gap: 48px;
+  
+  .close-button-wrapper {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+  }
 }
 
 .animal-profile-left {
@@ -83,17 +78,17 @@
     width: fit-content;
 
     &.adopted {
-      background-color: #0066cc;
+      background-color: colors.$blue-vibrant;
       color: white;
     }
 
     &.available {
-      background-color: #00aa00;
+      background-color: colors.$green-vibrant;
       color: white;
     }
 
     &.pending {
-      background-color: #ff9900;
+      background-color: colors.$yellow-vibrant;
       color: white;
     }
   }
