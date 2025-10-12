@@ -57,6 +57,7 @@ mod database_service_tests {
             neutered: true,
             admission_timestamp: Utc::now().timestamp(),
             status: AnimalStatus::Available,
+            image_path: Some("/test/images/buddy.jpg".to_string()),
         }
     }
 
@@ -105,12 +106,17 @@ mod database_service_tests {
         assert_eq!(animals.len(), 1);
         assert_eq!(animals[0].id, "a1");
         assert_eq!(animals[0].name, "Buddy");
+        assert_eq!(
+            animals[0].image_path,
+            Some("/test/images/buddy.jpg".to_string())
+        );
 
         // Test query by ID
         let found = db.query_animal_by_id("a1").unwrap().unwrap();
         assert_eq!(found.id, "a1");
         assert_eq!(found.breed, "Golden Retriever");
         assert!(found.neutered);
+        assert_eq!(found.image_path, Some("/test/images/buddy.jpg".to_string()));
 
         // Test query non-existent
         let not_found = db.query_animal_by_id("nonexistent").unwrap();
@@ -119,12 +125,17 @@ mod database_service_tests {
         // Test update
         animal.name = "Updated Buddy".to_string();
         animal.status = AnimalStatus::Adopted;
+        animal.image_path = Some("/test/images/updated_buddy.jpg".to_string());
         let updated = db.update_animal(&animal).unwrap();
         assert!(updated);
 
         let found = db.query_animal_by_id("a1").unwrap().unwrap();
         assert_eq!(found.name, "Updated Buddy");
         assert_eq!(found.status, AnimalStatus::Adopted);
+        assert_eq!(
+            found.image_path,
+            Some("/test/images/updated_buddy.jpg".to_string())
+        );
 
         // Test update non-existent
         let fake_animal = sample_animal("fake");
@@ -163,6 +174,7 @@ mod database_service_tests {
         let mut animal2 = sample_animal("a2");
         animal2.name = "Max".to_string();
         animal2.specie = "Cat".to_string();
+        animal2.image_path = Some("/test/images/max.jpg".to_string());
 
         // Insert multiple animals
         db.insert_animal(&animal1).unwrap();

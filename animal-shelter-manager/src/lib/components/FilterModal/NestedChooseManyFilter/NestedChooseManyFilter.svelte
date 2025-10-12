@@ -8,8 +8,6 @@
 -->
 
 <script lang="ts">
-  import "./style.scss";
-
   // Props
   interface Props {
     /** The title to display for this filter */
@@ -203,3 +201,7 @@
     </div>
   </div>
 </div>
+
+<style lang="scss">
+  @use "./style.scss";
+</style>

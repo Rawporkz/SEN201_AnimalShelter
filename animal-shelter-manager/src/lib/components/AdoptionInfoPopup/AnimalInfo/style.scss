@@ -1,0 +1,180 @@
+// lib/components/AnimalInfo/style.scss
+//
+// Styles for AnimalInfo component.
+//
+
+@use "../../../styles/colors.scss" as colors;
+
+.animal-info-modal {
+  position: relative;
+  background-color: white;
+  border-radius: 12px;
+  padding: 0px 48px 40px 0px;
+  height: 699px;
+  width: 1000px;
+  overflow-y: auto;
+  box-shadow: 4px 4px 4px 0px colors.$grey-text;
+  display: flex;
+  border-radius: 15px;
+  gap: 48px;
+}
+
+.animal-profile-left {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 180px;
+}
+
+.animal-image {
+  width: 270px;
+  height: 270px;
+  border-radius: 12px;
+  overflow: hidden;
+  background-color: #f0f0f0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .placeholder-image {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.status-section {
+  padding: 0px 0px 0px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  .status-label {
+    font-size: 14px;
+    color: colors.$grey-text;
+    font-weight: 400;
+  }
+
+  .status-badge {
+    padding: 6px 16px;
+    border-radius: 16px;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: default;
+    width: fit-content;
+
+    &.adopted {
+      background-color: colors.$blue-vibrant;
+      color: white;
+    }
+
+    &.available {
+      background-color: colors.$green-vibrant;
+      color: white;
+    }
+
+    &.pending {
+      background-color: colors.$yellow-vibrant;
+      color: white;
+    }
+  }
+}
+
+.dates-section {
+  padding: 0px 0px 40px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  .date-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .date-label {
+      font-size: 14px;
+      color: colors.$grey-text;
+      font-weight: 400;
+    }
+
+    .date-value {
+      font-size: 18px;
+      color: black;
+      font-weight: 400;
+    }
+  }
+}
+
+.animal-profile-right {
+  padding: 48px 54px 50px 42px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 72px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  .info-label {
+    font-size: 14px;
+    color: colors.$grey-text;
+    font-weight: 400;
+  }
+
+  .info-value {
+    font-size: 18px;
+    color: black;
+    font-weight: 400;
+  }
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: colors.$grey-border;
+}
+
+.description-section {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.description-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  .description-label {
+    font-size: 14px;
+    color: colors.$grey-text;
+    font-weight: 400;
+  }
+
+  .description-value {
+    font-size: 18px;
+    color: black;
+    font-weight: 400;
+  }
+}

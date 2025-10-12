@@ -70,7 +70,8 @@ impl DatabaseService {
                 birth_year INTEGER NOT NULL,
                 neutered BOOLEAN NOT NULL,
                 admission_timestamp INTEGER NOT NULL,
-                status TEXT NOT NULL
+                status TEXT NOT NULL,
+                image_path TEXT
             )
             ",
                 [],
@@ -115,7 +116,9 @@ impl DatabaseService {
     pub fn query_all_animals(&self) -> Result<Vec<AnimalSummary>> {
         let mut statement = self
             .connection
-            .prepare("SELECT id, name, specie, breed, sex, admission_timestamp FROM animals")
+            .prepare(
+                "SELECT id, name, specie, breed, sex, admission_timestamp, image_path FROM animals",
+            )
             .context("Failed to prepare query for all animals")?;
 
         let animal_iter = statement
@@ -127,6 +130,7 @@ impl DatabaseService {
                     breed: row.get(3)?,
                     sex: row.get(4)?,
                     admission_timestamp: row.get(5)?,
+                    image_path: row.get(6)?,
                 })
             })
             .context("Failed to execute query for all animals")?;
@@ -149,7 +153,7 @@ impl DatabaseService {
     /// * `Result<Option<Animal>>` - Complete animal information or None if not found
     pub fn query_animal_by_id(&self, animal_id: &str) -> Result<Option<Animal>> {
         let mut statement = self.connection.prepare(
-            "SELECT id, name, specie, breed, sex, birth_month, birth_year, neutered, admission_timestamp, status FROM animals WHERE id = ?1"
+            "SELECT id, name, specie, breed, sex, birth_month, birth_year, neutered, admission_timestamp, status, image_path FROM animals WHERE id = ?1"
         ).context("Failed to prepare query for animal by ID")?;
 
         let mut rows = statement
@@ -165,6 +169,7 @@ impl DatabaseService {
                     neutered: row.get(7)?,
                     admission_timestamp: row.get(8)?,
                     status: row.get(9)?,
+                    image_path: row.get(10)?,
                 })
             })
             .context("Failed to execute query for animal by ID")?;
@@ -191,7 +196,7 @@ impl DatabaseService {
     /// * `Result<()>` - Success or error
     pub fn insert_animal(&self, animal: &Animal) -> Result<()> {
         let rows_affected = self.connection.execute(
-            "INSERT INTO animals (id, name, specie, breed, sex, birth_month, birth_year, neutered, admission_timestamp, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
+            "INSERT INTO animals (id, name, specie, breed, sex, birth_month, birth_year, neutered, admission_timestamp, status, image_path) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
             params![
                 animal.id,
                 animal.name,
@@ -202,7 +207,8 @@ impl DatabaseService {
                 animal.birth_year,
                 animal.neutered,
                 animal.admission_timestamp,
-                animal.status
+                animal.status,
+                animal.image_path
             ]
         ).context("Failed to insert animal into database")?;
 
@@ -226,7 +232,7 @@ impl DatabaseService {
     /// * `Result<bool>` - True if animal was found and updated, false if not found
     pub fn update_animal(&self, animal: &Animal) -> Result<bool> {
         let rows_affected = self.connection.execute(
-            "UPDATE animals SET name = ?2, specie = ?3, breed = ?4, sex = ?5, birth_month = ?6, birth_year = ?7, neutered = ?8, admission_timestamp = ?9, status = ?10 WHERE id = ?1",
+            "UPDATE animals SET name = ?2, specie = ?3, breed = ?4, sex = ?5, birth_month = ?6, birth_year = ?7, neutered = ?8, admission_timestamp = ?9, status = ?10, image_path = ?11 WHERE id = ?1",
             params![
                 animal.id,
                 animal.name,
@@ -237,7 +243,8 @@ impl DatabaseService {
                 animal.birth_year,
                 animal.neutered,
                 animal.admission_timestamp,
-                animal.status
+                animal.status,
+                animal.image_path
             ]
         ).context("Failed to update animal in database")?;
 

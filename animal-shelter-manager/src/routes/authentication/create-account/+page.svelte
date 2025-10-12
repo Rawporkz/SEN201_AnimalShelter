@@ -13,18 +13,21 @@ Displays a card for password confirmation during account creation.
     type UserRole,
   } from "../authentication-utils";
   import { info, error } from "@tauri-apps/plugin-log";
-  import "./style.scss";
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
 
   /** URL search parameters from the current page */
   const params = page.url.searchParams;
+
   /** Username from URL parameters */
   const username = params.get("username");
+
   /** Password from URL parameters */
   const password = params.get("password");
+
   /** Role from URL parameters */
   const role = params.get("role");
+
   /** User credentials object constructed from URL parameters */
   const userCredentials: UserCredentials = {
     username: username || "",
@@ -138,7 +141,7 @@ Displays a card for password confirmation during account creation.
 <div class="container">
   <div class="create-account-card">
     <div class="create-account-header">
-      <User size="64" class="user-icon" />
+      <User size="64" />
       <h1>Creating an Account</h1>
     </div>
 
@@ -184,3 +187,7 @@ Displays a card for password confirmation during account creation.
     </div>
   </div>
 </div>
+
+<style lang="scss">
+  @use "./style.scss";
+</style>

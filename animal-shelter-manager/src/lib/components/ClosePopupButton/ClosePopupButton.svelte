@@ -5,7 +5,6 @@ This file defines a reusable ClosePopupButton component.
 -->
 
 <script lang="ts">
-  import "./style.scss";
   import { X } from "@lucide/svelte";
 
   // Props
@@ -33,5 +32,9 @@ This file defines a reusable ClosePopupButton component.
   type="button"
   title="Close"
 >
-  <X class="close-icon"></X>
+  <X size={24} />
 </button>
+
+<style lang="scss">
+  @use "./style.scss";
+</style>

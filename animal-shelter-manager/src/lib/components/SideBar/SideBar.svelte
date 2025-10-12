@@ -5,7 +5,6 @@ This file defines a reusable SideBar component.
 -->
 
 <script lang="ts">
-  import "./style.scss";
   import { User } from "@lucide/svelte";
 
   // Props
@@ -80,3 +79,7 @@ This file defines a reusable SideBar component.
     Sign Out
   </button>
 </div>
+
+<style lang="scss">
+  @use "./style.scss";
+</style>

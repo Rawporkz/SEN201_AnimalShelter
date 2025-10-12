@@ -5,8 +5,6 @@
 -->
 
 <script lang="ts">
-  import "./style.scss";
-
   // Props
   interface Props {
     /** The visible label shown above the textarea */
@@ -87,3 +85,7 @@
     onkeydown={handleKeyDown}
   ></textarea>
 </div>
+
+<style lang="scss">
+  @use "./style.scss";
+</style>
