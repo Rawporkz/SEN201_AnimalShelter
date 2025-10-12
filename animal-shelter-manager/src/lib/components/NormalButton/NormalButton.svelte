@@ -31,6 +31,9 @@ This file defines a reusable NormalButton component with optional icon support.
     // Button width
     export let width: string = "150px";
 
+    // Disabled state
+    export let disabled: boolean = false;
+
     // Click event handler
     export let onClick: () => void = () => {};
 
@@ -60,6 +63,7 @@ This file defines a reusable NormalButton component with optional icon support.
         text-align: {textAlign};
         justify-content: {getJustifyContent(textAlign)};
     "
+    disabled={disabled}
     on:click={onClick}
 >
     {#if showIcon && icon && iconPosition === "left"}

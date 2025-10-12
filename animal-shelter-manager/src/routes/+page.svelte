@@ -23,6 +23,11 @@ or the customer's home page based on the user's authentication status and role.
     console.info("Reject clicked");
   }
 
+  // Navigate to the modal test route
+  function openModalTest(): void {
+    goto("/modal-test");
+  }
+
   onMount(() => {
     if (TEST_BUTTON) {
       // Skip redirect while testing the button on this page
@@ -47,6 +52,15 @@ or the customer's home page based on the user's authentication status and role.
       text="Reject"
       width="106px"
       onClick={handleRejectClick}
+    />
+  </div>
+  <div style="padding: 16px; display: inline-block;">
+    <NormalButton
+      color="#004abb"
+      textColor="#ffffff"
+      text="Open Modal Test"
+      width="180px"
+      onClick={openModalTest}
     />
   </div>
 {/if}

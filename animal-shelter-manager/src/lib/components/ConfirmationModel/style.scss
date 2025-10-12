@@ -1,0 +1,101 @@
+//
+// lib/components/ConfirmationModel/style.scss
+//
+// Styles for the reusable confirmation modal component.
+//
+
+@use "../../styles/colors.scss" as colors;
+@use "sass:color";
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: grid;
+    place-items: center;
+    z-index: 50;
+}
+
+.modal {
+    width: 520px;
+    max-width: 92vw;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
+    padding: 64px 40px 60px 40px; // much more vertical padding for a taller frame
+}
+.modal__content {
+    width: var(--content-width, 360px);
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.modal__header {
+    margin-bottom: 20px;
+}
+
+.modal__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a; // slate-900
+    text-align: center;
+}
+
+.modal__body {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.modal__message {
+    margin: 0 0 20px 0;
+    color: colors.$grey-text;
+    text-align: center;
+}
+
+.modal__extra {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.modal__extra:empty {
+    display: none;
+}
+
+.modal__actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 32px;
+}
+
+// Helper block for warning/information content injected via the slot.
+// Marked global so that parent-provided slotted nodes can use this class.
+:global(.inline-warning) {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: color.scale(colors.$yellow-vibrant, $lightness: 85%);
+    border: 1px solid color.scale(colors.$yellow-vibrant, $lightness: -5%);
+    border-radius: 10px;
+    padding: 10px 12px;
+    color: #3b2f00;
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px color.scale(colors.$yellow-vibrant, $alpha: -60%);
+    }
+}
+
+:global(.inline-warning .icon) {
+        color: colors.$yellow-vibrant;
+        font-size: 18px;
+        line-height: 1;
+}
+
+:global(.inline-warning .content) {
+        font-size: 14px;
+}

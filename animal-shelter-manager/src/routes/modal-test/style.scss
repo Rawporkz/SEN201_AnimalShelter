@@ -1,0 +1,81 @@
+// routes/modal-test/style.scss
+
+@use "$lib/styles/colors.scss" as colors;
+
+.demo {
+  padding: 40px;
+  text-align: center;
+}
+
+.demo h1 {
+  margin-bottom: 30px;
+  color: #1f2937;
+}
+
+.demo-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+// Radio choices for delete modal
+.choices {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: colors.$grey-text;
+  width: 100%;
+  max-width: 420px;
+}
+
+.choice input[type="radio"] {
+  accent-color: colors.$blue-vibrant;
+  width: 18px;
+  height: 18px;
+}
+
+.other-text {
+  margin-top: 10px;
+  width: 100%;
+  border: 1px solid colors.$grey-border;
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+}
+.other-text:focus {
+  border-color: colors.$blue-vibrant;
+  box-shadow: 0 0 0 2px rgba(0, 74, 187, 0.15);
+}
+
+// Warning box for approve modal
+.warning-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  margin: 16px 0;
+  background-color: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  color: #92400e;
+  font-size: 14px;
+}
+
+.warning-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.warning-text {
+  line-height: 1.4;
+}
