@@ -1,0 +1,95 @@
+// lib/components/AdoptionInfoPopup/style.scss
+//
+// Styles for AdoptionInfoPopup component.
+//
+
+@use "../../styles/colors.scss" as colors;
+@use "sass:color";
+
+.animal-profile-overlay {
+  position: fixed;
+  top: 45%;
+  left: 0;
+  right: 80%;
+  bottom: 0;
+  background-color: pink;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.popup-content {
+  background: white;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  position: relative;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.tab-container {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  padding: 5px 0 5px 0;
+  width: 65px;
+  height: 150px;
+  position: fixed;
+  top: 325px;
+  left: 720px;
+  border-radius: 16px;
+
+}
+
+.tab-button {  
+  display: flex;
+  width: 65px;
+  height: 75px;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  stroke-width: 1px;
+  color: black;
+  transition: color 0.2s, background-color 0.2s;
+  border-radius: 12px;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    color: #333;
+  }
+
+  &.active {
+    color: white;
+    background-color: colors.$blue-main;
+    width: 65px;
+    height: 75px;
+    border-radius: 12px;
+  }
+}
+
+.tab-content {
+  padding: 32px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
