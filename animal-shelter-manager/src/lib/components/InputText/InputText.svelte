@@ -1,28 +1,35 @@
 <!--
   InputText.svelte
 
-  Reusable textarea component used across the app. Presents a labeled textarea
-  with a fixed width (prop) and configurable number of visible rows.
+  Reusable textarea component with configurable number of visible rows and width.
 -->
 
 <script lang="ts">
   import "./style.scss";
 
   // Props
-  /** The visible label shown above the textarea */
-  export let label: string;
-  /** Placeholder text shown when the field is empty */
-  export let placeholder: string = "";
-  /** Two-way bound value of the textarea */
-  export let value: string = "";
-  /** Width of the component (CSS value, e.g. '350px' or '100%') */
-  export let boxWidth: string = "350px";
-  /** Number of visible rows for the textarea (controls height) */
-  export let rows: number = 3;
+  interface Props {
+    /** The visible label shown above the textarea */
+    label: string;
+    /** Placeholder text shown when the field is empty */
+    placeholder?: string;
+    /** Two-way bound value of the textarea */
+    value?: string;
+    /** Width of the component (CSS value, e.g. '350px' or '100%') */
+    boxWidth?: string;
+    /** Number of visible rows for the textarea (controls height) */
+    rows?: number;
+  }
 
-  // Internal references
-  let textareaEl: HTMLTextAreaElement;
-  // Last accepted value that fit within the visible rows; used to reject overflow input
+  let {
+    label,
+    placeholder = "",
+    value = $bindable(""),
+    boxWidth = "350px",
+    rows = 3,
+  }: Props = $props();
+
+  /** Last accepted value that fit within the visible rows; used to reject overflow input */
   let prevValue: string = value;
 
   /**
@@ -75,10 +82,8 @@
     class="text-field {value ? 'has-content' : ''}"
     {placeholder}
     {rows}
-    bind:this={textareaEl}
     bind:value
-    on:input={handleInput}
-    on:keydown={handleKeyDown}
+    oninput={handleInput}
+    onkeydown={handleKeyDown}
   ></textarea>
 </div>
-

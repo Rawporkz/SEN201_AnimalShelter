@@ -1,0 +1,26 @@
+cargo check
+    Checking animal-shelter-manager v0.1.0 (/home/jira_pit/Documents/SEN201_AnimalShelter/animal-shelter-manager/src-tauri)
+error[E0502]: cannot borrow `state_guard` as mutable because it is also borrowed as immutable
+   --> src/lib.rs:459:24
+    |
+458 |     let db_service = state_guard.database_service.as_ref().unwrap();
+    |                      ----------- immutable borrow occurs here
+459 |     let auth_service = state_guard.authentication_service.as_mut().unwrap();
+    |                        ^^^^^^^^^^^ mutable borrow occurs here
+...
+462 |     let result = auth_service.sign_up(db_service, &username, &password, role);
+    |                                       ---------- immutable borrow later used here
+
+error[E0502]: cannot borrow `state_guard` as mutable because it is also borrowed as immutable
+   --> src/lib.rs:497:24
+    |
+496 |     let db_service = state_guard.database_service.as_ref().unwrap();
+    |                      ----------- immutable borrow occurs here
+497 |     let auth_service = state_guard.authentication_service.as_mut().unwrap();
+    |                        ^^^^^^^^^^^ mutable borrow occurs here
+...
+500 |     let result = auth_service.log_in(db_service, &username, &password);
+    |                                      ---------- immutable borrow later used here
+
+For more information about this error, try `rustc --explain E0502`.
+error: could not compile `animal-shelter-manager` (lib) due to 2 previous errors

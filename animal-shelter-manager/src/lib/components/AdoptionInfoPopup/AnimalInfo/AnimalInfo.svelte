@@ -5,8 +5,6 @@ This file defines a reusable AnimalInfo component.
 -->
 <script lang="ts">
   import "./style.scss";
-  import { emit } from "@tauri-apps/api/event";
-  import ClosePopupButton from "../../ClosePopupButton/ClosePopupButton.svelte";
 
   // Animal Information
   export let animalName: string = "Animal Name 1";

@@ -5,8 +5,6 @@ This file defines a reusable AdopterInfo component.
 -->
 <script lang="ts">
   import "./style.scss";
-  import { emit } from "@tauri-apps/api/event";
-  import ClosePopupButton from "../../ClosePopupButton/ClosePopupButton.svelte";
 
   // Fields
   export let name: string = "Adopter Name";

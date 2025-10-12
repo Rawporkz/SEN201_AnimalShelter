@@ -1,5 +1,5 @@
 //
-// lib/components/ClosePopupButton/style.scss
+// ClosePopupButton/style.scss
 //
 // Styles for ClosePopupButton component.
 //
@@ -31,10 +31,11 @@
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px color.adjust(colors.$red-vibrant, $alpha: -0.8);
   }
+}
 
-  svg {
-    flex-shrink: 0;
-  }
+.close-icon {
+  width: 24px;
+  height: 24px;
+  stroke-width: 2;
 }
