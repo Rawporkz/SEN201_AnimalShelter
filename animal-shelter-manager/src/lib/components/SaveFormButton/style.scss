@@ -1,0 +1,42 @@
+//
+// SaveFormButton/style.scss
+//
+// Styles for SaveFormButton component.
+//
+
+@use "../../styles/colors.scss" as colors;
+@use "sass:color" as color;
+
+.save-button {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 98px;
+  height: 31px;
+  background: colors.$green-vibrant;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0 10px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: none;
+  position: absolute;
+
+  &:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    background: colors.$grey-light;
+    color: white;
+    cursor: not-allowed;
+    pointer-events: none;
+    filter: grayscale(60%) opacity(0.95);
+    box-shadow: none;
+    transform: none;
+  }
+}
