@@ -22,9 +22,70 @@ This file defines a reusable AdoptionInfoPopup component.
   function closePopup() {
     isOpen = false;
   }
+
+  // Handle close from AdopterInfo
+  function handleCloseAdopterInfo() {
+    isOpen = false;
+  }
 </script>
 
 {#if isOpen}
+  <div
+    class="animal-profile-overlay"
+    role="button"
+    tabindex="0"
+    aria-label="Close popup"
+    on:click={closePopup}
+    on:keydown={(e) => {
+      if (e.key === "Enter" || e.key === " ") closePopup();
+    }}
+  >
+    <div
+      class="popup-content"
+      role="dialog"
+      aria-modal="true"
+      on:click|stopPropagation
+      tabindex="0"
+      aria-label="Adoption Info Popup"
+      on:keydown={(e) => {
+        if (e.key === "Escape") closePopup();
+      }}
+    >
+      <div class="tab-content">
+        {#if activeTab === "adopter"}
+          <AdopterInfo
+            on:close-adopter-info={handleCloseAdopterInfo}
+            name="John Doe"
+            occupation="Software Engineer"
+            annualIncome="100k-150k THB"
+            email="john.doe@example.com"
+            phoneNumber="081-234-5678"
+            streetAddress="123 Main St, Bangkok"
+            country="Thailand"
+            numOfHousehold={4}
+            numOfChildren={1}
+          />
+        {:else}
+          <AnimalInfo
+            animalName="Buddy"
+            birthMonth="4/2023"
+            age="2 years old"
+            species="Dog"
+            breed="Beagle"
+            sex="Male"
+            neutered="Yes"
+            imageUrl="https://example.com/buddy.jpg"
+            status="Adopted"
+            admissionDate="1/10/2024"
+            adoptionDate="1/10/2025"
+            appearance="Big brown eyes, Black back and tail, White legs, Has a white dot on the back near its tail"
+            bioCharacteristics="A classic tri-color Beagle, this sweet boy is a perfect example of his breed: curious, friendly, and always ready for adventure. Great with kids, so he loves to follow his nose! He is excellent with children and other pets, thriving on companionship and daily walks."
+          />
+        {/if}
+      </div>
+    </div>
+  </div>
+
   <div class="tab-container">
     <button
       class="tab-button"
