@@ -1,5 +1,5 @@
 <!-- 
-lib/components/AnimalInfo.svelte
+lib/components/AdoptionInfoPopup/AnimalInfo.svelte
 
 This file defines a reusable AnimalInfo component.
 -->

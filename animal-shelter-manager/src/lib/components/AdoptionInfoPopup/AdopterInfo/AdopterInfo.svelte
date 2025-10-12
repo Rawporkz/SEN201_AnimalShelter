@@ -1,5 +1,5 @@
 <!-- 
-lib/components/AdopterInfo.svelte
+lib/components/AdoptionInfoPopup/AdopterInfo.svelte
 
 This file defines a reusable AdopterInfo component.
 -->
