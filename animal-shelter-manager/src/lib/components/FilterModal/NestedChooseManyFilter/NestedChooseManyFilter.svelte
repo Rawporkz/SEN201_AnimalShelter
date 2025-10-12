@@ -24,7 +24,7 @@
 
   const { title, nestedOptions, selectedValues, onSelect }: Props = $props();
 
-  // Currently selected category for showing items on the right
+  /** Currently selected category for showing items on the right */
   let selectedCategory: string | null = $state(
     Object.keys(nestedOptions).length > 0
       ? Object.keys(nestedOptions)[0]

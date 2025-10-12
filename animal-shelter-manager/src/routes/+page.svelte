@@ -11,10 +11,9 @@ or the customer's home page based on the user's authentication status and role.
   import { onMount } from "svelte";
   import "./style.scss";
 
-  // Current authenticated user object, null if not logged in
+  /** Current authenticated user object, null if not logged in */
   let currentUser = $state(null);
 
-  // Commented out for testing FilterModal
   onMount(() => {
     // Check if user is authenticated
     if (currentUser === null) {

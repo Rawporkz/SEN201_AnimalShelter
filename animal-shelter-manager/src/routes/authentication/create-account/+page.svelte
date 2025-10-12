@@ -17,27 +17,31 @@ Displays a card for password confirmation during account creation.
   import { page } from "$app/state";
   import { goto } from "$app/navigation";
 
-  // Get credentials from search parameters
+  /** URL search parameters from the current page */
   const params = page.url.searchParams;
+  /** Username from URL parameters */
   const username = params.get("username");
+  /** Password from URL parameters */
   const password = params.get("password");
+  /** Role from URL parameters */
   const role = params.get("role");
+  /** User credentials object constructed from URL parameters */
   const userCredentials: UserCredentials = {
     username: username || "",
     password: password || "",
     role: (role as UserRole) || "staff",
   };
 
-  // Password confirmation entered by the user
+  /** Password confirmation entered by the user */
   let passwordConfirmation = $state("");
 
-  // Error message to display when account creation fails
+  /** Error message to display when account creation fails */
   let errorMessage = $state("");
 
-  // Flag to indicate if password confirmation field should show error state (red border)
+  /** Flag to indicate if password confirmation field should show error state (red border) */
   let hasPasswordConfirmationError = $state(false);
 
-  // Flag to indicate if account creation is in progress
+  /** Flag to indicate if account creation is in progress */
   let isCreatingAccount = $state(false);
 
   /**
