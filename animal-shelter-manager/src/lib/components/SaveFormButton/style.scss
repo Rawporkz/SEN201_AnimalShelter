@@ -1,0 +1,58 @@
+// SaveFormButton component styles
+//
+// This file contains component-scoped styles for the SaveFormButton.
+// Follow project Code-Standards: 4-space indentation, descriptive comments.
+
+@use "../../styles/colors.scss" as colors;
+@use "sass:color" as color;
+
+// Save button
+.save-button {
+    box-sizing: border-box; /* match project global box-sizing */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 98px; /* exact supplied width */
+    height: 31px; /* match requested 31px height */
+    background: colors.$green-vibrant; /* provided color */
+    color: white;
+    border: none;
+    border-radius: 10px; /* requested 10px radius */
+    padding: 0 10px; /* compact horizontal padding */
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: none;
+    transition: background .12s ease, opacity .12s ease, transform .06s ease;
+    position: absolute; /* absolute positioning per design */
+    overflow: hidden; /* ensure children don't poke outside rounded corners */
+}
+
+// Button press animation
+.save-button:active:not(:disabled) {
+    transform: translateY(1px);
+}
+
+// Button disabled
+.save-button:disabled {
+    background: colors.$grey-light;
+    color: white;
+    cursor: not-allowed;
+    pointer-events: none; /* prevent interaction */
+    filter: grayscale(60%) opacity(0.95);
+    box-shadow: none;
+    transform: none;
+}
+
+// Icon inside button
+.save-button__icon {
+    display: inline-flex;
+    width: 21px; /* icon sizing; keep in sync with component defaults */
+    height: 21px; /* icon sizing; keep in sync with component defaults */
+    align-items: center;
+    justify-content: center;
+    color: #ffffff; /* icon inherits white */
+}
+
+
