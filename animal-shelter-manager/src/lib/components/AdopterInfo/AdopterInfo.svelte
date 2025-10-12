@@ -1,3 +1,8 @@
+<!-- 
+lib/components/AdopterInfo.svelte
+
+This file defines a reusable AdopterInfo component.
+-->
 <script lang="ts">
   import "./style.scss";
   import { User } from "@lucide/svelte";
@@ -58,7 +63,7 @@
           <div class="value">{phoneNumber}</div>
         </div>
       </div>
-      <div class="adopter-info-separator"></div>
+      <div class="divider"></div>
       <div class="adopter-info-item full-width">
         <div class="label">Street Address</div>
         <div class="value">{streetAddress}</div>
@@ -67,7 +72,7 @@
         <div class="label">Country</div>
         <div class="value">{country}</div>
       </div>
-      <div class="adopter-info-separator"></div>
+      <div class="divider"></div>
       <div class="adopter-info-item full-width">
         <div class="label">How many people do you have in your household?</div>
         <div class="value">Answer: {numOfHousehold}</div>

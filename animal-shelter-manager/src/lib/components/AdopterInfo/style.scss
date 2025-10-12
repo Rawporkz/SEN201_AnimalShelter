@@ -24,9 +24,9 @@
   background-color: white;
   border-radius: 12px;
   padding: 40px 0px 0px 48px;
-  max-width: 800px;
-  width: 90%;
-  max-height: 90vh;
+  width: 68%;
+  height: 87%;
+  max-height: 699px;
   overflow-y: auto;
   box-shadow: 4px 4px 4px 0px colors.$grey-text;
 
@@ -74,9 +74,9 @@
     }
   }
   
-  .adopter-info-separator {
-    width: 100%;
-    height: 1px;
-    background-color: colors.$grey-border;
+  .divider {
+  width: 100%;
+  height: 1px;
+  background-color: colors.$grey-border;
   }
 }
