@@ -1,0 +1,22 @@
+npm run check
+
+> animal-shelter-manager@0.1.0 check
+> svelte-kit sync && svelte-check --tsconfig ./tsconfig.json
+
+Loading svelte-check in workspace: /home/jira_pit/Documents/SEN201_AnimalShelter/animal-shelter-manager
+Getting Svelte diagnostics...
+
+/home/jira_pit/Documents/SEN201_AnimalShelter/animal-shelter-manager/src/lib/components/InputText/InputText.svelte:24:7
+Error: 'textareaEl' is declared but its value is never read. (ts)
+  // Internal references
+  let textareaEl: HTMLTextAreaElement;
+  // Last accepted value that fit within the visible rows; used to reject overflow input
+
+/home/jira_pit/Documents/SEN201_AnimalShelter/animal-shelter-manager/src/routes/+page.svelte:12:3
+Error: 'SideBar' is declared but its value is never read. (ts)
+  import { onMount } from "svelte";
+  import SideBar from "$lib/components/SideBar/SideBar.svelte";
+  import "./style.scss";
+
+====================================
+svelte-check found 2 errors and 0 warnings in 2 files
