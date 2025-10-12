@@ -1,7 +1,6 @@
 // SaveFormButton component styles
 //
 // This file contains component-scoped styles for the SaveFormButton.
-// Follow project Code-Standards: 4-space indentation, descriptive comments.
 
 @use "../../styles/colors.scss" as colors;
 @use "sass:color" as color;
@@ -24,10 +23,10 @@
     line-height: 1;
     cursor: pointer;
     box-shadow: none;
-    transition: background .12s ease, opacity .12s ease, transform .06s ease;
     position: absolute; /* absolute positioning per design */
     overflow: hidden; /* ensure children don't poke outside rounded corners */
 }
+
 
 // Button press animation
 .save-button:active:not(:disabled) {

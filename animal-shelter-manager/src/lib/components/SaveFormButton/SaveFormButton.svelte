@@ -1,8 +1,8 @@
 <!--
-    SaveFormButton.svelte
+SaveFormButton.svelte
 
-    Reusable Save button component.
-    Follow project Code-Standards: minimal script, typed exports, and header comment.
+Reusable Save button component.
+Follows project Code-Standards: minimal script, typed exports, and JSDoc-style header.
 -->
 
 <script lang="ts">
@@ -21,24 +21,27 @@
     export let disabled: boolean = false;
 
     /**
-     * Optional extra CSS class on the root button
-     * @type {string}
-     */
-    export let className: string = '';
-
-    /**
      * Per-instance icon sizing (CSS values). Keep default in sync with SCSS (21px).
      * @type {string}
      */
     export let iconWidth: string = '21px';
     export let iconHeight: string = '21px';
 
-    // Native DOM events are forwarded via {...$$restProps}
+    /**
+     * Unique mask id for the SVG to avoid collisions when multiple components render.
+     * @type {string}
+     */
+    const maskId: string = `saveDiskMask-${Math.random().toString(36).slice(2, 9)}`;
+
+    /**
+     * Note: Native DOM attributes/events passed to the component are forwarded
+     * via Svelte's built-in `$$restProps` (e.g. aria, data-*, inline style).
+     */
 </script>
 
 <button
     type="button"
-    class="save-button {className}"
+    class="save-button"
     aria-pressed="false"
     aria-label={label}
     {disabled}
@@ -48,7 +51,7 @@
         <svg viewBox="0 0 24 24" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" focusable="false" role="img" aria-hidden="true">
             <!-- Filled floppy-disk with transparent holes for the inner rectangle and circle using an SVG mask -->
             <defs>
-                <mask id="saveDiskMask" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
+                <mask id={maskId} maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
                     <!-- white = visible, black = transparent (hole) -->
                     <rect x="0" y="0" width="24" height="24" fill="white" />
                     <rect x="7" y="6.5" width="9" height="3" rx="0.6" fill="black" />
@@ -57,7 +60,7 @@
             </defs>
 
             <!-- Draw the filled disk shapes, but apply the mask so the rect & circle become transparent holes -->
-            <g mask="url(#saveDiskMask)">
+            <g mask={`url(#${maskId})`}>
                 <path d="M6 2h9l5 5v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" fill="#ffffff" />
                 <path d="M15 3.5V8h4.5L15 3.5z" fill="#ffffff" opacity="0.98" />
             </g>
