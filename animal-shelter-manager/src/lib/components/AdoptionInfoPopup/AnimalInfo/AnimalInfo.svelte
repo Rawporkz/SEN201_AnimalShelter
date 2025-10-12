@@ -1,33 +1,54 @@
 <!-- 
-lib/components/AdoptionInfoPopup/AnimalInfo.svelte
+AdoptionInfoPopup/AnimalInfo.svelte
 
 This file defines a reusable AnimalInfo component.
 -->
 <script lang="ts">
-  import "./style.scss";
+  // Props
+  interface Props {
+    /** Animal's name */
+    animalName?: string;
+    /** Animal's birth month/year */
+    birthMonth?: string;
+    /** Animal's age description */
+    age?: string;
+    /** Animal species (Dog, Cat, etc.) */
+    species?: string;
+    /** Animal breed */
+    breed?: string;
+    /** Animal's sex (Male/Female) */
+    sex?: string;
+    /** Whether animal is neutered (Yes/No) */
+    neutered?: string;
+    /** URL to animal's image */
+    imageUrl?: string;
+    /** Animal's current status (Adopted, Available, Pending) */
+    status?: string;
+    /** Date animal was admitted to shelter */
+    admissionDate?: string;
+    /** Date animal was adopted */
+    adoptionDate?: string;
+    /** Description of animal's physical appearance */
+    appearance?: string;
+    /** Description of animal's bio and characteristics */
+    bioCharacteristics?: string;
+  }
 
-  // Animal Information
-  export let animalName: string = "Animal Name 1";
-  export let birthMonth: string = "4/2023";
-  export let age: string = "2 years old";
-  export let species: string = "Dog";
-  export let breed: string = "Beagle";
-  export let sex: string = "Male";
-  export let neutered: string = "Yes";
-  export let imageUrl: string = "";
-
-  // Status
-  export let status: string = "Adopted"; // "Adopted", "Available", "Pending"
-
-  // Dates
-  export let admissionDate: string = "1/10/2024";
-  export let adoptionDate: string = "1/10/2025";
-
-  // Description
-  export let appearance: string =
-    "Big brown eyes, Black back and tail, White legs, Has a white dot on the back near its tail";
-  export let bioCharacteristics: string =
-    "A classic tri-color Beagle, this sweet boy is a perfect example of his breed: curious, friendly, and always ready for adventure. Great with kids, so he loves to follow his nose! He is excellent with children and other pets, thriving on companionship and daily walks.";
+  const {
+    animalName = "Animal Name 1",
+    birthMonth = "4/2023",
+    age = "2 years old",
+    species = "Dog",
+    breed = "Beagle",
+    sex = "Male",
+    neutered = "Yes",
+    imageUrl = "",
+    status = "Adopted",
+    admissionDate = "1/10/2024",
+    adoptionDate = "1/10/2025",
+    appearance = "Big brown eyes, Black back and tail, White legs, Has a white dot on the back near its tail",
+    bioCharacteristics = "A classic tri-color Beagle, this sweet boy is a perfect example of his breed: curious, friendly, and always ready for adventure. Great with kids, so he loves to follow his nose! He is excellent with children and other pets, thriving on companionship and daily walks.",
+  }: Props = $props();
 
   /**
    * Returns the appropriate CSS class for the animal's status
@@ -119,3 +140,7 @@ This file defines a reusable AnimalInfo component.
     </div>
   </div>
 </div>
+
+<style lang="scss">
+  @use "./style.scss";
+</style>

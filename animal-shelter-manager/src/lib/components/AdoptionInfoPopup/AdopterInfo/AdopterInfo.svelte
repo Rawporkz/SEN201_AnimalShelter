@@ -1,22 +1,42 @@
 <!-- 
-lib/components/AdoptionInfoPopup/AdopterInfo.svelte
+AdoptionInfoPopup/AdopterInfo.svelte
 
 This file defines a reusable AdopterInfo component.
 -->
 <script lang="ts">
-  import "./style.scss";
+  // Props
+  interface Props {
+    /** Adopter's full name */
+    name?: string;
+    /** Adopter's occupation */
+    occupation?: string;
+    /** Adopter's annual income range */
+    annualIncome?: string;
+    /** Adopter's email address */
+    email?: string;
+    /** Adopter's phone number */
+    phoneNumber?: string;
+    /** Adopter's street address */
+    streetAddress?: string;
+    /** Adopter's country */
+    country?: string;
+    /** Number of people in household */
+    numOfHousehold?: number;
+    /** Number of children under 15 in household */
+    numOfChildren?: number;
+  }
 
-  // Fields
-  export let name: string = "Adopter Name";
-  export let occupation: string = "Construction Worker";
-  export let annualIncome: string = "150k-200k THB";
-  export let email: string = "example@gmail.com";
-  export let phoneNumber: string = "081-234-5678";
-  export let streetAddress: string =
-    "1 Chalong Krung 1 Alley, Khwaeng Lat Krabang, Lat Krabang, Bangkok 10520";
-  export let country: string = "Thailand";
-  export let numOfHousehold: number = 4;
-  export let numOfChildren: number = 1;
+  const {
+    name = "Adopter Name",
+    occupation = "Construction Worker",
+    annualIncome = "150k-200k THB",
+    email = "example@gmail.com",
+    phoneNumber = "081-234-5678",
+    streetAddress = "1 Chalong Krung 1 Alley, Khwaeng Lat Krabang, Lat Krabang, Bangkok 10520",
+    country = "Thailand",
+    numOfHousehold = 4,
+    numOfChildren = 1,
+  }: Props = $props();
 </script>
 
 <div class="adopter-info-modal" role="dialog" aria-modal="true" tabindex="0">
@@ -70,3 +90,7 @@ This file defines a reusable AdopterInfo component.
     </div>
   </div>
 </div>
+
+<style lang="scss">
+  @use "./style.scss";
+</style>
