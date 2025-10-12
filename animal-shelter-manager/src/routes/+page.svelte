@@ -6,9 +6,12 @@
 
 <script lang="ts">
   import AnimalInfoRow from "$lib/components/AnimalInfoRow/AnimalInfoRow.svelte";
-  import type { AnimalSummary } from "$lib/utils/animal-utils";
-  import { AnimalStatus } from "$lib/utils/animal-utils";
+  import AnimalAdoptionInfoRow from "$lib/components/AnimalAdoptionInfoRow/AnimalAdoptionInfoRow.svelte";
+  import type { AnimalSummary, AdoptionRequest } from "$lib/utils/animal-utils";
+  import { AnimalStatus, RequestStatus } from "$lib/utils/animal-utils";
   import { Eye, X } from "@lucide/svelte";
+  import { info } from "@tauri-apps/plugin-log";
+  import "./style.scss";
 
   // Sample animal data for demonstration
   const sampleAnimals: AnimalSummary[] = [
@@ -28,8 +31,8 @@
       specie: "Dog",
       breed: "Golden Retriever",
       sex: "Male",
-      admission_timestamp: 1722556800, // 1/8/2024 equivalent
-      image_path: "/path/to/nonexistent/image.jpg", // Invalid path to test error handling
+      admission_timestamp: 1722556800,
+      image_path: "/path/to/nonexistent/image.jpg",
       status: AnimalStatus.AVAILABLE,
     },
     {
@@ -38,8 +41,91 @@
       specie: "Cat",
       breed: "Siamese",
       sex: "Female",
-      admission_timestamp: 1704067200, // 1/1/2024 equivalent
-      image_path: undefined, // No image to test placeholder
+      admission_timestamp: 1704067200,
+      image_path: undefined,
+      status: AnimalStatus.ADOPTED,
+    },
+  ];
+
+  // Sample adoption data for demonstration
+  const sampleAdoptionRequests: AdoptionRequest[] = [
+    {
+      id: "REQ001",
+      animal_id: "120312",
+      name: "Adopter Name 1",
+      email: "someone@gmail.com",
+      tel_number: "+1234567890",
+      address: "123 Main St, City, State",
+      occupation: "Software Engineer",
+      annual_income: "$75,000",
+      num_people: 2,
+      num_children: 0,
+      request_timestamp: 1726185600,
+      adoption_timestamp: 1729209600,
+      status: RequestStatus.APPROVED,
+    },
+    {
+      id: "REQ002",
+      animal_id: "542312",
+      name: "Adopter Name 2",
+      email: "someone@gmail.com",
+      tel_number: "+1234567891",
+      address: "456 Oak Ave, City, State",
+      occupation: "Teacher",
+      annual_income: "$55,000",
+      num_people: 4,
+      num_children: 2,
+      request_timestamp: 1726185600,
+      adoption_timestamp: 1729209600,
+      status: RequestStatus.APPROVED,
+    },
+    {
+      id: "REQ003",
+      animal_id: "123121",
+      name: "Adopter Name 3",
+      email: "someone@gmail.com",
+      tel_number: "+1234567892",
+      address: "789 Pine Rd, City, State",
+      occupation: "Nurse",
+      annual_income: "$65,000",
+      num_people: 3,
+      num_children: 1,
+      request_timestamp: 1726185600,
+      adoption_timestamp: 1729209600,
+      status: RequestStatus.APPROVED,
+    },
+  ];
+
+  // Sample animals for adoption reports (matching the adoption requests)
+  const sampleAdoptionAnimals: AnimalSummary[] = [
+    {
+      id: "120312",
+      name: "Animal Name 1",
+      specie: "Dog",
+      breed: "Golden Retriever",
+      sex: "Male",
+      admission_timestamp: 1715731200,
+      image_path: undefined,
+      status: AnimalStatus.ADOPTED,
+    },
+    {
+      id: "542312",
+      name: "Animal Name 2",
+      specie: "Cat",
+      breed: "Scottish Fold",
+      sex: "Female",
+      admission_timestamp: 1723852800,
+      image_path: undefined,
+      status: AnimalStatus.ADOPTED,
+    },
+    {
+      id: "123121",
+      name: "Animal Name 3",
+      specie: "Dog",
+      breed: "Labrador",
+      sex: "Male",
+      admission_timestamp: 1723852800,
+      image_path: undefined,
       status: AnimalStatus.ADOPTED,
     },
   ];
@@ -50,7 +136,7 @@
    * @param animalId - ID of the animal being viewed
    */
   function handleView(animalId: string): void {
-    console.log(`View clicked for animal ${animalId}`);
+    info(`View clicked for animal ${animalId}`);
   }
 
   /**
@@ -59,17 +145,18 @@
    * @param animalId - ID of the animal being revoked
    */
   function handleRevoke(animalId: string): void {
-    console.log(`Revoke clicked for animal ${animalId}`);
+    info(`Revoke clicked for animal ${animalId}`);
   }
 </script>
 
 <svelte:head>
-  <title>Animal Info Row Demo</title>
+  <title>Animal Components Demo</title>
 </svelte:head>
 
 <main class="demo-page">
   <header class="page-header">
-    <h1>AnimalInfoRow Component Demo</h1>
+    <h1>Animal Components Demo</h1>
+    <p>AnimalInfoRow and AnimalAdoptionInfoRow components</p>
   </header>
 
   <section class="animals-list">
@@ -97,6 +184,28 @@
       </AnimalInfoRow>
     {/each}
   </section>
+
+  <section class="adoption-reports-section">
+    <h2 class="section-title">Adoption Reports</h2>
+    <div class="animals-list">
+      {#each sampleAdoptionAnimals as animal, index (animal.id)}
+        <AnimalAdoptionInfoRow
+          animalSummary={animal}
+          adoptionRequest={sampleAdoptionRequests[index]}
+        >
+          <button
+            class="action-btn view-btn"
+            onclick={() => handleView(animal.id)}
+            type="button"
+            title="View {animal.name} adoption report"
+          >
+            <Eye size={16} />
+            View
+          </button>
+        </AnimalAdoptionInfoRow>
+      {/each}
+    </div>
+  </section>
 </main>
 
 <style lang="scss">
@@ -108,8 +217,6 @@
     max-width: 800px;
     margin: 0 auto;
     padding: 24px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-      sans-serif;
   }
 
   .page-header {
@@ -123,6 +230,27 @@
       color: colors.$blue-main;
       margin: 0 0 8px 0;
     }
+
+    p {
+      font-size: 16px;
+      color: colors.$grey-text;
+      margin: 0;
+    }
+  }
+
+  .adoption-reports-section {
+    /* Container for adoption report section */
+    margin-top: 48px;
+  }
+
+  .section-title {
+    /* Section title styling */
+    font-size: 24px;
+    font-weight: 600;
+    color: colors.$blue-main;
+    margin: 0 0 24px 0;
+    border-bottom: 2px solid colors.$grey-light;
+    padding-bottom: 8px;
   }
 
   .animals-list {
@@ -174,21 +302,6 @@
 
     &:hover {
       background-color: color.adjust(colors.$red-vibrant, $lightness: -10%);
-    }
-  }
-
-  /* Responsive design for smaller screens */
-  @media (max-width: 600px) {
-    .demo-page {
-      padding: 16px;
-    }
-
-    .page-header h1 {
-      font-size: 24px;
-    }
-
-    .animals-list {
-      gap: 12px;
     }
   }
 </style>

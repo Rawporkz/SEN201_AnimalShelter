@@ -25,7 +25,6 @@
   import ChooseMultiFilter from "./ChooseMultiFilter/ChooseMuliFilter.svelte";
   import ChooseOneFilter from "./ChooseOneFilter/ChooseOneFilter.svelte";
   import NestedChooseManyFilter from "./NestedChooseManyFilter/NestedChooseManyFilter.svelte";
-  import "./style.scss";
 
   // Props
   interface Props {
@@ -355,3 +354,7 @@
     </div>
   </div>
 {/if}
+
+<style lang="scss">
+  @use "./style.scss";
+</style>

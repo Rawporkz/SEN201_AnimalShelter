@@ -7,13 +7,16 @@
 
 <script lang="ts">
   import { CircleOff } from "@lucide/svelte";
-  import "./style.scss";
 </script>
 
 <div class="nothing-to-show-icon">
   <div class="icon-container">
-    <CircleOff size="80" class="nothing-icon" />
+    <CircleOff size="80" />
   </div>
-  
+
   <p class="message-text">Nothing to Show</p>
 </div>
+
+<style lang="scss">
+  @use "./style.scss";
+</style>

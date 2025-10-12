@@ -3,11 +3,9 @@
 
   Reusable component that displays animal information in a horizontal row layout,
   showing animal image, name, ID, species/breed, sex, and admission date.
-  Accepts action buttons as children to be displayed on the right side.
 -->
 
 <script lang="ts">
-  import "./style.scss";
   import type { AnimalSummary } from "$lib/utils/animal-utils";
   import {
     formatTimestamp,
@@ -58,7 +56,7 @@
       />
     {:else}
       <div class="animal-image-placeholder">
-        <ImageOff size={32} class="no-image-icon" />
+        <ImageOff size={32} />
       </div>
     {/if}
   </div>
@@ -84,7 +82,7 @@
       <div class="info-item">
         <span class="info-label">Specie:</span>
         <span class="info-value"
-          >{animalSummary.specie}, {animalSummary.status}</span
+          >{animalSummary.specie}, {animalSummary.breed}</span
         >
       </div>
 
@@ -109,3 +107,6 @@
   {/if}
 </div>
 
+<style lang="scss">
+  @use "./style.scss";
+</style>

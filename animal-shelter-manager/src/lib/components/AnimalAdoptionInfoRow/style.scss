@@ -1,12 +1,12 @@
 //
-// AnimalInfoRow/style.scss
+// AnimalAdoptionInfoRow/style.scss
 //
-// Styles for the main AnimalInfoRow component
+// Styles for the main AnimalAdoptionInfoRow component
 //
 
 @use "../../styles/colors.scss" as colors;
 
-.animal-info-row {
+.animal-adoption-info-row {
   display: flex;
   align-items: flex-start;
   padding: 16px 16px;
@@ -16,6 +16,13 @@
   gap: 24px;
   width: 100%;
   box-sizing: border-box;
+}
+
+.left-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex: 1;
 }
 
 .animal-image-container {
@@ -48,78 +55,52 @@
   gap: 12px;
 }
 
-.animal-name-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
 .animal-name {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 400;
   color: black;
-  margin: 0;
   line-height: 1.2;
 }
 
-.status-indicator {
-  position: relative;
-  width: 22px;
-  height: 22px;
-  border-radius: 8px;
-  transition: all 0.2s ease-in-out;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-
-  &:hover {
-    width: 80px;
-    padding: 0 8px;
-    justify-content: center;
-    gap: 4px;
-
-    .status-tooltip {
-      opacity: 1;
-      visibility: visible;
-    }
-  }
-}
-
-.status-available {
-  background-color: colors.$green-vibrant;
-}
-
-.status-requested {
-  background-color: colors.$yellow-vibrant;
-}
-
-.status-adopted {
-  background-color: colors.$blue-vibrant;
-}
-
-.status-passed-away {
-  background-color: colors.$grey-border;
-}
-
-.status-tooltip {
-  font-size: 12px;
-  font-weight: 500;
-  color: white;
-  white-space: nowrap;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s ease-in-out;
-  pointer-events: none;
-}
-
 .animal-info-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto auto;
-  gap: 4px 16px;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.by-separator {
+  font-size: 16px;
+  font-weight: 400;
+  color: colors.$grey-text;
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.right-section {
+  display: flex;
+  align-items: flex-start;
+  flex: 1;
+  margin-left: 16px;
+}
+
+.adopter-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.adopter-name {
+  font-size: 20px;
+  font-weight: 400;
+  color: black;
+  line-height: 1.2;
+}
+
+.adopter-info-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .info-item {
