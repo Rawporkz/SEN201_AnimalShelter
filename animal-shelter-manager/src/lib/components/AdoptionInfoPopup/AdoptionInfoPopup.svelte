@@ -8,6 +8,7 @@ This file defines a reusable AdoptionInfoPopup component.
   import { User, Dog } from "@lucide/svelte";
   import AdopterInfo from "./AdopterInfo/AdopterInfo.svelte";
   import AnimalInfo from "./AnimalInfo/AnimalInfo.svelte";
+  import ClosePopupButton from "../ClosePopupButton/ClosePopupButton.svelte";
 
   type Tab = "animal" | "adopter";
 
@@ -20,11 +21,6 @@ This file defines a reusable AdoptionInfoPopup component.
   }
 
   function closePopup() {
-    isOpen = false;
-  }
-
-  // Handle close from AdopterInfo
-  function handleCloseAdopterInfo() {
     isOpen = false;
   }
 </script>
@@ -51,10 +47,12 @@ This file defines a reusable AdoptionInfoPopup component.
         if (e.key === "Escape") closePopup();
       }}
     >
+      <div class="close-button-wrapper">
+        <ClosePopupButton on:click={closePopup} />
+      </div>
       <div class="tab-content">
         {#if activeTab === "adopter"}
           <AdopterInfo
-            on:close-adopter-info={handleCloseAdopterInfo}
             name="John Doe"
             occupation="Software Engineer"
             annualIncome="100k-150k THB"

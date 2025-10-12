@@ -34,9 +34,6 @@ This file defines a reusable AdopterInfo component.
     if (e.key === "Escape") closeModal();
   }}
 >
-  <div class="close-button-wrapper">
-    <ClosePopupButton on:click={closeModal} />
-  </div>
   <div class="adopter-info-header">
     <h1>Adopter Information</h1>
   </div>

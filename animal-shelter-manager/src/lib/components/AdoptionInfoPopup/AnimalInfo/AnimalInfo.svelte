@@ -34,16 +34,9 @@ This file defines a reusable AnimalInfo component.
   const getStatusClass = (status: string) => {
     return status.toLowerCase().replace(" ", "-");
   };
-
-  const closeModal = () => {
-    emit("close-animal-info");
-  };
 </script>
 
 <div class="animal-info-modal">
-  <div class="close-button-wrapper">
-    <ClosePopupButton on:click={closeModal} />
-  </div>
   <div class="animal-profile-left">
     <div class="animal-image">
       {#if imageUrl}
