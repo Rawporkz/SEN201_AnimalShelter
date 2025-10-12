@@ -1,7 +1,8 @@
 <!-- 
 lib/components/AdoptionInfoPopup/AdoptionInfoPopup.svelte
 
-This file defines a reusable AdoptionInfoPopup component.
+This file defines a reusable AdoptionInfoPopup component that displays 
+adoption information with tabbed navigation between animal and adopter views.
 -->
 <script lang="ts">
   import "./style.scss";
@@ -10,16 +11,26 @@ This file defines a reusable AdoptionInfoPopup component.
   import AnimalInfo from "./AnimalInfo/AnimalInfo.svelte";
   import ClosePopupButton from "../ClosePopupButton/ClosePopupButton.svelte";
 
+  // Type definition for tab selection
   type Tab = "animal" | "adopter";
 
+  // Currently active tab state
   let activeTab: Tab = "animal";
 
+  // Controls whether the popup is visible
   export let isOpen = false;
 
+  /**
+   * Switches the active tab to the specified tab
+   * @param tab - The tab to switch to ("animal" or "adopter")
+   */
   function selectTab(tab: Tab) {
     activeTab = tab;
   }
 
+  /**
+   * Closes the popup by setting isOpen to false
+   */
   function closePopup() {
     isOpen = false;
   }
