@@ -14,7 +14,7 @@ adoption information with tabbed navigation between animal and adopter views.
   /** Type definition for tab selection in the adoption info popup */
   type Tab = "animal" | "adopter";
 
-  // Props interface for AdoptionInfoPopup component
+  // Props
   interface Props {
     /** Controls whether the popup is visible */
     isOpen?: boolean;
@@ -30,7 +30,7 @@ adoption information with tabbed navigation between animal and adopter views.
 
   /**
    * Switches the active tab to the specified tab.
-   * 
+   *
    * @param tab - The tab to switch to ("animal" or "adopter")
    * @returns void
    */
@@ -40,7 +40,7 @@ adoption information with tabbed navigation between animal and adopter views.
 
   /**
    * Closes the popup by calling the onClose callback if it exists.
-   * 
+   *
    * @returns void
    */
   function closePopup(): void {
