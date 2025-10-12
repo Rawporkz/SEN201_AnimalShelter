@@ -7,24 +7,23 @@
 
 // Save button
 .save-button {
-    box-sizing: border-box; /* match project global box-sizing */
+    box-sizing: border-box;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    width: 98px; /* exact supplied width */
-    height: 31px; /* match requested 31px height */
-    background: colors.$green-vibrant; /* provided color */
+    width: 98px;
+    height: 31px;
+    background: colors.$green-vibrant; /* button color */
     color: white;
     border: none;
-    border-radius: 10px; /* requested 10px radius */
+    border-radius: 10px;
     padding: 0 10px; /* compact horizontal padding */
     font-size: 14px;
     line-height: 1;
     cursor: pointer;
     box-shadow: none;
-    position: absolute; /* absolute positioning per design */
-    overflow: hidden; /* ensure children don't poke outside rounded corners */
+    position: absolute;
 }
 
 
@@ -47,11 +46,11 @@
 // Icon inside button
 .save-button__icon {
     display: inline-flex;
-    width: 21px; /* icon sizing; keep in sync with component defaults */
-    height: 21px; /* icon sizing; keep in sync with component defaults */
+    width: 21px; /* icon sizing*/
+    height: 21px; /* icon sizing*/
     align-items: center;
     justify-content: center;
-    color: #ffffff; /* icon inherits white */
+    color: #ffffff; /* icon color */
 }
 
 
