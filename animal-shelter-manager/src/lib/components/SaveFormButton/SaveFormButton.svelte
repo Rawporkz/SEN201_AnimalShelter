@@ -20,3 +20,7 @@
   <Save aria-hidden="true" />
   Save
 </button>
+
+<style lang="scss">
+  @use "./style.scss";
+</style>
