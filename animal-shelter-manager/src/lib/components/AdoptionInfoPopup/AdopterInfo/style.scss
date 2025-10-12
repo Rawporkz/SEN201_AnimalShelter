@@ -10,13 +10,15 @@
 .adopter-info-modal {
   position: relative;
   background-color: white;
-  border-radius: 15px;
+  border-radius: 1px;
   padding: 40px 0px 0px 48px;
   width: 80%;
   height: 87%;
   max-height: 699px;
+  max-width: 1000px;
   overflow-y: auto;
   box-shadow: 4px 4px 4px 0px colors.$grey-text;
+  border-radius: 15px;
 
   .close-button-wrapper {
     position: absolute;
