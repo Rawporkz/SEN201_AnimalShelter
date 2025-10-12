@@ -4,35 +4,47 @@ lib/components/AdoptionInfoPopup/AdoptionInfoPopup.svelte
 This file defines a reusable AdoptionInfoPopup component that displays 
 adoption information with tabbed navigation between animal and adopter views.
 -->
+
 <script lang="ts">
-  import "./style.scss";
   import { User, Dog } from "@lucide/svelte";
   import AdopterInfo from "./AdopterInfo/AdopterInfo.svelte";
   import AnimalInfo from "./AnimalInfo/AnimalInfo.svelte";
   import ClosePopupButton from "../ClosePopupButton/ClosePopupButton.svelte";
 
-  // Type definition for tab selection
+  /** Type definition for tab selection in the adoption info popup */
   type Tab = "animal" | "adopter";
 
-  // Currently active tab state
-  let activeTab: Tab = "animal";
+  // Props interface for AdoptionInfoPopup component
+  interface Props {
+    /** Controls whether the popup is visible */
+    isOpen?: boolean;
+    /** Callback function to close the popup */
+    onClose?: () => void;
+  }
 
-  // Controls whether the popup is visible
-  export let isOpen = false;
+  /** Component props with default values */
+  const { isOpen = false, onClose }: Props = $props();
+
+  /** Currently active tab state - tracks which tab (animal or adopter) is being displayed */
+  let activeTab: Tab = $state("animal");
 
   /**
-   * Switches the active tab to the specified tab
+   * Switches the active tab to the specified tab.
+   * 
    * @param tab - The tab to switch to ("animal" or "adopter")
+   * @returns void
    */
-  function selectTab(tab: Tab) {
+  function selectTab(tab: Tab): void {
     activeTab = tab;
   }
 
   /**
-   * Closes the popup by setting isOpen to false
+   * Closes the popup by calling the onClose callback if it exists.
+   * 
+   * @returns void
    */
-  function closePopup() {
-    isOpen = false;
+  function closePopup(): void {
+    onClose?.();
   }
 </script>
 
@@ -42,8 +54,8 @@ adoption information with tabbed navigation between animal and adopter views.
     role="button"
     tabindex="0"
     aria-label="Close popup"
-    on:click={closePopup}
-    on:keydown={(e) => {
+    onclick={closePopup}
+    onkeydown={(e) => {
       if (e.key === "Enter" || e.key === " ") closePopup();
     }}
   >
@@ -51,15 +63,15 @@ adoption information with tabbed navigation between animal and adopter views.
       class="popup-content"
       role="dialog"
       aria-modal="true"
-      on:click|stopPropagation
+      onclick={(e) => e.stopPropagation()}
       tabindex="0"
       aria-label="Adoption Info Popup"
-      on:keydown={(e) => {
+      onkeydown={(e) => {
         if (e.key === "Escape") closePopup();
       }}
     >
       <div class="close-button-wrapper">
-        <ClosePopupButton on:click={closePopup} />
+        <ClosePopupButton onclick={closePopup} />
       </div>
       <div class="tab-content">
         {#if activeTab === "adopter"}
@@ -99,7 +111,7 @@ adoption information with tabbed navigation between animal and adopter views.
     <button
       class="tab-button"
       class:active={activeTab === "adopter"}
-      on:click={() => selectTab("adopter")}
+      onclick={() => selectTab("adopter")}
       aria-label="Adopter Profile"
     >
       <User size={40} />
@@ -108,10 +120,14 @@ adoption information with tabbed navigation between animal and adopter views.
     <button
       class="tab-button"
       class:active={activeTab === "animal"}
-      on:click={() => selectTab("animal")}
+      onclick={() => selectTab("animal")}
       aria-label="Animal Info"
     >
       <Dog size={40} />
     </button>
   </div>
 {/if}
+
+<style lang="scss">
+  @use "./style.scss";
+</style>
