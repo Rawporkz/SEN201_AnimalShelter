@@ -10,17 +10,24 @@ or the customer's home page based on the user's authentication status and role.
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import "./style.scss";
+  import SaveFormButton from "$lib/components/SaveFormButton/SaveFormButton.svelte";
+
+
 
   /** Current authenticated user object, null if not logged in */
   let currentUser = $state(null);
 
-  onMount(() => {
-    // Check if user is authenticated
-    if (currentUser === null) {
-      // Redirect to authentication page if not logged in
-      goto("/authentication");
-    } else {
-      // TODO: Handle authenticated user - show appropriate dashboard
-    }
-  });
+  // onMount(() => {
+  //   // Check if user is authenticated
+  //   if (currentUser === null) {
+  //     // Redirect to authentication page if not logged in
+  //     goto("/authentication");
+  //   } else {
+  //     // TODO: Handle authenticated user - show appropriate dashboard
+  //   }
+  // });
+
+
 </script>
+
+<SaveFormButton on:click={() => console.log("✅ raw button clicked")} />

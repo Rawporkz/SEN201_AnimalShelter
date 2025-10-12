@@ -1,8 +1,8 @@
 <!--
-SaveFormButton.svelte
+  SaveFormButton.svelte
 
-Reusable Save button component.
-Follows project Code-Standards: minimal script, typed exports, and JSDoc-style header.
+  Reusable Save button component.
+  Follows project Code-Standards: minimal script, typed exports, and JSDoc-style header.
 -->
 
 <script lang="ts">
@@ -29,6 +29,7 @@ Follows project Code-Standards: minimal script, typed exports, and JSDoc-style h
     aria-pressed="false"
     aria-label={label}
     {disabled}
+    {...$$restProps}
 >
     <!-- Render save icon inside button-->
     <Save class="save-button__icon" aria-hidden="true" />
