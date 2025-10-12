@@ -53,10 +53,16 @@ export interface Animal {
   neutered: boolean;
   /** Timestamp when the animal was admitted to the shelter */
   admission_timestamp: number;
+  /** Timestamp when the animal was adopted*/
+  adoption_timestamp: number;
   /** Current status of the animal */
   status: AnimalStatus;
   /** Path to the animal's image file */
   image_path?: string;
+  /** Appearance description of the animal */
+  appearance: string;
+  /** Bio & Characteristics of the animal */
+  bio: string;
 }
 
 /** Simplified animal information for listing views */
