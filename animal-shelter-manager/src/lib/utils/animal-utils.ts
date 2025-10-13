@@ -6,6 +6,7 @@
  */
 
 import { invoke } from "@tauri-apps/api/core";
+import { error } from "@tauri-apps/plugin-log";
 
 // ==================== ENUMS ====================
 
@@ -129,7 +130,7 @@ export interface AdoptionRequestSummary {
   request_timestamp: number;
 }
 
-// ==================== ANIMAL API FUNCTIONS ====================
+// ==================== ANIMAL FUNCTIONS ====================
 
 /**
  * Retrieves all animals from the database.
@@ -140,8 +141,9 @@ export interface AdoptionRequestSummary {
 export async function getAllAnimals(): Promise<AnimalSummary[]> {
   try {
     return await invoke<AnimalSummary[]>("get_all_animals");
-  } catch (error) {
-    throw new Error(`Failed to get all animals: ${error}`);
+  } catch (e) {
+    error(`Failed to get all animals: ${e}`);
+    return [];
   }
 }
 
@@ -155,8 +157,9 @@ export async function getAllAnimals(): Promise<AnimalSummary[]> {
 export async function getAnimalById(animalId: string): Promise<Animal | null> {
   try {
     return await invoke<Animal | null>("get_animal_by_id", { animalId });
-  } catch (error) {
-    throw new Error(`Failed to get animal by ID ${animalId}: ${error}`);
+  } catch (e) {
+    error(`Failed to get animal by ID ${animalId}: ${e}`);
+    return null;
   }
 }
 
@@ -169,8 +172,8 @@ export async function getAnimalById(animalId: string): Promise<Animal | null> {
 export async function createAnimal(animal: Animal): Promise<void> {
   try {
     await invoke("create_animal", { animal });
-  } catch (error) {
-    throw new Error(`Failed to create animal: ${error}`);
+  } catch (e) {
+    error(`Failed to create animal: ${e}`);
   }
 }
 
@@ -184,8 +187,9 @@ export async function createAnimal(animal: Animal): Promise<void> {
 export async function updateAnimal(animal: Animal): Promise<boolean> {
   try {
     return await invoke<boolean>("update_animal", { animal });
-  } catch (error) {
-    throw new Error(`Failed to update animal: ${error}`);
+  } catch (e) {
+    error(`Failed to update animal: ${e}`);
+    return false;
   }
 }
 
@@ -199,12 +203,13 @@ export async function updateAnimal(animal: Animal): Promise<boolean> {
 export async function deleteAnimal(animalId: string): Promise<boolean> {
   try {
     return await invoke<boolean>("delete_animal", { animalId });
-  } catch (error) {
-    throw new Error(`Failed to delete animal with ID ${animalId}: ${error}`);
+  } catch (e) {
+    error(`Failed to delete animal with ID ${animalId}: ${e}`);
+    return false;
   }
 }
 
-// ==================== ADOPTION REQUEST API FUNCTIONS ====================
+// ==================== ADOPTION REQUEST FUNCTIONS ====================
 
 /**
  * Retrieves all adoption requests from the database.
@@ -217,8 +222,9 @@ export async function getAllAdoptionRequests(): Promise<
 > {
   try {
     return await invoke<AdoptionRequestSummary[]>("get_all_adoption_requests");
-  } catch (error) {
-    throw new Error(`Failed to get all adoption requests: ${error}`);
+  } catch (e) {
+    error(`Failed to get all adoption requests: ${e}`);
+    return [];
   }
 }
 
@@ -236,10 +242,9 @@ export async function getAdoptionRequestById(
     return await invoke<AdoptionRequest | null>("get_adoption_request_by_id", {
       requestId,
     });
-  } catch (error) {
-    throw new Error(
-      `Failed to get adoption request by ID ${requestId}: ${error}`,
-    );
+  } catch (e) {
+    error(`Failed to get adoption request by ID ${requestId}: ${e}`);
+    return null;
   }
 }
 
@@ -254,8 +259,8 @@ export async function createAdoptionRequest(
 ): Promise<void> {
   try {
     await invoke("create_adoption_request", { request });
-  } catch (error) {
-    throw new Error(`Failed to create adoption request: ${error}`);
+  } catch (e) {
+    error(`Failed to create adoption request: ${e}`);
   }
 }
 
@@ -271,8 +276,9 @@ export async function updateAdoptionRequest(
 ): Promise<boolean> {
   try {
     return await invoke<boolean>("update_adoption_request", { request });
-  } catch (error) {
-    throw new Error(`Failed to update adoption request: ${error}`);
+  } catch (e) {
+    error(`Failed to update adoption request: ${e}`);
+    return false;
   }
 }
 
@@ -288,14 +294,13 @@ export async function deleteAdoptionRequest(
 ): Promise<boolean> {
   try {
     return await invoke<boolean>("delete_adoption_request", { requestId });
-  } catch (error) {
-    throw new Error(
-      `Failed to delete adoption request with ID ${requestId}: ${error}`,
-    );
+  } catch (e) {
+    error(`Failed to delete adoption request with ID ${requestId}: ${e}`);
+    return false;
   }
 }
 
-// ==================== FILE API FUNCTIONS ====================
+// ==================== FILE FUNCTIONS ====================
 
 /**
  * Uploads a file selected by the user for animal images.
@@ -306,8 +311,9 @@ export async function deleteAdoptionRequest(
 export async function uploadAnimalImage(): Promise<string | null> {
   try {
     return await invoke<string | null>("upload_file");
-  } catch (error) {
-    throw new Error(`Failed to upload animal image: ${error}`);
+  } catch (e) {
+    error(`Failed to upload animal image: ${e}`);
+    return null;
   }
 }
 
@@ -320,8 +326,8 @@ export async function uploadAnimalImage(): Promise<string | null> {
 export async function deleteFile(filePath: string): Promise<void> {
   try {
     await invoke("delete_file", { filePath });
-  } catch (error) {
-    throw new Error(`Failed to delete file: ${error}`);
+  } catch (e) {
+    error(`Failed to delete file: ${e}`);
   }
 }
 
