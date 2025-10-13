@@ -76,7 +76,10 @@
         {#if adopter && activeTab === "adopter"}
           <AdopterInfo {adopter} />
         {:else}
-          <AnimalInfo {animal} />
+          <AnimalInfo
+            {animal}
+            adoption_timestamp={adopter?.adoption_timestamp ?? 0}
+          />
         {/if}
       </div>
     </div>
