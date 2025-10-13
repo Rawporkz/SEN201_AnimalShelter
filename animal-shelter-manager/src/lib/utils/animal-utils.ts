@@ -53,9 +53,6 @@ export interface Animal {
   neutered: boolean;
   /** Timestamp when the animal was admitted to the shelter */
   admission_timestamp: number;
-  //TODO: Is this really needed?
-  /** Timestamp when the animal was adopted*/
-  adoption_timestamp: number;
   /** Current status of the animal */
   status: AnimalStatus;
   /** Path to the animal's image file */
