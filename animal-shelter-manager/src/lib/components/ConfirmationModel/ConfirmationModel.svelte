@@ -20,9 +20,9 @@ Reusable confirmation modal with:
     export let message: string = "Are you sure you want to proceed?";
 
         // Sizing
-        export let width: string = "600px";
+        export let width: string = "365px";
         // Inner content width: keeps body/actions width constant while frame padding can grow
-        export let contentWidth: string = "360px";
+        export let contentWidth: string = "275px";
 
     // Actions
     export let confirmText: string = "Confirm";
@@ -142,15 +142,5 @@ Reusable confirmation modal with:
                     </footer>
                 </div>
         </div>
-    </div>
-{/if}
-
-<style>
-    /* Keep component-scoped layout fallbacks if SCSS fails to load */
-    .modal-overlay { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.35); z-index: 50; }
-    .modal { background: white; border-radius: 16px; padding: 20px; max-width: 90vw; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
-        .modal__content { width: 360px; max-width: 100%; margin: 0 auto; }
-    .modal__actions { display: flex; gap: 24px; justify-content: center; margin-top: 22px; }
-    .modal__extra:empty { display: none; }
-    .modal__title { margin: 0; }
-</style>
+            </div>
+        {/if}

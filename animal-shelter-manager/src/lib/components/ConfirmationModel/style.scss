@@ -22,7 +22,7 @@
     background: #ffffff;
     border-radius: 16px;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22);
-    padding: 64px 40px 60px 40px; // much more vertical padding for a taller frame
+    padding: 45px 40px 45px 40px; // much more vertical padding for a taller frame
 }
 .modal__content {
     width: var(--content-width, 360px);
@@ -36,7 +36,7 @@
 
 .modal__title {
     margin: 0;
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     color: #0f172a; // slate-900
     text-align: center;
@@ -48,7 +48,7 @@
 }
 
 .modal__message {
-    margin: 0 0 20px 0;
+    margin: 0 0 16px 0;
     color: colors.$grey-text;
     text-align: center;
 }
@@ -92,7 +92,7 @@
 
 :global(.inline-warning .icon) {
         color: colors.$yellow-vibrant;
-        font-size: 18px;
+        font-size: 14px;
         line-height: 1;
 }
 
