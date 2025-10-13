@@ -67,7 +67,7 @@ export interface Animal {
   image_path?: string;
 }
 ```
-Non suggested to put in 3 more fields: adoption_timestamp, appearance, and bio, since we are missing that from the Animal's status. He needs it for the `AdopterInfoModal`.
+Non suggested to put in 3 more fields: adoption_timestamp, appearance, and bio, since we are missing that from this interface. He needs it for the `AdopterInfoModal`.
 
 Jira agrees with adding bio and appearance. But for adoption_timestamp, he suggests that we can just use the adoption_timestamp field in the `AdoptionRequest` interface instead. We can retrieve the associated adoption by matching the animal's ID and the adoption's animal_id field. I will add both the appearance and bio since
 
