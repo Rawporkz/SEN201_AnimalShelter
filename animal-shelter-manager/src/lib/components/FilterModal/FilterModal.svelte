@@ -1,9 +1,9 @@
 <!--
-  FilterModal.svelte
+FilterModal.svelte
 
-  Modal component that presents available filtering criteria to users.
-  Allows users to select and configure different filter options for
-  data filtering throughout the application.
+Modal component that presents available filtering criteria to users.
+Allows users to select and configure different filter options for
+data filtering throughout the application.
 -->
 
 <script lang="ts">

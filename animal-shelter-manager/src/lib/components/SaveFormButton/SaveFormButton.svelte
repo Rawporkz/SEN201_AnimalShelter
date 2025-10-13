@@ -1,7 +1,7 @@
 <!--
-  SaveFormButton.svelte
+SaveFormButton.svelte
 
-  Reusable Save button for forms.
+Reusable Save button for forms.
 -->
 
 <script lang="ts">
