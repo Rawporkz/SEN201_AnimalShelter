@@ -11,7 +11,14 @@ This file defines a reusable AnimalInfo component.
     getStatusDisplayText,
   } from "../../../utils/animal-utils";
 
-  export let animal: Animal;
+  interface Props {
+    /** The animal to display information about */
+    animal: Animal;
+    /** The adopter information (optional) */
+    adoption_timestamp: number;
+  }
+  /** Component props with default values */
+  const { animal, adoption_timestamp }: Props = $props();
 
   // Helper to display neutered status as Yes/No
   const getNeuteredText = (neutered: boolean) => (neutered ? "Yes" : "No");
@@ -64,8 +71,8 @@ This file defines a reusable AnimalInfo component.
       <div class="date-item">
         <div class="date-label">Adoption Date</div>
         <div class="date-value">
-          {animal?.adoption_timestamp
-            ? formatTimestamp(animal.adoption_timestamp)
+          {adoption_timestamp
+            ? formatTimestamp(adoption_timestamp)
             : "Not adopted"}
         </div>
       </div>
