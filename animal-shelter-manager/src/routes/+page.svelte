@@ -18,7 +18,7 @@ or the customer's home page based on the user's authentication status and role.
     // Check if user is authenticated
     if (currentUser === null) {
       // Redirect to authentication page if not logged in
-      goto("/modal-test");
+      goto("/authentication");
     } else {
       // TODO: Handle authenticated user - show appropriate dashboard
     }
