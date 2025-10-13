@@ -1,8 +1,8 @@
 <!-- 
-lib/components/AdoptionInfoPopup/AdoptionInfoPopup.svelte
+ViewAnimalModal.svelte
 
-This file defines a reusable AdoptionInfoPopup component that displays 
-adoption information with tabbed navigation between animal and adopter views.
+Reusable modal popup component to display detailed information
+about an animal and its adopter (if applicable).
 -->
 
 <script lang="ts">
@@ -10,12 +10,18 @@ adoption information with tabbed navigation between animal and adopter views.
   import AdopterInfo from "./AdopterInfo/AdopterInfo.svelte";
   import AnimalInfo from "./AnimalInfo/AnimalInfo.svelte";
   import ClosePopupButton from "../ClosePopupButton/ClosePopupButton.svelte";
+  import type { Animal } from "../../utils/animal-utils";
+  import type { AdoptionRequest } from "../../utils/animal-utils";
 
   /** Type definition for tab selection in the adoption info popup */
   type Tab = "animal" | "adopter";
 
   // Props
   interface Props {
+    /** The animal to display information about */
+    animal: Animal;
+    /** The adopter information (optional) */
+    adopter?: AdoptionRequest | null;
     /** Controls whether the popup is visible */
     isOpen?: boolean;
     /** Callback function to close the popup */
@@ -23,7 +29,7 @@ adoption information with tabbed navigation between animal and adopter views.
   }
 
   /** Component props with default values */
-  const { isOpen = false, onClose }: Props = $props();
+  const { animal, adopter, isOpen = false, onClose }: Props = $props();
 
   /** Currently active tab state - tracks which tab (animal or adopter) is being displayed */
   let activeTab: Tab = $state("animal");
@@ -74,58 +80,40 @@ adoption information with tabbed navigation between animal and adopter views.
         <ClosePopupButton onclick={closePopup} />
       </div>
       <div class="tab-content">
-        {#if activeTab === "adopter"}
-          <AdopterInfo
-            name="John Doe"
-            occupation="Software Engineer"
-            annualIncome="100k-150k THB"
-            email="john.doe@example.com"
-            phoneNumber="081-234-5678"
-            streetAddress="123 Main St, Bangkok"
-            country="Thailand"
-            numOfHousehold={4}
-            numOfChildren={1}
-          />
+        {#if adopter && activeTab === "adopter"}
+          <AdopterInfo {adopter} />
         {:else}
           <AnimalInfo
-            animalName="Buddy"
-            birthMonth="4/2023"
-            age="2 years old"
-            species="Dog"
-            breed="Beagle"
-            sex="Male"
-            neutered="Yes"
-            imageUrl="https://example.com/buddy.jpg"
-            status="Adopted"
-            admissionDate="1/10/2024"
-            adoptionDate="1/10/2025"
-            appearance="Big brown eyes, Black back and tail, White legs, Has a white dot on the back near its tail"
-            bioCharacteristics="A classic tri-color Beagle, this sweet boy is a perfect example of his breed: curious, friendly, and always ready for adventure. Great with kids, so he loves to follow his nose! He is excellent with children and other pets, thriving on companionship and daily walks."
+            {animal}
+            adoption_timestamp={adopter?.adoption_timestamp ?? 0}
           />
         {/if}
       </div>
     </div>
   </div>
 
-  <div class="tab-container">
-    <button
-      class="tab-button"
-      class:active={activeTab === "adopter"}
-      onclick={() => selectTab("adopter")}
-      aria-label="Adopter Profile"
-    >
-      <User size={40} />
-    </button>
+  {#if adopter}
+    <div class="tab-container">
+      <div class="tab-slider" class:bottom={activeTab === "animal"}></div>
+      <button
+        class="tab-button"
+        class:active={activeTab === "adopter"}
+        onclick={() => selectTab("adopter")}
+        aria-label="Adopter Profile"
+      >
+        <User size={40} />
+      </button>
 
-    <button
-      class="tab-button"
-      class:active={activeTab === "animal"}
-      onclick={() => selectTab("animal")}
-      aria-label="Animal Info"
-    >
-      <Dog size={40} />
-    </button>
-  </div>
+      <button
+        class="tab-button"
+        class:active={activeTab === "animal"}
+        onclick={() => selectTab("animal")}
+        aria-label="Animal Info"
+      >
+        <Dog size={40} />
+      </button>
+    </div>
+  {/if}
 {/if}
 
 <style lang="scss">

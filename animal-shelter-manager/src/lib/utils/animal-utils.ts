@@ -57,6 +57,10 @@ export interface Animal {
   status: AnimalStatus;
   /** Path to the animal's image file */
   image_path?: string;
+  /** Appearance description of the animal */
+  appearance: string;
+  /** Bio & Characteristics of the animal */
+  bio: string;
 }
 
 /** Simplified animal information for listing views */
@@ -107,6 +111,8 @@ export interface AdoptionRequest {
   adoption_timestamp: number;
   /** Current status of the request */
   status: RequestStatus;
+  /** Country of the requester */
+  country: string;
 }
 
 /** Simplified adoption request information for listing views */

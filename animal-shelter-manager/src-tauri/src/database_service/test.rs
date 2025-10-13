@@ -58,6 +58,8 @@ mod database_service_tests {
             admission_timestamp: Utc::now().timestamp(),
             status: AnimalStatus::Available,
             image_path: Some("/test/images/buddy.jpg".to_string()),
+            appearance: "Golden coat with friendly eyes".to_string(),
+            bio: "Buddy is a friendly and energetic dog who loves playing fetch and going on walks. He gets along well with children and other pets.".to_string(),
         }
     }
 
@@ -84,6 +86,7 @@ mod database_service_tests {
             request_timestamp: Utc::now().timestamp(),
             adoption_timestamp: 0,
             status: RequestStatus::Pending,
+            country: "Thailand".to_string(),
         }
     }
 
@@ -117,6 +120,8 @@ mod database_service_tests {
         assert_eq!(found.breed, "Golden Retriever");
         assert!(found.neutered);
         assert_eq!(found.image_path, Some("/test/images/buddy.jpg".to_string()));
+        assert_eq!(found.appearance, "Golden coat with friendly eyes");
+        assert_eq!(found.bio, "Buddy is a friendly and energetic dog who loves playing fetch and going on walks. He gets along well with children and other pets.");
 
         // Test query non-existent
         let not_found = db.query_animal_by_id("nonexistent").unwrap();
@@ -126,6 +131,8 @@ mod database_service_tests {
         animal.name = "Updated Buddy".to_string();
         animal.status = AnimalStatus::Adopted;
         animal.image_path = Some("/test/images/updated_buddy.jpg".to_string());
+        animal.appearance = "Updated golden coat with wise eyes".to_string();
+        animal.bio = "Updated bio: Buddy is now a mature and well-trained dog.".to_string();
         let updated = db.update_animal(&animal).unwrap();
         assert!(updated);
 
@@ -135,6 +142,11 @@ mod database_service_tests {
         assert_eq!(
             found.image_path,
             Some("/test/images/updated_buddy.jpg".to_string())
+        );
+        assert_eq!(found.appearance, "Updated golden coat with wise eyes");
+        assert_eq!(
+            found.bio,
+            "Updated bio: Buddy is now a mature and well-trained dog."
         );
 
         // Test update non-existent
@@ -175,6 +187,9 @@ mod database_service_tests {
         animal2.name = "Max".to_string();
         animal2.specie = "Cat".to_string();
         animal2.image_path = Some("/test/images/max.jpg".to_string());
+        animal2.appearance = "Sleek black fur with green eyes".to_string();
+        animal2.bio =
+            "Max is a calm and independent cat who enjoys sunny spots and gentle pets.".to_string();
 
         // Insert multiple animals
         db.insert_animal(&animal1).unwrap();
@@ -219,6 +234,7 @@ mod database_service_tests {
         assert_eq!(found.animal_id, "a1");
         assert_eq!(found.email, "jira.pit@gmail.com");
         assert_eq!(found.adoption_timestamp, 0);
+        assert_eq!(found.country, "Thailand");
 
         // Test query non-existent
         let not_found = db.query_adoption_request_by_id("nonexistent").unwrap();
@@ -228,6 +244,7 @@ mod database_service_tests {
         request.name = "Non Prajogo".to_string();
         request.status = RequestStatus::Approved;
         request.adoption_timestamp = Utc::now().timestamp();
+        request.country = "Indonesia".to_string();
         let updated = db.update_adoption_request(&request).unwrap();
         assert!(updated);
 
@@ -235,6 +252,7 @@ mod database_service_tests {
         assert_eq!(found.name, "Non Prajogo");
         assert_eq!(found.status, RequestStatus::Approved);
         assert_ne!(found.adoption_timestamp, 0);
+        assert_eq!(found.country, "Indonesia");
 
         // Test update non-existent
         let fake_request = sample_request("fake", "a1");
@@ -289,6 +307,7 @@ mod database_service_tests {
         request2.email = "non.prajogo@gmail.com".to_string();
         request2.tel_number = "9876543210".to_string();
         request2.annual_income = "50000".to_string();
+        request2.country = "Indonesia".to_string();
 
         db.insert_animal(&animal).unwrap();
         db.insert_adoption_request(&request1).unwrap();
