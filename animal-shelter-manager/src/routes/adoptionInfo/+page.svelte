@@ -15,7 +15,7 @@
     neutered: true,
     admission_timestamp: 1640995200,
     adoption_timestamp: 0,
-    status: AnimalStatus.REQUESTED,
+    status: AnimalStatus.PASSED_AWAY,
     image_path:
       "https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&w=800",
     appearance: "Golden fur, friendly eyes, medium build",
