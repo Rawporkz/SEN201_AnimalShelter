@@ -1,14 +1,17 @@
 <!-- 
-AdoptionInfoPopup/AdopterInfo.svelte
+ViewAnimalModal/AdopterInfo.svelte
 
 This file defines a reusable AdopterInfo component.
 -->
 <script lang="ts">
   import type { AdoptionRequest } from "../../../utils/animal-utils";
 
+  // Props
   interface Props {
+    /** The adopter information (optional) */
     adopter?: AdoptionRequest | null;
   }
+
   const { adopter }: Props = $props();
 </script>
 

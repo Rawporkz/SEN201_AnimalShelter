@@ -1,3 +1,10 @@
+<!-- 
+ViewAnimalModal.svelte
+
+Reusable modal popup component to display detailed information
+about an animal and its adopter (if applicable).
+-->
+
 <script lang="ts">
   import { User, Dog } from "@lucide/svelte";
   import AdopterInfo from "./AdopterInfo/AdopterInfo.svelte";
@@ -9,7 +16,7 @@
   /** Type definition for tab selection in the adoption info popup */
   type Tab = "animal" | "adopter";
 
-  // Props interface
+  // Props
   interface Props {
     /** The animal to display information about */
     animal: Animal;
@@ -87,6 +94,7 @@
 
   {#if adopter}
     <div class="tab-container">
+      <div class="tab-slider" class:bottom={activeTab === "animal"}></div>
       <button
         class="tab-button"
         class:active={activeTab === "adopter"}

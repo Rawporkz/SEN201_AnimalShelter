@@ -1,5 +1,5 @@
 <!-- 
-AdoptionInfoPopup/AnimalInfo.svelte
+ViewAnimalModal/AnimalInfo.svelte
 
 This file defines a reusable AnimalInfo component.
 -->
@@ -10,23 +10,25 @@ This file defines a reusable AnimalInfo component.
     calculateAge,
     getStatusDisplayText,
   } from "../../../utils/animal-utils";
+  import { ImageOff } from "@lucide/svelte";
 
+  // Props
   interface Props {
     /** The animal to display information about */
     animal: Animal;
     /** The adopter information (optional) */
     adoption_timestamp: number;
   }
+
   /** Component props with default values */
   const { animal, adoption_timestamp }: Props = $props();
 
-  // Helper to display neutered status as Yes/No
+  /** Helper to display neutered status as Yes/No */
   const getNeuteredText = (neutered: boolean) => (neutered ? "Yes" : "No");
 
-  // Helper to display birth month/year as string
+  /** Helper to display birth month/year as string */
   const getBirthMonthYear = (month: number, year: number) => `${month}/${year}`;
 
-  // Helper to display status as string
   /**
    * Returns the appropriate CSS class for the animal's status
    * @param status - The status of the animal
@@ -43,7 +45,9 @@ This file defines a reusable AnimalInfo component.
       {#if animal?.image_path}
         <img src={animal.image_path} alt="" />
       {:else}
-        <div class="placeholder-image">No Image</div>
+        <div class="placeholder-image">
+          <ImageOff size={48} />
+        </div>
       {/if}
     </div>
 
@@ -51,7 +55,7 @@ This file defines a reusable AnimalInfo component.
       <div class="status-label">Status</div>
       <button
         class="status-badge {getStatusClass(
-          getStatusDisplayText(animal?.status)
+          getStatusDisplayText(animal?.status),
         )}"
       >
         {getStatusDisplayText(animal?.status)}
