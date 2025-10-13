@@ -1,5 +1,5 @@
 //
-// lib/components/DropdownButton/style.scss
+// DropdownButton/style.scss
 //
 // Styles for DropdownButton component.
 //
@@ -8,12 +8,12 @@
 @use "sass:color";
 
 .dropdown-button-container {
-  display: inline-flex; // Ensure the container stretches vertically
-  flex-direction: column; // Stack the button and dropdown menu vertically
+  display: inline-flex;
+  flex-direction: column;
   background-color: colors.$blue-main;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  overflow: hidden; // Ensure the dropdown menu stays within the rectangle
+  overflow: hidden;
   color: white;
 }
 
@@ -22,7 +22,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 16px;
-  background-color: inherit; // Use the same background as the container
+  background-color: inherit;
   color: inherit;
   border: none;
   cursor: pointer;
@@ -47,7 +47,7 @@
     flex-shrink: 0;
     width: 20px;
     height: 20px;
-    display: flex; // Ensure consistent alignment
+    display: flex;
     align-items: center;
     justify-content: center;
   }
@@ -68,25 +68,25 @@
 }
 
 .dropdown-menu {
-  display: flex; // Stack options vertically
+  display: flex;
   flex-direction: column;
-  width: 100%; // Match the width of the button
-  background-color: inherit; // Use the same background as the container
-  padding: 0; // Remove extra padding
+  width: 100%;
+  background-color: inherit;
+  padding: 0;
 }
 
 .dropdown-divider {
-  width: 80%; // Keep consistent width for all dividers
-  height: 2px; // Ensure consistent thickness for all dividers
-  background-color: white; // Divider color
-  margin: 0 auto; // Center the divider horizontally
+  width: 80%;
+  height: 2px;
+  background-color: white;
+  margin: 0 auto;
 }
 
 .dropdown-option {
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 100%; // Stretch options to match dropdown width
+  width: 100%;
   padding: 12px 16px;
   background: none;
   border: none;
@@ -111,9 +111,9 @@
 
   .option-icon {
     flex-shrink: 0;
-    width: 20px; // Match the size of the button icon
-    height: 20px; // Match the size of the button icon
-    display: flex; // Ensure consistent alignment
+    width: 20px;
+    height: 20px;
+    display: flex;
     align-items: center;
     justify-content: center;
   }
@@ -122,3 +122,4 @@
     flex: 1;
   }
 }
+

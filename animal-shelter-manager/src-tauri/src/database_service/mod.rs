@@ -70,7 +70,10 @@ impl DatabaseService {
                 birth_year INTEGER NOT NULL,
                 neutered BOOLEAN NOT NULL,
                 admission_timestamp INTEGER NOT NULL,
-                status TEXT NOT NULL
+                status TEXT NOT NULL,
+                image_path TEXT,
+                appearance TEXT NOT NULL,
+                bio TEXT NOT NULL
             )
             ",
                 [],
@@ -95,6 +98,7 @@ impl DatabaseService {
                 request_timestamp INTEGER NOT NULL,
                 adoption_timestamp INTEGER NOT NULL,
                 status TEXT NOT NULL,
+                country TEXT NOT NULL,
                 FOREIGN KEY (animal_id) REFERENCES animals (id)
             )
             ",
@@ -115,7 +119,9 @@ impl DatabaseService {
     pub fn query_all_animals(&self) -> Result<Vec<AnimalSummary>> {
         let mut statement = self
             .connection
-            .prepare("SELECT id, name, specie, breed, sex, admission_timestamp FROM animals")
+            .prepare(
+                "SELECT id, name, specie, breed, sex, admission_timestamp, image_path FROM animals",
+            )
             .context("Failed to prepare query for all animals")?;
 
         let animal_iter = statement
@@ -127,6 +133,7 @@ impl DatabaseService {
                     breed: row.get(3)?,
                     sex: row.get(4)?,
                     admission_timestamp: row.get(5)?,
+                    image_path: row.get(6)?,
                 })
             })
             .context("Failed to execute query for all animals")?;
@@ -149,7 +156,7 @@ impl DatabaseService {
     /// * `Result<Option<Animal>>` - Complete animal information or None if not found
     pub fn query_animal_by_id(&self, animal_id: &str) -> Result<Option<Animal>> {
         let mut statement = self.connection.prepare(
-            "SELECT id, name, specie, breed, sex, birth_month, birth_year, neutered, admission_timestamp, status FROM animals WHERE id = ?1"
+            "SELECT id, name, specie, breed, sex, birth_month, birth_year, neutered, admission_timestamp, status, image_path, appearance, bio FROM animals WHERE id = ?1"
         ).context("Failed to prepare query for animal by ID")?;
 
         let mut rows = statement
@@ -165,6 +172,9 @@ impl DatabaseService {
                     neutered: row.get(7)?,
                     admission_timestamp: row.get(8)?,
                     status: row.get(9)?,
+                    image_path: row.get(10)?,
+                    appearance: row.get(11)?,
+                    bio: row.get(12)?,
                 })
             })
             .context("Failed to execute query for animal by ID")?;
@@ -191,7 +201,7 @@ impl DatabaseService {
     /// * `Result<()>` - Success or error
     pub fn insert_animal(&self, animal: &Animal) -> Result<()> {
         let rows_affected = self.connection.execute(
-            "INSERT INTO animals (id, name, specie, breed, sex, birth_month, birth_year, neutered, admission_timestamp, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
+            "INSERT INTO animals (id, name, specie, breed, sex, birth_month, birth_year, neutered, admission_timestamp, status, image_path, appearance, bio) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
             params![
                 animal.id,
                 animal.name,
@@ -202,7 +212,10 @@ impl DatabaseService {
                 animal.birth_year,
                 animal.neutered,
                 animal.admission_timestamp,
-                animal.status
+                animal.status,
+                animal.image_path,
+                animal.appearance,
+                animal.bio
             ]
         ).context("Failed to insert animal into database")?;
 
@@ -226,7 +239,7 @@ impl DatabaseService {
     /// * `Result<bool>` - True if animal was found and updated, false if not found
     pub fn update_animal(&self, animal: &Animal) -> Result<bool> {
         let rows_affected = self.connection.execute(
-            "UPDATE animals SET name = ?2, specie = ?3, breed = ?4, sex = ?5, birth_month = ?6, birth_year = ?7, neutered = ?8, admission_timestamp = ?9, status = ?10 WHERE id = ?1",
+            "UPDATE animals SET name = ?2, specie = ?3, breed = ?4, sex = ?5, birth_month = ?6, birth_year = ?7, neutered = ?8, admission_timestamp = ?9, status = ?10, image_path = ?11, appearance = ?12, bio = ?13 WHERE id = ?1",
             params![
                 animal.id,
                 animal.name,
@@ -237,7 +250,10 @@ impl DatabaseService {
                 animal.birth_year,
                 animal.neutered,
                 animal.admission_timestamp,
-                animal.status
+                animal.status,
+                animal.image_path,
+                animal.appearance,
+                animal.bio
             ]
         ).context("Failed to update animal in database")?;
 
@@ -338,7 +354,7 @@ impl DatabaseService {
         request_id: &str,
     ) -> Result<Option<AdoptionRequest>> {
         let mut statement = self.connection.prepare(
-            "SELECT id, animal_id, name, email, tel_number, address, occupation, annual_income, num_people, num_children, request_timestamp, adoption_timestamp, status FROM adoption_requests WHERE id = ?1"
+            "SELECT id, animal_id, name, email, tel_number, address, occupation, annual_income, num_people, num_children, request_timestamp, adoption_timestamp, status, country FROM adoption_requests WHERE id = ?1"
         ).context("Failed to prepare query for adoption request by ID")?;
 
         let mut rows = statement
@@ -357,6 +373,7 @@ impl DatabaseService {
                     request_timestamp: row.get(10)?,
                     adoption_timestamp: row.get(11)?,
                     status: row.get(12)?,
+                    country: row.get(13)?,
                 })
             })
             .context("Failed to execute query for adoption request by ID")?;
@@ -383,7 +400,7 @@ impl DatabaseService {
     /// * `Result<()>` - Success or error
     pub fn insert_adoption_request(&self, request: &AdoptionRequest) -> Result<()> {
         let rows_affected = self.connection.execute(
-            "INSERT INTO adoption_requests (id, animal_id, name, email, tel_number, address, occupation, annual_income, num_people, num_children, request_timestamp, adoption_timestamp, status) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
+            "INSERT INTO adoption_requests (id, animal_id, name, email, tel_number, address, occupation, annual_income, num_people, num_children, request_timestamp, adoption_timestamp, status, country) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)",
             params![
                 request.id,
                 request.animal_id,
@@ -397,7 +414,8 @@ impl DatabaseService {
                 request.num_children,
                 request.request_timestamp,
                 request.adoption_timestamp,
-                request.status
+                request.status,
+                request.country
             ]
         ).context("Failed to insert adoption request into database")?;
 
@@ -424,7 +442,7 @@ impl DatabaseService {
     /// * `Result<bool>` - True if request was found and updated, false if not found
     pub fn update_adoption_request(&self, request: &AdoptionRequest) -> Result<bool> {
         let rows_affected = self.connection.execute(
-            "UPDATE adoption_requests SET animal_id = ?2, name = ?3, email = ?4, tel_number = ?5, address = ?6, occupation = ?7, annual_income = ?8, num_people = ?9, num_children = ?10, request_timestamp = ?11, adoption_timestamp = ?12, status = ?13 WHERE id = ?1",
+            "UPDATE adoption_requests SET animal_id = ?2, name = ?3, email = ?4, tel_number = ?5, address = ?6, occupation = ?7, annual_income = ?8, num_people = ?9, num_children = ?10, request_timestamp = ?11, adoption_timestamp = ?12, status = ?13, country = ?14 WHERE id = ?1",
             params![
                 request.id,
                 request.animal_id,
@@ -438,7 +456,8 @@ impl DatabaseService {
                 request.num_children,
                 request.request_timestamp,
                 request.adoption_timestamp,
-                request.status
+                request.status,
+                request.country
             ]
         ).context("Failed to update adoption request in database")?;
 

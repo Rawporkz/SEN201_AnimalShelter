@@ -13,7 +13,7 @@ use anyhow::{bail, Context, Result};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use rusqlite::{params, Connection};
 use std::path::Path;
-use types::{UserAuthentication, UserRole};
+use types::{LoginResult, UserAuthentication, UserRole};
 
 /// Service for handling authentication operations in the animal shelter application
 pub struct AuthenticationService {
@@ -85,7 +85,6 @@ impl AuthenticationService {
             )
             .context("Failed to create user_authentication table")?;
 
-        log::debug!("Authentication database tables initialized successfully");
         Ok(())
     }
 
@@ -138,14 +137,14 @@ impl AuthenticationService {
     /// * `password` - Plain text password to verify
     ///
     /// # Returns
-    /// * `Result<bool>` - True if login successful, false if credentials invalid
-    pub fn log_in(&mut self, username: &str, password: &str) -> Result<bool> {
+    /// * `Result<LoginResult>` - Login result indicating success, invalid password, or user not found
+    pub fn log_in(&mut self, username: &str, password: &str) -> Result<LoginResult> {
         // Retrieve password hash from database
         let stored_hash = match self.get_password_hash(username)? {
             Some(hash) => hash,
             None => {
                 log::warn!("Login attempt for non-existent username: {}", username);
-                return Ok(false);
+                return Ok(LoginResult::UserNotFound);
             }
         };
 
@@ -156,10 +155,10 @@ impl AuthenticationService {
             // Set current user on successful login
             self.current_user = Some(username.to_string());
             log::info!("User logged in successfully: {}", username);
-            Ok(true)
+            Ok(LoginResult::Success)
         } else {
             log::warn!("Invalid password for username: {}", username);
-            Ok(false)
+            Ok(LoginResult::InvalidPassword)
         }
     }
 

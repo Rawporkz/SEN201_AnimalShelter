@@ -12,11 +12,8 @@ or the customer's home page based on the user's authentication status and role.
   import "./style.scss";
   import NormalButton from "$lib/components/NormalButton/NormalButton.svelte";
 
-  // Current authenticated user object, null if not logged in
+  /** Current authenticated user object, null if not logged in */
   let currentUser = $state(null);
-
-  // TEMP: Enable to quickly test the NormalButton on this page
-  const TEST_BUTTON: boolean = true;
 
   // Test click handler
   function handleRejectClick(): void {
@@ -28,39 +25,34 @@ or the customer's home page based on the user's authentication status and role.
     goto("/modal-test");
   }
 
-  onMount(() => {
-    if (TEST_BUTTON) {
-      // Skip redirect while testing the button on this page
-      return;
-    }
-
-    // Check if user is authenticated
-    if (currentUser === null) {
-      // Redirect to authentication page if not logged in
-      goto("/authentication");
-    } else {
-      // TODO: Handle authenticated user - show appropriate dashboard
-    }
-  });
+  // onMount(() => {
+  // =======
+  //   onMount(() => {
+  //     // Check if user is authenticated
+  //     if (currentUser === null) {
+  //       // Redirect to authentication page if not logged in
+  //       goto("/authentication");
+  //     } else {
+  //       // TODO: Handle authenticated user - show appropriate dashboard
+  //     }
+  //   });
 </script>
 
-{#if TEST_BUTTON}
-  <div style="padding: 16px; display: inline-block;">
-    <NormalButton
-      color="#ea4444"
-      textColor="#ffffff"
-      text="Reject"
-      width="106px"
-      onClick={handleRejectClick}
-    />
-  </div>
-  <div style="padding: 16px; display: inline-block;">
-    <NormalButton
-      color="#004abb"
-      textColor="#ffffff"
-      text="Open Modal Test"
-      width="180px"
-      onClick={openModalTest}
-    />
-  </div>
-{/if}
+<div style="padding: 16px; display: inline-block;">
+  <NormalButton
+    color="#ea4444"
+    textColor="#ffffff"
+    text="Reject"
+    width="106px"
+    onClick={handleRejectClick}
+  />
+</div>
+<div style="padding: 16px; display: inline-block;">
+  <NormalButton
+    color="#004abb"
+    textColor="#ffffff"
+    text="Open Modal Test"
+    width="180px"
+    onClick={openModalTest}
+  />
+</div>

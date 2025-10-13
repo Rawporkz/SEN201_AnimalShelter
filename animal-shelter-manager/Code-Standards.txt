@@ -11,8 +11,7 @@ General Standards
 1. Formatting
 1.1        Prioritize clarity and readability. Avoid unnecessary “innovative” approaches that result in hard-to-read codes.
 1.2        Avoid nesting too many if blocks or loop blocks
-1.3        Use consistent 4-space indentation.
-1.4        Always use K&R bracketing style, not Allman style. This is because K&R is the official standard for all languages used in this project.
+1.3        Always use K&R bracketing style, not Allman style. This is because K&R is the official standard for all languages used in this project.
 // GOOD EXAMPLE: K&R style
 fn function() {
    // ...
@@ -174,11 +173,17 @@ function wrapInArray<T>(value: T): T[] { ... }
 
 2. Page Structure
 2.1        Page components must follow SvelteKit file naming conventions:
-“+page.svelte” : the Svelte component (HTML and minimal script only)
+“+page.svelte” : the Svelte component (HTML and minimal script)
 “+page.ts” : data-loading functions (Page initialization). 
 2.2        Non-data-loading functions must not go into +page.ts. Instead, use a separate “<purpose>-utils.ts” file in the same page directory.
-2.3        Page-specific styles must be in style.scss in the same folder. This can be imported to “+page.svelte” in the <script> tag.
-2.4        <script> blocks in +page.svelte should only contain minimal typescript mainly for importing from style.scss, external components and functions.
+2.3        Page-specific styles must be in style.scss in the same folder. This can be imported to “+page.svelte” in the <script> or <style> tag.
+2.4        <script> blocks in +page.svelte should only contain minimal Typescript. Minimal Typescript includes:
+        - Import statements
+        - Props declaration
+        - Reactive variables declaration
+        - Functions that require interacting with reactive variables such as event handlers
+- Small amount of other functions/variables are allowed if offloading them makes the code less readable
+        Other codes should be offloaded to ./<purpose>-utils.ts or lib/utils/<purpose>-utils.ts
 src/routes/users/   // in user page directory
  +page.svelte      // HTML and minimal TS
  +page.ts          // data-loading function
@@ -187,7 +192,9 @@ src/routes/users/   // in user page directory
  style.scss        // page-specific styles
 	
 
-        2.5        Utility TypeScript files export what to be imported and used by +page.svelte. 
+        
+________________
+2.5        Utility TypeScript files export what to be imported and used by +page.svelte. 
 // in user-utils.ts
 export type User = {
  firstName: string;
@@ -199,8 +206,10 @@ export function formatUserName(user: User): string {
 }
 	
 
+// in +page.svelte
 <script lang="ts">
  import { formatUserName, type User } from './user-utils.ts';
+ // Use this for transitive styles only
  import './style.scss'
  
  const newUser: User = {
@@ -211,10 +220,15 @@ export function formatUserName(user: User): string {
  const formattedName: string = formatUserName(newUser);
 </script>
 
+// Use this this for component-scoped styles (not transitive)
+<style>
+ @use './style.scss'
+<style/>
+
 <p>{formattedName}</p>
 	
 
-2.6        Reusable styling variables such as colors must be declared in lib/styles/ directory. They can be imported using the “@use” syntax by other scss files.
+2.7        Reusable styling variables such as colors must be declared in lib/styles/ directory. They can be imported using the “@use” syntax by other scss files.
 // in lib/styles/colors.scss
 $grey-text: #6f6f6fff;
 $grey-light: #8c8c8cff;
@@ -229,26 +243,26 @@ $grey-border: #3a3a3aff;
  color: colors.$grey-text; //variable is used here
  margin: 0;
 }
-	________________
-
+	
 
 3. Reusable Component Structure
 3.1        All reusable components must reside in: src/lib/components/{ComponentName}/
 3.2        File naming within the component folder:
 src/lib/components/{ComponentName}/   // in component directory
  ComponentName.svelte      // HTML and minimal TS
- ComponentName.ts          // component-specific logic
  style.scss                 // component-specific styles
 	        
-3.3         Any page can import these components from there +page.svelte
+3.3         Any page can import these components from their +page.svelte
+// In +page.svelte of a page
 <script lang="ts">
  import UserCard from '$lib/components/ComponentName/ComponentName.svelte';
- import './style.scss';
 </script>
 
 <UserCard {user} />
-	4. Reusable Functions Structure
-4.1        All reusable components must reside in: src/lib/utils/
+	
+
+4. Reusable Functions Structure
+4.1        All globally reusable functions must reside in: src/lib/utils/
 4.2        File naming within the component folder:
 src/lib/utils/      // in utils directory
  date-utils.ts     // contains date-related functions
@@ -261,34 +275,30 @@ src/lib/utils/      // in utils directory
 
 
 
-________________
-
-
 TypeScript-specific Standards
 1. Casings
         Follow casings standards defined in SvelteKit-specific Standards section
 
 
 2. Formatting
-2.1        Use 4-space indentation
-2.2        Use semi-colon consistently
-2.3        Use trailing commas in objects/arrays
+2.1        Use semi-colon consistently
+2.2        Use trailing commas in objects/arrays
 const user = {
  id: 1,
  name: 'Alice',
 };
 	
 
-2.4        Always explicitly specify input/output types of every function
+2.3        Always explicitly specify input/output types of every function
 const add = (a: number, b: number): number => a + b;
 	
 
-2.5        Always explicitly specify the types for all variables
+2.4        Always explicitly specify the types for all variables
 let name: string = 'Alice';
 const age: number = 30;
 	
 
-2.6        Avoid using “any” type. Use Union types instead.
+2.5        Avoid using “any” type. Use Union types instead.
 let value: string | number;
 	
 
@@ -319,7 +329,7 @@ const MAX_RETRY: u32 = 5;
         2.4        Unit tests module (test.rs) must cover all functions defined in mod.rs
 src/database_interface/  // in module directory
  mod.rs    // contains main functionality for the module
- user-type.rs           // contains user structs and impls
+ types.rs  // contains user structs and impl blocks
  test.rs   // Unit tests for all functions defined in mod.rs
 	
 
@@ -329,13 +339,14 @@ src/database_interface/  // in module directory
 * Defines all functions that can be called by SvelteKit and TypeScript.
 * Defines and maintains app states.
 * Define how the application is initialized and run.
-________________
-   4. Formatting
+
+
+4. Formatting
 4.1        Since rustfmt (Rust official formatter) is already very strict. The code is automatically considered well-formatted as long as it follows rustfmt standard. The standard can be applied by running “cargo fmt” command.
 4.2        The code must not contain any warnings when compiled, including non-functional warnings such as unused variables, unneeded mutability for variables, and so on.
 
 
-   5. Best practises 
+5. Best practises 
         5.1        “unsafe” flag is not allowed to maintain Rust’s memory safety nature.
         5.2        Use Enums such as Option and Result instead of “special value”
 // BAD EXAMPLE: Return an empty user if user not found

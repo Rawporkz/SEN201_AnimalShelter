@@ -1,0 +1,33 @@
+//
+// NothingToShowIcon/style.scss
+//
+// Styles for NothingToShowIcon component
+//
+
+@use "../../styles/colors.scss" as colors;
+
+.nothing-to-show-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  min-height: 200px;
+}
+
+.icon-container {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.message-text {
+  font-size: 18px;
+  font-weight: 400;
+  color: colors.$grey-light;
+  margin: 0;
+  opacity: 0.8;
+  letter-spacing: 0.5px;
+}
