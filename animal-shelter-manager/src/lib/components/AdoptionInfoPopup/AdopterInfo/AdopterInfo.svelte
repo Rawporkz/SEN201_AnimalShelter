@@ -6,7 +6,10 @@ This file defines a reusable AdopterInfo component.
 <script lang="ts">
   import type { AdoptionRequest } from "../../../utils/animal-utils";
 
-  export let adopter: AdoptionRequest;
+  interface Props {
+    adopter?: AdoptionRequest | null;
+  }
+  const { adopter }: Props = $props();
 </script>
 
 <div class="adopter-info-modal" role="dialog" aria-modal="true" tabindex="0">
