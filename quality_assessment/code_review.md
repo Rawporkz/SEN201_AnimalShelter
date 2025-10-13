@@ -6,8 +6,8 @@ for `animal-shelter-manager/src/lib/utils/animal-utils.ts`
 
 
 ### AnimalStatus
-Why did we use enum? 
-it's better than putting status as a string. Enum type makes sure that we can only put one of these 4 values as an animal's status.
+Prue asks why did we use enum.
+So, Jira answers that it's better than putting status as a string. Enum type makes sure that we can only put one of these 4 values as an animal's status.
 
 ### RequestStatus
 No problem with this enum. The 3 options are sufficient for all adoption requests.
