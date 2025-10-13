@@ -70,63 +70,63 @@ This file defines a reusable AnimalInfo component.
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="animal-profile-right">
-      <div class="info-grid">
-        <div class="info-row">
-          <div class="info-item">
-            <div class="info-label">Name</div>
-            <div class="info-value">{animal?.name ?? "Unknown"}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Birth Month/Year</div>
-            <div class="info-value">
-              {animal
-                ? `${getBirthMonthYear(animal.birth_month, animal.birth_year)} (${calculateAge(animal.birth_year, animal.birth_month)})`
-                : "Unknown"}
-            </div>
-          </div>
+  <div class="animal-profile-right">
+    <div class="info-grid">
+      <div class="info-row">
+        <div class="info-item">
+          <div class="info-label">Name</div>
+          <div class="info-value">{animal?.name ?? "Unknown"}</div>
         </div>
-
-        <div class="info-row">
-          <div class="info-item">
-            <div class="info-label">Specie</div>
-            <div class="info-value">{animal?.specie ?? "Unknown"}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Breed</div>
-            <div class="info-value">{animal?.breed ?? "Unknown"}</div>
-          </div>
-        </div>
-
-        <div class="info-row">
-          <div class="info-item">
-            <div class="info-label">Sex</div>
-            <div class="info-value">{animal?.sex ?? "Unknown"}</div>
-          </div>
-          <div class="info-item">
-            <div class="info-label">Neutered</div>
-            <div class="info-value">
-              {animal ? getNeuteredText(animal.neutered) : "Unknown"}
-            </div>
+        <div class="info-item">
+          <div class="info-label">Birth Month/Year</div>
+          <div class="info-value">
+            {animal
+              ? `${getBirthMonthYear(animal.birth_month, animal.birth_year)} (${calculateAge(animal.birth_year, animal.birth_month)})`
+              : "Unknown"}
           </div>
         </div>
       </div>
 
-      <div class="divider"></div>
-
-      <!-- Appearance and bioCharacteristics are not in Animal, so omit or add if available in future -->
-      <div class="description-section">
-        <div class="description-item">
-          <div class="description-label">Appearance</div>
-          <div class="description-value">{animal?.appearance ?? "Unknown"}</div>
+      <div class="info-row">
+        <div class="info-item">
+          <div class="info-label">Specie</div>
+          <div class="info-value">{animal?.specie ?? "Unknown"}</div>
         </div>
+        <div class="info-item">
+          <div class="info-label">Breed</div>
+          <div class="info-value">{animal?.breed ?? "Unknown"}</div>
+        </div>
+      </div>
 
-        <div class="description-item">
-          <div class="description-label">Bio & Characteristics</div>
-          <div class="description-value">
-            {animal?.bio ?? "No Description Available"}
+      <div class="info-row">
+        <div class="info-item">
+          <div class="info-label">Sex</div>
+          <div class="info-value">{animal?.sex ?? "Unknown"}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Neutered</div>
+          <div class="info-value">
+            {animal ? getNeuteredText(animal.neutered) : "Unknown"}
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Appearance and bioCharacteristics are not in Animal, so omit or add if available in future -->
+    <div class="description-section">
+      <div class="description-item">
+        <div class="description-label">Appearance</div>
+        <div class="description-value">{animal?.appearance ?? "Unknown"}</div>
+      </div>
+
+      <div class="description-item">
+        <div class="description-label">Bio & Characteristics</div>
+        <div class="description-value">
+          {animal?.bio ?? "No Description Available"}
         </div>
       </div>
     </div>
