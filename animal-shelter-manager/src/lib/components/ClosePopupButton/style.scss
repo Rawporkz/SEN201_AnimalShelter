@@ -1,5 +1,5 @@
 //
-// lib/components/ClosePopupButton/style.scss
+// ClosePopupButton/style.scss
 //
 // Styles for ClosePopupButton component.
 //
@@ -15,7 +15,7 @@
   height: 50px;
   background-color: colors.$red-vibrant;
   border: none;
-  border-radius: 15px;
+  border-radius: 0 15px 0 15px;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   color: white;
@@ -31,10 +31,5 @@
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 3px color.adjust(colors.$red-vibrant, $alpha: -0.8);
-  }
-
-  svg {
-    flex-shrink: 0;
   }
 }

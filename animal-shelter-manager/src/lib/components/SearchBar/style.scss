@@ -1,0 +1,74 @@
+//
+// SearchBar/style.scss
+//
+// Styles for the SearchBar component
+//
+
+@use "../../styles/colors.scss" as colors;
+@use "sass:color";
+
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 340px;
+  height: 30px;
+  background-color: white;
+  border: 2px solid colors.$blue-main;
+  border-radius: 10px;
+  padding: 0;
+  box-sizing: border-box;
+  transition: box-shadow 0.2s ease-in-out;
+
+  &:focus-within {
+    box-shadow: 0 0 0 3px color.adjust(colors.$blue-main, $alpha: -0.9);
+  }
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: colors.$blue-main;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  height: 100%;
+  padding: 0 12px 0 36px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 400;
+  color: black;
+  outline: none;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: colors.$grey-text;
+    opacity: 1;
+  }
+
+  &:disabled {
+    background-color: colors.$grey-light;
+    color: colors.$grey-text;
+    cursor: not-allowed;
+
+    &::placeholder {
+      color: colors.$grey-border;
+    }
+  }
+
+  // Remove default styling for different browsers
+  &::-webkit-search-decoration,
+  &::-webkit-search-cancel-button,
+  &::-webkit-search-results-button,
+  &::-webkit-search-results-decoration {
+    display: none;
+  }
+}

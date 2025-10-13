@@ -94,6 +94,12 @@ pub struct Animal {
     pub admission_timestamp: i64,
     /// Current status of the animal
     pub status: AnimalStatus,
+    /// Path to the animal's image file
+    pub image_path: Option<String>,
+    /// Appearance description of the animal
+    pub appearance: String,
+    /// Bio & Characteristics of the animal
+    pub bio: String,
 }
 
 /// Simplified animal information for listing views
@@ -111,6 +117,8 @@ pub struct AnimalSummary {
     pub sex: String,
     /// Timestamp when the animal was admitted to the shelter
     pub admission_timestamp: i64,
+    /// Path to the animal's image file
+    pub image_path: Option<String>,
 }
 
 /// Represents an adoption request in the system
@@ -142,6 +150,8 @@ pub struct AdoptionRequest {
     pub adoption_timestamp: i64,
     /// Current status of the request
     pub status: RequestStatus,
+    /// Country of the requester
+    pub country: String,
 }
 
 /// Simplified adoption request information for listing views

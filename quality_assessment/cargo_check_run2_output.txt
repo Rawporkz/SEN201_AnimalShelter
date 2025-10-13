@@ -1,0 +1,3 @@
+cargo check
+   Compiling animal-shelter-manager v0.1.0 (/home/jira_pit/Documents/SEN201_AnimalShelter/animal-shelter-manager/src-tauri)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.41s

@@ -1,5 +1,5 @@
 <!-- 
-lib/components/DropdownButton/DropdownButton.svelte
+DropdownButton.svelte
 
 This file defines a reusable DropdownButton component with a dropdown menu.
 -->
@@ -10,7 +10,11 @@ This file defines a reusable DropdownButton component with a dropdown menu.
   export let label: string = "Handle";
 
   // Options for the dropdown menu
-  export let options: Array<{ label: string; icon?: string; onclick?: () => void }> = [];
+  export let options: Array<{
+    label: string;
+    icon?: string;
+    onclick?: () => void;
+  }> = [];
 
   // Icon for the dropdown button
   export let icon: string = "M12 2L2 7L12 12L22 7L12 2Z";
@@ -32,7 +36,7 @@ This file defines a reusable DropdownButton component with a dropdown menu.
    * Handles the click event for a dropdown option.
    * @param option - The selected dropdown option.
    */
-  function handleOptionClick(option: typeof options[0]): void {
+  function handleOptionClick(option: (typeof options)[0]): void {
     if (option.onclick) {
       option.onclick();
     }
@@ -61,7 +65,7 @@ This file defines a reusable DropdownButton component with a dropdown menu.
     class:open={isOpen}
     on:click|stopPropagation={toggleDropdown}
     type="button"
-    title={title}
+    {title}
   >
     <!-- Button icon -->
     <svg
@@ -71,10 +75,7 @@ This file defines a reusable DropdownButton component with a dropdown menu.
       height="16"
       viewBox="0 0 24 24"
     >
-      <path
-        d={icon}
-        fill="currentColor"
-      />
+      <path d={icon} fill="currentColor" />
     </svg>
     <!-- Button label -->
     <span class="button-label">{label}</span>
@@ -87,10 +88,7 @@ This file defines a reusable DropdownButton component with a dropdown menu.
       viewBox="0 0 24 24"
       class:rotated={isOpen}
     >
-      <path
-        d="M6 9L12 15L18 9"
-        fill="currentColor"
-      />
+      <path d="M6 9L12 15L18 9" fill="currentColor" />
     </svg>
   </button>
 
@@ -118,13 +116,9 @@ This file defines a reusable DropdownButton component with a dropdown menu.
               height="16"
               viewBox="0 0 24 24"
             >
-              <path
-                d={option.icon}
-                fill="currentColor"
-              />
+              <path d={option.icon} fill="currentColor" />
             </svg>
           {/if}
-          <!-- Option label -->
           <span>{option.label}</span>
         </button>
       {/each}

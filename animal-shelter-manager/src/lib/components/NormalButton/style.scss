@@ -1,5 +1,5 @@
 //
-// lib/components/NormalButton/style.scss
+// NormalButton/style.scss
 //
 // Styles for NormalButton component.
 //
@@ -7,46 +7,47 @@
 @use "../../styles/colors.scss" as colors;
 
 .normal-button {
-    display: flex;
-    align-items: center;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    gap: 8px;
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 8px;
 
-    &:hover {
-        opacity: 0.9;
-        transform: translateY(-1px);
-    }
+  &:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
 
-    &:active {
-        transform: translateY(0);
-    }
+  &:active {
+    transform: translateY(0);
+  }
 
-    &:disabled,
-    &[disabled] {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-    }
+  &:disabled,
+  &[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
 
-    &:disabled:hover,
-    &[disabled]:hover {
-        opacity: 0.6;
-        transform: none;
-    }
+  &:disabled:hover,
+  &[disabled]:hover {
+    opacity: 0.6;
+    transform: none;
+  }
 }
 
 .icon {
-    display: flex;
-    align-items: center;
-    font-size: 18px;
+  display: flex;
+  align-items: center;
+  font-size: 18px;
 }
 
 .text {
-    flex-shrink: 0;
+  flex-shrink: 0;
 }
+

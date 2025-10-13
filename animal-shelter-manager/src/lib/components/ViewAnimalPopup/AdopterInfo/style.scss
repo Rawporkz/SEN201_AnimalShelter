@@ -1,0 +1,77 @@
+//
+// ViewAnimalModal/AdopterInfo/style.scss
+//
+// Styles for AdopterInfo component.
+//
+
+@use "../../../styles/colors.scss" as colors;
+@use "sass:color";
+
+.adopter-info-modal {
+  position: relative;
+  background-color: white;
+  border-radius: 15px;
+  padding: 0;
+  height: 699px;
+  width: 1000px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  h1 {
+    font-size: 36px;
+    font-weight: 400;
+    margin: 0 0 32px 0;
+    color: black;
+  }
+
+  .adopter-info-header {
+    display: flex;
+    align-items: center;
+    padding: 40px 48px 0 48px;
+    flex-shrink: 0;
+  }
+
+  .adopter-info-content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding: 20px 48px 40px 48px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .adopter-info-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+
+  .adopter-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .label {
+      font-size: 14px;
+      color: colors.$grey-text;
+      font-weight: 400;
+    }
+
+    .value {
+      font-size: 18px;
+      color: black;
+      font-weight: 400;
+    }
+  }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+    background-color: colors.$grey-border;
+  }
+}
