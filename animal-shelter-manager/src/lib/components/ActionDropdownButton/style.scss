@@ -1,7 +1,7 @@
 //
-// DropdownButton/style.scss
+// ActionDropdownButton/style.scss
 //
-// Styles for DropdownButton component.
+// Styles for ActionDropdownButton component with fixed blue theme.
 //
 
 @use "../../styles/colors.scss" as colors;
@@ -11,8 +11,7 @@
   display: inline-flex;
   flex-direction: column;
   background-color: colors.$blue-main;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
   overflow: hidden;
   color: white;
 }
@@ -28,7 +27,7 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  transition: background-color 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 
   &:hover {
     background-color: color.adjust(colors.$blue-main, $lightness: 5%);
@@ -94,7 +93,7 @@
   font-size: 14px;
   text-align: left;
   cursor: pointer;
-  transition: background-color 0.15s ease-in-out;
+  transition: all 0.15s ease-in-out;
 
   &:hover {
     background-color: color.adjust(colors.$blue-main, $lightness: 5%);
@@ -122,4 +121,3 @@
     flex: 1;
   }
 }
-

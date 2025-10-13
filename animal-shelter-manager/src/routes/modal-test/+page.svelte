@@ -1,15 +1,19 @@
 <!--
 routes/modal-test/+page.svelte
 
-Demo page to test ConfirmationModel with multiple variations:
+Demo page to test ConfirmationModal with multiple variations:
 1. Deleting an Animal (with radio choices)
 2. Rejecting a Request (simple confirmation)
 3. Approving a Request (with warning box)
 -->
 
 <script lang="ts">
-  import ConfirmationModel from "$lib/components/ConfirmationModel/ConfirmationModel.svelte";
-  import NormalButton from "$lib/components/NormalButton/NormalButton.svelte";
+  import ConfirmationModal from "$lib/components/ConfirmationModal/ConfirmationModal.svelte";
+  import GenericButton from "$lib/components/GenericButton/GenericButton.svelte";
+  import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
+  import ActionDropdownButton from "$lib/components/ActionDropdownButton/ActionDropdownButton.svelte";
+  import { Settings, Trash2, Eye, Pencil } from "@lucide/svelte";
+  import { info } from "@tauri-apps/plugin-log";
   import "./style.scss";
 
   // Modal states
@@ -32,7 +36,8 @@ Demo page to test ConfirmationModel with multiple variations:
   }
 
   function deleteConfirmDisabled(): boolean {
-    if (selectedReason === "passed" || selectedReason === "mistake") return false;
+    if (selectedReason === "passed" || selectedReason === "mistake")
+      return false;
     if (selectedReason === "other") return otherText.trim().length === 0;
     return true; // nothing selected
   }
@@ -42,8 +47,11 @@ Demo page to test ConfirmationModel with multiple variations:
       reason: selectedReason,
       otherText: selectedReason === "other" ? otherText.trim() : undefined,
     };
-    console.log("Delete confirmed:", payload);
-    deleteOpen = false;
+    info(`Delete confirmed: ${JSON.stringify(payload)}`);
+  }
+
+  function onDeleteCancel() {
+    info("Delete cancelled");
   }
 
   // Reject modal functions
@@ -52,8 +60,11 @@ Demo page to test ConfirmationModel with multiple variations:
   }
 
   function onRejectConfirm() {
-    console.log("Request rejected for:", requestorName);
-    rejectOpen = false;
+    info(`Request rejected for: ${requestorName}`);
+  }
+
+  function onRejectCancel() {
+    info("Reject cancelled");
   }
 
   // Approve modal functions
@@ -62,43 +73,85 @@ Demo page to test ConfirmationModel with multiple variations:
   }
 
   function onApproveConfirm() {
-    console.log("Request approved for:", requestorName);
-    approveOpen = false;
+    info(`Request approved for: ${requestorName}`);
   }
+
+  function onApproveCancel() {
+    info("Approve cancelled");
+  }
+
+  // Dropdown button options
+  const dropdownOptions = [
+    {
+      label: "View Details",
+      icon: Eye,
+      onclick: () => info("View Details clicked"),
+    },
+    {
+      label: "Edit Animal",
+      icon: Pencil,
+      onclick: () => info("Edit Animal clicked"),
+    },
+    {
+      label: "Delete Animal",
+      icon: Trash2,
+      onclick: () => info("Delete Animal clicked from dropdown"),
+    },
+  ];
 </script>
 
 <div class="demo">
-  <h1>Confirmation Modal Examples</h1>
-  
-  <div class="demo-buttons">
-    <NormalButton 
-      text="Delete Animal" 
-      color="#ea4444" 
-      textColor="#ffffff" 
-      width="200px" 
-      onClick={handleDeleteOpen} 
-    />
-    
-    <NormalButton 
-      text="Reject Request" 
-      color="#ea4444" 
-      textColor="#ffffff" 
-      width="200px" 
-      onClick={handleRejectOpen} 
-    />
-    
-    <NormalButton 
-      text="Approve Request" 
-      color="#00b047" 
-      textColor="#ffffff" 
-      width="200px" 
-      onClick={handleApproveOpen} 
-    />
+  <h1>Component Testing Examples</h1>
+
+  <div class="demo-section">
+    <h2>Confirmation Modals</h2>
+    <div class="demo-buttons">
+      <GenericButton
+        text="Delete Animal"
+        color="#ea4444"
+        textColor="#ffffff"
+        width="200px"
+        onclick={handleDeleteOpen}
+      />
+
+      <GenericButton
+        text="Reject Request"
+        color="#ea4444"
+        textColor="#ffffff"
+        width="200px"
+        onclick={handleRejectOpen}
+      />
+
+      <GenericButton
+        text="Approve Request"
+        color="#00b047"
+        textColor="#ffffff"
+        width="200px"
+        onclick={handleApproveOpen}
+      />
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>Action Components</h2>
+    <div class="demo-buttons">
+      <ActionDropdownButton
+        label="Animal Actions"
+        icon={Settings}
+        options={dropdownOptions}
+        title="Animal management actions"
+      />
+      <ActionButton
+        text="Animal Actions"
+        icon={Settings}
+        onclick={() => info("ActionButton clicked")}
+      />
+    </div>
   </div>
 </div>
 
 <!-- Delete Animal Modal -->
-<ConfirmationModel
+<ConfirmationModal
   bind:open={deleteOpen}
   title="Deleting an Animal"
   message={`Please provide a reason of the deletion of ${animalName}.`}
@@ -110,37 +163,53 @@ Demo page to test ConfirmationModel with multiple variations:
   confirmTextColor="#ffffff"
   confirmDisabled={deleteConfirmDisabled()}
   destructive={true}
-  on:confirm={onDeleteConfirm}
+  onconfirm={onDeleteConfirm}
+  oncancel={onDeleteCancel}
 >
-  <div slot="extra">
+  {#snippet extra()}
     <div class="choices">
       <label class="choice">
-        <input type="radio" name="reason" value="passed" bind:group={selectedReason} />
+        <input
+          type="radio"
+          name="reason"
+          value="passed"
+          bind:group={selectedReason}
+        />
         <span>The animal has passed away</span>
       </label>
       <label class="choice">
-        <input type="radio" name="reason" value="mistake" bind:group={selectedReason} />
+        <input
+          type="radio"
+          name="reason"
+          value="mistake"
+          bind:group={selectedReason}
+        />
         <span>The animal was added by mistake</span>
       </label>
       <label class="choice">
-        <input type="radio" name="reason" value="other" bind:group={selectedReason} />
+        <input
+          type="radio"
+          name="reason"
+          value="other"
+          bind:group={selectedReason}
+        />
         <span>Other</span>
       </label>
 
       {#if selectedReason === "other"}
-        <textarea 
-          class="other-text" 
-          bind:value={otherText} 
-          placeholder="Type Here..." 
+        <textarea
+          class="other-text"
+          bind:value={otherText}
+          placeholder="Type Here..."
           rows={4}
         ></textarea>
       {/if}
     </div>
-  </div>
-</ConfirmationModel>
+  {/snippet}
+</ConfirmationModal>
 
 <!-- Reject Request Modal -->
-<ConfirmationModel
+<ConfirmationModal
   bind:open={rejectOpen}
   title="Rejecting a Request"
   message={`Are you sure you want to reject this adoption request by ${requestorName}?`}
@@ -152,11 +221,12 @@ Demo page to test ConfirmationModel with multiple variations:
   confirmTextColor="#ffffff"
   destructive={true}
   contentWidth="400px"
-  on:confirm={onRejectConfirm}
+  onconfirm={onRejectConfirm}
+  oncancel={onRejectCancel}
 />
 
 <!-- Approve Request Modal -->
-<ConfirmationModel
+<ConfirmationModal
   bind:open={approveOpen}
   title="Approving a Request"
   message={`Are you sure you want to approve this adoption request by ${requestorName}?`}
@@ -168,12 +238,15 @@ Demo page to test ConfirmationModel with multiple variations:
   confirmTextColor="#ffffff"
   destructive={false}
   contentWidth="400px"
-  on:confirm={onApproveConfirm}
+  onconfirm={onApproveConfirm}
+  oncancel={onApproveCancel}
 >
-  <div slot="extra" class="warning-box">
-    <div class="warning-icon">⚠️</div>
-    <div class="warning-text">
-      This will reject all other requests to this animal.
+  {#snippet extra()}
+    <div class="warning-box">
+      <div class="warning-icon">⚠️</div>
+      <div class="warning-text">
+        This will reject all other requests to this animal.
+      </div>
     </div>
-  </div>
-</ConfirmationModel>
+  {/snippet}
+</ConfirmationModal>

@@ -1,8 +1,8 @@
 <!--
-  AnimalInfoRow.svelte
+AnimalInfoRow.svelte
 
-  Reusable component that displays animal information in a horizontal row layout,
-  showing animal image, name, ID, species/breed, sex, and admission date.
+Reusable component that displays animal information in a horizontal row layout,
+showing animal image, name, ID, species/breed, sex, and admission date.
 -->
 
 <script lang="ts">
@@ -21,10 +21,14 @@
     /** Whether to show the status indicator next to the name */
     showStatus?: boolean;
     /** Action buttons or components to display on the right side */
-    children?: Snippet;
+    actions?: Snippet;
   }
 
-  const { animalSummary, showStatus = false, children }: Props = $props();
+  const {
+    animalSummary,
+    showStatus = false,
+    actions: actions,
+  }: Props = $props();
 
   /** Flag to track if the animal has a valid image */
   let hasValidImage: boolean = $state(!!animalSummary.image_path);
@@ -100,9 +104,9 @@
     </div>
   </div>
 
-  {#if children}
+  {#if actions}
     <div class="action-buttons">
-      {@render children()}
+      {@render actions()}
     </div>
   {/if}
 </div>
