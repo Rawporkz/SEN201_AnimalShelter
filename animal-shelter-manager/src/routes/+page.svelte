@@ -7,38 +7,71 @@ or the customer's home page based on the user's authentication status and role.
 -->
 
 <script lang="ts">
-  import { goto } from "$app/navigation";
-  import { onMount } from "svelte";
   import "./style.scss";
   import FormDropdownButton from "$lib/components/FormDropdownButton/FormDropdownButton.svelte";
-  import SaveFormButton from "$lib/components/SaveFormButton/SaveFormButton.svelte";
-    import { Save } from "@lucide/svelte";
 
-  /** Current authenticated user object, null if not logged in */
-  let currentUser = $state(null);
+  /** Selected value from dropdown */
+  let selectedValue: string = "";
 
-  // onMount(() => {
-  //   // Check if user is authenticated
-  //   if (currentUser === null) {
-  //     // Redirect to authentication page if not logged in
-  //     goto("/authentication");
-  //   } else {
-  //     // TODO: Handle authenticated user - show appropriate dashboard
-  //   }
-  // });
+  /**
+   * Handles dropdown selection change
+   * @param value - The selected value from dropdown
+   */
+  function handleDropdownChange(value: string): void {
+    selectedValue = value;
+  }
 </script>
 
-<div class="ccc">
+<div class="test-container">
+  <FormDropdownButton
+    options={[
+      "Dog", "Cat", "Bird", "Rabbit", "Fish", 
+      "Horse", "Cow", "Pig", "Sheep", "Goat", 
+      "Chicken", "Duck", "Turkey", "Hamster", "Guinea Pig"
+    ]}
+    placeholder="Select an animal"
+    width="300px"
+    label="Choose an animal type:"
+    maxOptions={4}
+    onSelect={handleDropdownChange}
+  />
 
-<FormDropdownButton
-  options={["Option 1", "Option 2", "Option 3"]}
-  placeholder="Select an option"
-  width="200px"
-  label="Choose an option:"
-/>
-
-<SaveFormButton disabled={false} />
+  <div class="text-below">
+    <p>This text is positioned below the dropdown.</p>
+    <p>When the dropdown opens, observe how this text behaves.</p>
+    <p>Does it get pushed down or does the dropdown overlay on top of it?</p>
+    {#if selectedValue}
+      <p><strong>Selected: {selectedValue}</strong></p>
+    {/if}
+  </div>
 </div>
 
+<style lang="scss">
+  .test-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 40px;
+    max-width: 500px;
+  }
 
+  .text-below {
+    background-color: #f0f0f0;
+    padding: 16px;
+    border-radius: 8px;
+    border: 2px solid #ddd;
 
+    p {
+      margin: 8px 0;
+      line-height: 1.5;
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+</style>
