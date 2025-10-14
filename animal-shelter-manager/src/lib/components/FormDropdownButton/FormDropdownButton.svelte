@@ -42,28 +42,35 @@
   {label}
 </h1>
 
-<!-- Dropdown button -->
-<button 
-  class="dropdown-button"
-  class:active={isActive}
-  onclick={toggle}
-  style="width: {width};"
-  class:chosen={optionChosen()}
-  >
-  {selection}
-</button>
+<div class="dropdown" style="width: {width};">
+    <!-- Dropdown button -->
+    <button 
+      class="dropdown-button"
+      class:active={isActive}
+      onclick={toggle}
+      style="width: {width};"
+      class:chosen={optionChosen()}
+      >
+      {selection}
+    </button>
 
-<!-- Dropdown options, shown only if dropdown is active -->
-{#if isActive}
-    {#each options as option, i (option)}
-        <button
-            class="dropdown-option"
-            class:last={i === options.length - 1}  onclick={() => selectOption(option)}
-            style="width: {width};"
-        >
-            {option}
-        </button>
-    {/each}
-{/if}
+    <!-- Dropdown options, shown only if dropdown is active -->
+    {#if isActive}
+        <div class="dropdown-options-container">
+        {#each options as option, i (option)}
+            <button
+                class="dropdown-option"
+                class:last={i === options.length - 1}  onclick={() => selectOption(option)}
+                style="width: {width};"
+            >
+                {option}
+            </button>
+        {#if i < options.length - 1}
+          <div class="horizontal-divider"></div>
+        {/if}
+        {/each}
+    </div>
+    {/if}
+</div>
 
 
