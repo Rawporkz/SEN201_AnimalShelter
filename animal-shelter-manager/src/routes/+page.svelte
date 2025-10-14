@@ -9,9 +9,13 @@ or the customer's home page based on the user's authentication status and role.
 <script lang="ts">
   import "./style.scss";
   import FormDropdownButton from "$lib/components/FormDropdownButton/FormDropdownButton.svelte";
+  import FormTextField from "$lib/components/FormTextField/FormTextField.svelte";
 
   /** Selected value from dropdown */
   let selectedValue: string = "";
+
+  /** Text field value */
+  let textFieldValue: string = "";
 
   /**
    * Handles dropdown selection change
@@ -23,18 +27,40 @@ or the customer's home page based on the user's authentication status and role.
 </script>
 
 <div class="test-container">
-  <FormDropdownButton
-    options={[
-      "Dog", "Cat", "Bird", "Rabbit", "Fish", 
-      "Horse", "Cow", "Pig", "Sheep", "Goat", 
-      "Chicken", "Duck", "Turkey", "Hamster", "Guinea Pig"
-    ]}
-    placeholder="Select an animal"
-    width="300px"
-    label="Choose an animal type:"
-    maxOptions={4}
-    onSelect={handleDropdownChange}
-  />
+  <div class="form-row">
+    <FormDropdownButton
+      options={[
+        "Dog",
+        "Cat",
+        "Bird",
+        "Rabbit",
+        "Fish",
+        "Horse",
+        "Cow",
+        "Pig",
+        "Sheep",
+        "Goat",
+        "Chicken",
+        "Duck",
+        "Turkey",
+        "Hamster",
+        "Guinea Pig",
+      ]}
+      placeholder="Select an animal"
+      width="300px"
+      label="Choose an animal type:"
+      maxOptions={4}
+      onSelect={handleDropdownChange}
+    />
+
+    <FormTextField
+      label="Animal description:"
+      placeholder="Enter animal description..."
+      bind:value={textFieldValue}
+      boxWidth="300px"
+      rows={1}
+    />
+  </div>
 
   <div class="text-below">
     <p>This text is positioned below the dropdown.</p>
@@ -42,6 +68,9 @@ or the customer's home page based on the user's authentication status and role.
     <p>Does it get pushed down or does the dropdown overlay on top of it?</p>
     {#if selectedValue}
       <p><strong>Selected: {selectedValue}</strong></p>
+    {/if}
+    {#if textFieldValue}
+      <p><strong>Description: {textFieldValue}</strong></p>
     {/if}
   </div>
 </div>
@@ -52,7 +81,13 @@ or the customer's home page based on the user's authentication status and role.
     flex-direction: column;
     gap: 20px;
     padding: 40px;
-    max-width: 500px;
+    max-width: 800px;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
   }
 
   .text-below {

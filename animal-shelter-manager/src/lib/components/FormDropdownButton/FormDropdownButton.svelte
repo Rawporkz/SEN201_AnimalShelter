@@ -75,47 +75,49 @@ with customizable styling, placeholder text, and width for form interfaces.
   }
 </script>
 
-<h1 class="dropdown-label">
-  {label}
-</h1>
+<div class="dropdown-container" style="width: {width};">
+  <label class="dropdown-label" for="dropdown-label">
+    {label}
+  </label>
 
-<div class="dropdown" style="width: {width};">
-  <button
-    class="dropdown-button"
-    class:active={isOpen}
-    class:chosen={optionChosen()}
-    onclick={toggle}
-    style="width: {width};"
-    type="button"
-  >
-    <span class="button-text">{text}</span>
-    <div class="chevron" class:rotated={isOpen}>
-      <ChevronDown size={16} />
-    </div>
-  </button>
-
-  {#if isOpen}
-    <div 
-      class="dropdown-options-container" 
-      class:scrollable={shouldScroll()}
-      style="--max-height: {maxOptions * 44}px;"
+  <div class="dropdown">
+    <button
+      class="dropdown-button"
+      class:active={isOpen}
+      class:chosen={optionChosen()}
+      onclick={toggle}
+      style="width: {width};"
+      type="button"
     >
-      {#each options as option, i (option)}
-        <button
-          class="dropdown-option"
-          class:last={i === options.length - 1}
-          onclick={() => selectOption(option)}
-          style="width: {width};"
-          type="button"
-        >
-          {option}
-        </button>
-        {#if i < options.length - 1}
-          <div class="horizontal-divider"></div>
-        {/if}
-      {/each}
-    </div>
-  {/if}
+      <span class="button-text">{text}</span>
+      <div class="chevron" class:rotated={isOpen}>
+        <ChevronDown size={16} />
+      </div>
+    </button>
+
+    {#if isOpen}
+      <div
+        class="dropdown-options-container"
+        class:scrollable={shouldScroll()}
+        style="--max-height: {maxOptions * 44}px;"
+      >
+        {#each options as option, i (option)}
+          <button
+            class="dropdown-option"
+            class:last={i === options.length - 1}
+            onclick={() => selectOption(option)}
+            style="width: {width};"
+            type="button"
+          >
+            {option}
+          </button>
+          {#if i < options.length - 1}
+            <div class="horizontal-divider"></div>
+          {/if}
+        {/each}
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style lang="scss">
