@@ -1,0 +1,60 @@
+//
+// ActionButton/style.scss
+//
+// Styles for ActionButton component with fixed blue theme.
+//
+
+@use "../../styles/colors.scss" as colors;
+@use "sass:color";
+
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: colors.$blue-main;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: color.adjust(colors.$blue-main, $lightness: 5%);
+  }
+
+  &:active {
+    background-color: colors.$blue-main;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
+  &:disabled,
+  &[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+
+    &:hover {
+      background-color: colors.$blue-main;
+    }
+  }
+
+  .button-icon {
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .button-text {
+    flex: 1;
+    white-space: nowrap;
+  }
+}
+

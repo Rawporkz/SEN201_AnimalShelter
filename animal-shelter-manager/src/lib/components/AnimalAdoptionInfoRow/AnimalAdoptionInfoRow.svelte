@@ -1,8 +1,8 @@
 <!--
-  AnimalAdoptionInfoRow.svelte
+AnimalAdoptionInfoRow.svelte
 
-  Reusable component that displays both animal information and adopter/requester
-  information in a horizontal row layout.
+Reusable component that displays both animal information and adopter/requester
+information in a horizontal row layout.
 -->
 
 <script lang="ts">
@@ -20,14 +20,14 @@
     /** Whether to show the "by" word between animal and adopter columns */
     showBySeparator?: boolean;
     /** Action buttons or components to display on the right side */
-    children?: Snippet;
+    actions?: Snippet;
   }
 
   const {
     animalSummary,
     adoptionRequest,
     showBySeparator = true,
-    children,
+    actions: actions,
   }: Props = $props();
 
   /** Flag to track if the animal has a valid image */
@@ -109,9 +109,9 @@
     </div>
   </div>
 
-  {#if children}
+  {#if actions}
     <div class="action-buttons">
-      {@render children()}
+      {@render actions()}
     </div>
   {/if}
 </div>

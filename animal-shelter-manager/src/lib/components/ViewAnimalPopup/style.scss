@@ -1,5 +1,5 @@
 //
-// AdoptionInfoPopup/style.scss
+// ViewAnimalModal/style.scss
 //
 // Styles for AdoptionInfoPopup component.
 //
@@ -13,7 +13,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: color.adjust(black, $lightness: 50%);
+  background-color: color.adjust(black, $alpha: -0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,9 +49,25 @@
   left: calc(50% + 500px + 20px);
   top: 50%;
   transform: translateY(-50%);
-  border-radius: 16px;
+  border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1001;
+}
+
+.tab-slider {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  right: 4px;
+  height: calc(75px - 8px);
+  background: colors.$blue-main;
+  border-radius: 12px;
+  transition: transform 0.25s ease;
+  z-index: 0;
+
+  &.bottom {
+    transform: translateY(75px);
+  }
 }
 
 .tab-button {
@@ -66,22 +82,15 @@
   position: relative;
   stroke-width: 1px;
   color: black;
-  transition:
-    color 0.2s,
-    background-color 0.2s;
-  border-radius: 12px;
+  transition: color 0.2s ease;
+  z-index: 1;
 
-  &:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    color: #333;
+  &:hover:not(.active) {
+    color: color.adjust(black, $lightness: +50%);
   }
 
   &.active {
     color: white;
-    background-color: colors.$blue-main;
-    width: 65px;
-    height: 75px;
-    border-radius: 12px;
   }
 }
 

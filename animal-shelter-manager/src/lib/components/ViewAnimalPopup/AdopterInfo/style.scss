@@ -1,5 +1,5 @@
 //
-// AdopterInfoPopup/AdopterInfo/style.scss
+// ViewAnimalModal/AdopterInfo/style.scss
 //
 // Styles for AdopterInfo component.
 //
@@ -10,13 +10,13 @@
 .adopter-info-modal {
   position: relative;
   background-color: white;
-  border-radius: 1px;
-  padding: 40px 0px 0px 48px;
+  border-radius: 15px;
+  padding: 0;
   height: 699px;
   width: 1000px;
-  overflow-y: auto;
-  box-shadow: 4px 4px 4px 0px colors.$grey-text;
-  border-radius: 15px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 
   h1 {
     font-size: 36px;
@@ -28,14 +28,17 @@
   .adopter-info-header {
     display: flex;
     align-items: center;
-    padding: 0 48px 0 0;
+    padding: 40px 48px 0 48px;
+    flex-shrink: 0;
   }
 
   .adopter-info-content {
     display: flex;
     flex-direction: column;
     gap: 24px;
-    padding: 0 48px 40px 0;
+    padding: 20px 48px 40px 48px;
+    overflow-y: auto;
+    flex: 1;
   }
 
   .adopter-info-row {
@@ -49,14 +52,18 @@
     flex-direction: column;
     gap: 4px;
 
+    &.full-width {
+      grid-column: 1 / -1;
+    }
+
     .label {
-      font-size: 12px;
+      font-size: 14px;
       color: colors.$grey-text;
       font-weight: 400;
     }
 
     .value {
-      font-size: 14px;
+      font-size: 18px;
       color: black;
       font-weight: 400;
     }

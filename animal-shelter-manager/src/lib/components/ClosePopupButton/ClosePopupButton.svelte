@@ -1,5 +1,5 @@
 <!-- 
-lib/components/ClosePopupButton.svelte
+ClosePopupButton.svelte
 
 This file defines a reusable ClosePopupButton component.
 -->

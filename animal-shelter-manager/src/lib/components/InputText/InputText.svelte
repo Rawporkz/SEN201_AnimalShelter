@@ -1,7 +1,7 @@
 <!--
-  InputText.svelte
+InputText.svelte
 
-  Reusable textarea component with configurable number of visible rows and width.
+Reusable textarea component with configurable number of visible rows and width.
 -->
 
 <script lang="ts">
