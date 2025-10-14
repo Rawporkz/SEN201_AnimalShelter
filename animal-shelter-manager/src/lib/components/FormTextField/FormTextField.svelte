@@ -1,5 +1,5 @@
 <!--
-InputText.svelte
+FormTextField.svelte
 
 Reusable textarea component with configurable number of visible rows and width.
 -->
