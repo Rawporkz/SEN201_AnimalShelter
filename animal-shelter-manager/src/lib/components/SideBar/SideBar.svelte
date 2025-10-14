@@ -21,7 +21,7 @@ This file defines a reusable SideBar component.
 
   const {
     username = "Username",
-    role = "as Staff",
+    role = "Staff",
     onSignOut = undefined,
     onNavigate = undefined,
   }: Props = $props();
@@ -57,7 +57,7 @@ This file defines a reusable SideBar component.
     </div>
     <div class="user-info">
       <h2>{username}</h2>
-      <p>{role}</p>
+      <p>as {role}</p>
     </div>
   </div>
 

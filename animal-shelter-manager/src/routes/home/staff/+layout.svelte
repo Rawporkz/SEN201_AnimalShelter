@@ -62,7 +62,7 @@
 <div class="staff-layout">
   <div class="sidebar-container">
     <SideBar
-      username="Staff User"
+      username={data.currentUser.username}
       role="Staff"
       onNavigate={handleNavigation}
       onSignOut={handleSignOut}

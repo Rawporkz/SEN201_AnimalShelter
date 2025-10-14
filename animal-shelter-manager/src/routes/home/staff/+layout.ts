@@ -5,7 +5,7 @@
  */
 
 import { redirect } from "@sveltejs/kit";
-import { getCurrentUser } from "$lib/utils/authentication-utils";
+import { getCurrentUser, CurrentUser } from "$lib/utils/authentication-utils";
 import type { LayoutLoad } from "./$types";
 import { error } from "@tauri-apps/plugin-log";
 
@@ -13,8 +13,7 @@ import { error } from "@tauri-apps/plugin-log";
 export const load: LayoutLoad = async ({ url }) => {
   try {
     // Check if user is authenticated
-    const currentUser = await getCurrentUser();
-    error(`Current User: ${JSON.stringify(currentUser)}`);
+    const currentUser: CurrentUser | null = await getCurrentUser();
 
     if (!currentUser) {
       // Redirect to authentication if not logged in
@@ -37,7 +36,7 @@ export const load: LayoutLoad = async ({ url }) => {
     };
   } catch (error) {
     // Authentication check failed, redirect to authentication
-    error("Error during authentication check");
+    error(`Error during authentication check: ${error}`);
     redirect(302, "/authentication");
   }
 };

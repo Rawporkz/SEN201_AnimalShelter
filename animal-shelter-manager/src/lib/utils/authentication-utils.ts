@@ -10,11 +10,34 @@ import { info, error } from "@tauri-apps/plugin-log";
 
 // ==================== TYPES ====================
 
-/** User role type matching the Rust backend enum */
-export type UserRole = "staff" | "customer";
+/** User role enum type */
+export enum UserRole {
+  STAFF = "staff",
+  CUSTOMER = "customer",
+}
 
-/** Login result enum matching Tauri backend */
-export type LoginResult = "success" | "invalid-password" | "user-not-found";
+/** Login result enum type */
+export enum LoginResult {
+  SUCCESS = "success",
+  INVALID_PASSWORD = "invalid-password",
+  USER_NOT_FOUND = "user-not-found",
+}
+
+/** Current user type containing username and role */
+export interface CurrentUser {
+  /** Username of the current user */
+  username: string;
+  /** Role of the current user */
+  role: UserRole;
+}
+
+/** Validation result type */
+export interface ValidationResult {
+  /** Indicates if the input is valid */
+  isValid: boolean;
+  /** Error message if validation fails */
+  errorMessage: string;
+}
 
 // ==================== INTERFACES ====================
 
@@ -63,12 +86,11 @@ export function validatePassword(password: string): boolean {
  * Validates user credentials format before attempting authentication.
  *
  * @param credentials - The user credentials to validate
- * @returns object - Contains isValid boolean and error message if invalid
+ * @returns ValidationResult - Contains isValid boolean and error message if invalid
  */
-export function validateCredentials(credentials: UserCredentials): {
-  isValid: boolean;
-  errorMessage: string;
-} {
+export function validateCredentials(
+  credentials: UserCredentials,
+): ValidationResult {
   // Check username format
   if (!validateUsername(credentials.username)) {
     return {
@@ -207,14 +229,11 @@ export async function createUserAccount(
       };
     }
 
-    /** Convert role to match backend enum format (keep lowercase) */
-    const rustRole: string = credentials.role;
-
     // Create account via Tauri backend
     await invoke("sign_up", {
       username: credentials.username,
       password: credentials.password,
-      role: rustRole,
+      role: credentials.role,
     });
 
     return {
@@ -245,12 +264,12 @@ export async function createUserAccount(
 /**
  * Gets the current logged-in user information.
  *
- * @returns Promise<object | null> - Current user info or null if not logged in
+ * @returns Promise<CurrentUser | null> - Current user info or null if not logged in
  */
-export async function getCurrentUser(): Promise<object | null> {
+export async function getCurrentUser(): Promise<CurrentUser | null> {
   try {
-    const currentUser = await invoke("get_current_user");
-    return currentUser as object | null;
+    const currentUser: CurrentUser | null = await invoke("get_current_user");
+    return currentUser;
   } catch (e) {
     error(`Get current user error: ${e}`);
     return null;
