@@ -21,4 +21,3 @@ This page displays adoption reports and analytics for staff members.
     }
   }
 </style>
-

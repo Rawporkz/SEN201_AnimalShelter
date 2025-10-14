@@ -11,7 +11,6 @@
   import { error } from "@tauri-apps/plugin-log";
   import SideBar from "$lib/components/SideBar/SideBar.svelte";
   import { logoutUser } from "$lib/utils/authentication-utils";
-  import "./style.scss";
   import type { LayoutData } from "./$types";
 
   interface Props {
@@ -62,7 +61,7 @@
 <div class="staff-layout">
   <div class="sidebar-container">
     <SideBar
-      username={data.currentUser.username}
+      username={data.currentUser?.username ?? "Staff User"}
       role="Staff"
       onNavigate={handleNavigation}
       onSignOut={handleSignOut}
@@ -74,3 +73,7 @@
     <slot />
   </main>
 </div>
+
+<style lang="scss">
+  @use "./style.scss";
+</style>
