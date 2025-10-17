@@ -1,8 +1,8 @@
 <!--
-  GenericButton.svelte
+GenericButton.svelte
 
-  Generic button component with fully customizable styling, text, and optional icon support,
-  providing complete flexibility for various use cases throughout the application.
+Generic button component with fully customizable styling, text, and optional icon support,
+providing complete flexibility for various use cases throughout the application.
 -->
 
 <script lang="ts">
