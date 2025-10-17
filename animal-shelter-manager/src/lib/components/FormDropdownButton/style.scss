@@ -31,11 +31,16 @@
   width: 100%;
 
   &.disabled {
-    background-color: colors.$grey-light;
-    border-color: colors.$grey-light;
-    color: colors.$grey-border;
     cursor: not-allowed;
+    pointer-events: none;
   }
+}
+
+.dropdown.disabled .dropdown-button {
+  background-color: colors.$grey-light;
+  border: 2px solid colors.$grey-light;
+  border-radius: 10px;
+  color: colors.$grey-border;
 }
 
 .dropdown-button {

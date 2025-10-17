@@ -351,7 +351,7 @@ Allows staff to admit new animals to the shelter system.
             <img src={imagePath} alt="Animal" class="uploaded-image" />
           {:else}
             <div class="image-placeholder">
-              <ImagePlus size={48} color="#999" />
+              <ImagePlus size={48} />
               <span class="upload-text">
                 {isUploadingImage ? "Uploading..." : "Upload Image"}
               </span>
@@ -412,6 +412,8 @@ Allows staff to admit new animals to the shelter system.
               width="100%"
               label="Breed"
               onSelect={handleBreedSelect}
+              disabled={!selectedSpecies}
+              resetOn={selectedSpecies}
             />
           </div>
         </div>

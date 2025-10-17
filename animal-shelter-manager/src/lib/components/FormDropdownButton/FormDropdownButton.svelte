@@ -25,6 +25,8 @@ with customizable styling, placeholder text, and width for form interfaces.
     maxOptions?: number;
     /** Disable the dropdown (non-interactive, muted styles) */
     disabled?: boolean;
+    /** When this value changes, the selection resets to placeholder */
+    resetOn?: unknown;
   }
 
   const {
@@ -35,6 +37,7 @@ with customizable styling, placeholder text, and width for form interfaces.
     onSelect,
     maxOptions = 5,
     disabled = false,
+    resetOn,
   }: Props = $props();
 
   /** Currently selected option, defaults to placeholder */
@@ -51,6 +54,19 @@ with customizable styling, placeholder text, and width for form interfaces.
    */
   $effect(() => {
     if (disabled && isOpen) {
+      isOpen = false;
+    }
+  });
+
+  /**
+   * Reset selection when resetOn changes (e.g., parent dependency changed).
+   * @returns void
+   */
+  let lastResetToken: unknown = undefined;
+  $effect(() => {
+    if (resetOn !== lastResetToken) {
+      lastResetToken = resetOn;
+      text = placeholder;
       isOpen = false;
     }
   });
