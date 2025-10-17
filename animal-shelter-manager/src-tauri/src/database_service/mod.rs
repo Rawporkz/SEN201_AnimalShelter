@@ -12,6 +12,7 @@ pub mod types;
 use anyhow::{bail, Context, Result};
 use rusqlite::{params, Connection};
 use std::path::Path;
+use chrono::Utc;
 use types::{AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary};
 
 /// Service for handling database operations in the animal shelter application
@@ -21,6 +22,10 @@ pub struct DatabaseService {
 }
 
 impl DatabaseService {
+    /// Generate a millisecond-precision timestamp-based ID as a string (UTC)
+    fn generate_timestamp_ms_id() -> String {
+        Utc::now().timestamp_millis().to_string()
+    }
     /// Creates a new DatabaseService instance and initializes the database
     ///
     /// # Arguments
@@ -200,10 +205,16 @@ impl DatabaseService {
     /// # Returns
     /// * `Result<()>` - Success or error
     pub fn insert_animal(&self, animal: &Animal) -> Result<()> {
+        // Auto-generate ID if not provided (or empty)
+        let id = if animal.id.trim().is_empty() {
+            Self::generate_timestamp_ms_id()
+        } else {
+            animal.id.clone()
+        };
         let rows_affected = self.connection.execute(
             "INSERT INTO animals (id, name, specie, breed, sex, birth_month, birth_year, neutered, admission_timestamp, status, image_path, appearance, bio) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
             params![
-                animal.id,
+                id,
                 animal.name,
                 animal.specie,
                 animal.breed,
@@ -220,7 +231,7 @@ impl DatabaseService {
         ).context("Failed to insert animal into database")?;
 
         if rows_affected == 1 {
-            log::info!("Successfully inserted animal with ID: {}", animal.id);
+            log::info!("Successfully inserted animal with ID: {}", id);
             Ok(())
         } else {
             bail!(
@@ -399,10 +410,16 @@ impl DatabaseService {
     /// # Returns
     /// * `Result<()>` - Success or error
     pub fn insert_adoption_request(&self, request: &AdoptionRequest) -> Result<()> {
+        // Auto-generate ID if not provided (or empty)
+        let id = if request.id.trim().is_empty() {
+            Self::generate_timestamp_ms_id()
+        } else {
+            request.id.clone()
+        };
         let rows_affected = self.connection.execute(
             "INSERT INTO adoption_requests (id, animal_id, name, email, tel_number, address, occupation, annual_income, num_people, num_children, request_timestamp, adoption_timestamp, status, country) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)",
             params![
-                request.id,
+                id,
                 request.animal_id,
                 request.name,
                 request.email,
@@ -422,7 +439,7 @@ impl DatabaseService {
         if rows_affected == 1 {
             log::info!(
                 "Successfully inserted adoption request with ID: {}",
-                request.id
+                id
             );
             Ok(())
         } else {
