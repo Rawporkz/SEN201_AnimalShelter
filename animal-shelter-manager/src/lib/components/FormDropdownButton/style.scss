@@ -49,6 +49,7 @@
   font-size: 14px;
   color: colors.$grey-text;
   cursor: pointer;
+  box-sizing: border-box;
 
   &.active {
     border-radius: 10px 10px 0 0;
@@ -90,6 +91,7 @@
   position: absolute;
   top: 100%;
   left: 0;
+  right: 0;
   width: 100%;
   background-color: white;
   border-left: 2px solid colors.$grey-light;
@@ -97,6 +99,8 @@
   border-bottom: 2px solid colors.$grey-light;
   border-radius: 0 0 10px 10px;
   overflow: hidden;
+  z-index: 2147483647;
+  box-sizing: border-box;
 
   &.scrollable {
     max-height: var(--max-height);
@@ -136,6 +140,7 @@
   cursor: pointer;
   min-height: 40px;
   box-sizing: border-box;
+  width: 100%;
 
   &:hover {
     background: color.scale(white, $lightness: -10%);
