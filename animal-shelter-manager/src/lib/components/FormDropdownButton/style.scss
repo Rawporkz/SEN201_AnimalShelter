@@ -22,9 +22,20 @@
   margin-bottom: 5px;
 }
 
+.dropdown-label-spacer {
+  height: 18px;
+}
+
 .dropdown {
   position: relative;
   width: 100%;
+
+  &.disabled {
+    background-color: colors.$grey-light;
+    border-color: colors.$grey-light;
+    color: colors.$grey-border;
+    cursor: not-allowed;
+  }
 }
 
 .dropdown-button {
@@ -47,6 +58,14 @@
   &.chosen {
     border-color: colors.$blue-main;
     color: black;
+  }
+
+  &:disabled {
+    background-color: colors.$grey-light;
+    border-color: colors.$grey-light;
+    color: colors.$grey-border;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 
   .button-text {

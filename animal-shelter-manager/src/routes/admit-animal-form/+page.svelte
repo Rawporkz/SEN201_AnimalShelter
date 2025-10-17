@@ -6,18 +6,16 @@ Allows staff to admit new animals to the shelter system.
 -->
 
 <script lang="ts">
-  import { X, ImagePlus } from "@lucide/svelte";
+  import { X, ImagePlus, Save } from "@lucide/svelte";
   import { goto } from "$app/navigation";
   import FormTextField from "$lib/components/FormTextField/FormTextField.svelte";
   import FormDropdownButton from "$lib/components/FormDropdownButton/FormDropdownButton.svelte";
+  import GenericButton from "$lib/components/GenericButton/GenericButton.svelte";
   import {
     ANIMAL_SPECIES_OPTIONS,
     ANIMAL_SEX_OPTIONS,
     NEUTERED_STATUS_OPTIONS,
     getBreedsForSpecies,
-    type AnimalSpecies,
-    type AnimalSex,
-    type NeuteredStatus,
   } from "$lib/config/animal-options";
   import {
     uploadAnimalImage,
@@ -25,7 +23,7 @@ Allows staff to admit new animals to the shelter system.
     type Animal,
     AnimalStatus,
   } from "$lib/utils/animal-utils";
-  import { info, warn, error } from "@tauri-apps/plugin-log";
+  import { info, error } from "@tauri-apps/plugin-log";
 
   /** Animal name entered by user */
   let animalName: string = $state("");
@@ -321,16 +319,12 @@ Allows staff to admit new animals to the shelter system.
         neutered: neuteredValue === "yes",
         admission_timestamp: Math.floor(Date.now() / 1000), // Current timestamp in seconds
         status: AnimalStatus.AVAILABLE,
-        image_path: imagePath,
+        image_path: imagePath!,
         appearance: animalAppearance.trim(),
         bio: animalBio.trim(),
       };
-
       info(`Creating animal: ${JSON.stringify(animal)}`);
-
       await createAnimal(animal);
-
-      info("Animal admitted successfully!");
       goto("/");
     } catch (e) {
       error(`Failed to admit animal: ${e}`);
@@ -342,154 +336,165 @@ Allows staff to admit new animals to the shelter system.
 </script>
 
 <div class="container">
-  <div class="admit-animal-card">
-    <h1 class="page-title">Admit Animal</h1>
+  <h1 class="page-title">Admit Animal</h1>
 
-    <div class="form-content">
-      <div class="left-section">
-        <div class="image-upload-area">
-          <button
-            type="button"
-            class="image-upload-button"
-            onclick={handleImageUpload}
-            disabled={isUploadingImage}
-          >
-            {#if imagePath}
-              <img src={imagePath} alt="Animal" class="uploaded-image" />
-            {:else}
-              <div class="image-placeholder">
-                <ImagePlus size={48} color="#999" />
-                <span class="upload-text">
-                  {isUploadingImage ? "Uploading..." : "Upload Image"}
-                </span>
-              </div>
-            {/if}
-          </button>
-        </div>
+  <div class="form-content">
+    <div class="left-section">
+      <div class="image-upload-area">
+        <button
+          type="button"
+          class="image-upload-button"
+          onclick={handleImageUpload}
+          disabled={isUploadingImage}
+        >
+          {#if imagePath}
+            <img src={imagePath} alt="Animal" class="uploaded-image" />
+          {:else}
+            <div class="image-placeholder">
+              <ImagePlus size={48} color="#999" />
+              <span class="upload-text">
+                {isUploadingImage ? "Uploading..." : "Upload Image"}
+              </span>
+            </div>
+          {/if}
+        </button>
       </div>
+    </div>
 
-      <div class="right-section">
-        <div class="form-fields">
-          <!-- Name Field -->
-          <div class="form-row">
+    <div class="right-section">
+      <div class="form-fields">
+        <!-- Name and Birthdate Row -->
+        <div class="form-row">
+          <div class="form-field-left">
             <FormTextField
               label="Name"
               placeholder="Enter Name"
               bind:value={animalName}
-              boxWidth="350px"
+              boxWidth="100%"
               rows={1}
             />
-            <div class="birthdate-group">
-              <span class="birthdate-label">Birthdate</span>
-              <div class="birthdate-fields">
-                <FormDropdownButton
-                  options={monthOptions}
-                  placeholder="Month"
-                  width="120px"
-                  label=""
-                  onSelect={handleMonthSelect}
-                />
-                <FormDropdownButton
-                  options={yearOptions}
-                  placeholder="Year"
-                  width="90px"
-                  label=""
-                  onSelect={handleYearSelect}
-                />
-              </div>
+          </div>
+          <div class="form-field-right">
+            <div class="birthdate-fields">
+              <FormDropdownButton
+                options={monthOptions}
+                placeholder="Month"
+                width="100%"
+                label="Birthdate"
+                onSelect={handleMonthSelect}
+              />
+              <FormDropdownButton
+                options={yearOptions}
+                placeholder="Year"
+                width="100%"
+                label="‎"
+                onSelect={handleYearSelect}
+              />
             </div>
           </div>
+        </div>
 
-          <!-- Species and Breed Row -->
-          <div class="form-row">
+        <!-- Species and Breed Row -->
+        <div class="form-row">
+          <div class="form-field-left">
             <FormDropdownButton
               options={speciesOptions}
               placeholder="Pick a species"
-              width="350px"
+              width="100%"
               label="Species"
               onSelect={handleSpeciesSelect}
             />
+          </div>
+          <div class="form-field-right">
             <FormDropdownButton
               options={getBreedOptions()}
               placeholder="Pick breeds"
-              width="350px"
+              width="100%"
               label="Breed"
               onSelect={handleBreedSelect}
             />
           </div>
+        </div>
 
-          <!-- Sex and Neutered Status Row -->
-          <div class="form-row">
+        <!-- Sex and Neutered Status Row -->
+        <div class="form-row">
+          <div class="form-field-left">
             <FormDropdownButton
               options={sexOptions}
               placeholder="Pick a sex"
-              width="350px"
+              width="100%"
               label="Sex"
               onSelect={handleSexSelect}
             />
+          </div>
+          <div class="form-field-right">
             <FormDropdownButton
               options={neuteredStatusOptions}
               placeholder="Pick a neutured status"
-              width="350px"
+              width="100%"
               label="Neutured Status"
               onSelect={handleNeuteredStatusSelect}
             />
           </div>
+        </div>
 
-          <!-- Appearance Field -->
-          <div class="form-row">
-            <FormTextField
-              label="Appearance"
-              placeholder="Type Here..."
-              bind:value={animalAppearance}
-              boxWidth="100%"
-              rows={4}
-            />
-          </div>
+        <!-- Appearance Field -->
+        <div class="form-row full-width">
+          <FormTextField
+            label="Appearance"
+            placeholder="Type Here..."
+            bind:value={animalAppearance}
+            boxWidth="100%"
+            rows={4}
+          />
+        </div>
 
-          <!-- Bio and Characteristics Field -->
-          <div class="form-row">
-            <FormTextField
-              label="Bio and Characteristics"
-              placeholder="Type Here..."
-              bind:value={animalBio}
-              boxWidth="100%"
-              rows={4}
-            />
-          </div>
+        <!-- Bio and Characteristics Field -->
+        <div class="form-row full-width">
+          <FormTextField
+            label="Bio and Characteristics"
+            placeholder="Type Here..."
+            bind:value={animalBio}
+            boxWidth="100%"
+            rows={4}
+          />
         </div>
       </div>
     </div>
-
-    <!-- Action Buttons -->
-    <div class="action-buttons">
-      <button
-        type="button"
-        class="cancel-btn"
-        onclick={handleCancel}
-        disabled={isSaving}
-      >
-        <X size={20} />
-        Cancel
-      </button>
-
-      <button
-        type="button"
-        class="save-btn"
-        onclick={handleSave}
-        disabled={isSaving}
-      >
-        Save
-      </button>
-    </div>
-
-    <!-- Error Message -->
-    {#if errorMessage}
-      <div class="error-message">
-        {errorMessage}
-      </div>
-    {/if}
   </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <GenericButton
+      color="#003a62"
+      textColor="white"
+      text="Cancel"
+      icon={X}
+      showIcon={true}
+      iconPosition="left"
+      width="120px"
+      disabled={isSaving}
+      onclick={handleCancel}
+    />
+    <GenericButton
+      color="#00b047"
+      textColor="white"
+      text="Save"
+      icon={Save}
+      showIcon={true}
+      iconPosition="left"
+      width="120px"
+      disabled={isSaving}
+      onclick={handleSave}
+    />
+  </div>
+
+  <!-- Error Message -->
+  {#if errorMessage}
+    <div class="error-message">
+      {errorMessage}
+    </div>
+  {/if}
 </div>
 
 <style lang="scss">
