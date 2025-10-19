@@ -22,10 +22,6 @@
   margin-bottom: 5px;
 }
 
-.dropdown-label-spacer {
-  height: 18px;
-}
-
 .dropdown {
   position: relative;
   width: 100%;
@@ -106,6 +102,7 @@
   overflow: hidden;
   z-index: 2147483647;
   box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
   &.scrollable {
     max-height: var(--max-height);

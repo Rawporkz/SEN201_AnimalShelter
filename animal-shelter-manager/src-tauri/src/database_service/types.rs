@@ -85,9 +85,9 @@ pub struct Animal {
     /// Sex of the animal (e.g., "Male", "Female")
     pub sex: String,
     /// Birth month of the animal (1-12)
-    pub birth_month: i32,
+    pub birth_month: Option<i32>,
     /// Birth year of the animal
-    pub birth_year: i32,
+    pub birth_year: Option<i32>,
     /// Whether the animal has been neutered
     pub neutered: bool,
     /// Timestamp when the animal was admitted to the shelter

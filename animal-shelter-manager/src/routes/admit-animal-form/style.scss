@@ -40,8 +40,8 @@
 .image-upload-button {
   width: 100%;
   height: 300px;
-  background: color.adjust(colors.$grey-light, $lightness: +15%);
-  border: 2px solid colors.$grey-border;
+  background: color.adjust(colors.$grey-light, $lightness: +30%);
+  border: 2px solid colors.$grey-light;
   border-radius: 15px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -50,7 +50,7 @@
 }
 
 .image-upload-button:hover:not(:disabled) {
-  background: color.adjust(colors.$grey-light, $lightness: +10%);
+  background: color.adjust(colors.$grey-light, $lightness: +20%);
 }
 
 .image-upload-button:disabled {

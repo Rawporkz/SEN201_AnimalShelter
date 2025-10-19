@@ -109,9 +109,9 @@ with customizable styling, placeholder text, and width for form interfaces.
   }
 
   /*
-  * Handles clicks outside of this component to close the dropdown.
-  * @param event - The pointer event fired on the document
-  */
+   * Handles clicks outside of this component to close the dropdown.
+   * @param event - The pointer event fired on the document
+   */
   function handleDocumentPointerDown(event: PointerEvent): void {
     if (!isOpen) return;
     if (!rootEl) return;
@@ -121,9 +121,9 @@ with customizable styling, placeholder text, and width for form interfaces.
   }
 
   /*
-  * Handles the Escape key to close the dropdown when open.
-  * @param event - The keyboard event fired on the document
-  */
+   * Handles the Escape key to close the dropdown when open.
+   * @param event - The keyboard event fired on the document
+   */
   function handleDocumentKeyDown(event: KeyboardEvent): void {
     if (!isOpen) return;
     if (event.key === "Escape") {
@@ -137,7 +137,11 @@ with customizable styling, placeholder text, and width for form interfaces.
   });
 
   onDestroy(() => {
-    document.removeEventListener("pointerdown", handleDocumentPointerDown, true);
+    document.removeEventListener(
+      "pointerdown",
+      handleDocumentPointerDown,
+      true,
+    );
     document.removeEventListener("keydown", handleDocumentKeyDown, true);
   });
 </script>
@@ -149,7 +153,7 @@ with customizable styling, placeholder text, and width for form interfaces.
     </label>
   {/if}
 
-  <div class="dropdown" class:disabled={disabled}>
+  <div class="dropdown" class:disabled>
     <button
       class="dropdown-button"
       class:active={isOpen}
@@ -157,7 +161,7 @@ with customizable styling, placeholder text, and width for form interfaces.
       onclick={toggle}
       style="width: {width};"
       type="button"
-      disabled={disabled}
+      {disabled}
     >
       <span class="button-text">{text}</span>
       <div class="chevron" class:rotated={isOpen}>

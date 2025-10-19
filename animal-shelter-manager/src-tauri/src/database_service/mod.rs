@@ -12,7 +12,6 @@ pub mod types;
 use anyhow::{bail, Context, Result};
 use rusqlite::{params, Connection};
 use std::path::Path;
-use chrono::Utc;
 use types::{AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary};
 
 /// Service for handling database operations in the animal shelter application
@@ -22,10 +21,6 @@ pub struct DatabaseService {
 }
 
 impl DatabaseService {
-    /// Generate a millisecond-precision timestamp-based ID as a string (UTC)
-    fn generate_timestamp_ms_id() -> String {
-        Utc::now().timestamp_millis().to_string()
-    }
     /// Creates a new DatabaseService instance and initializes the database
     ///
     /// # Arguments
@@ -71,8 +66,8 @@ impl DatabaseService {
                 specie TEXT NOT NULL,
                 breed TEXT NOT NULL,
                 sex TEXT NOT NULL,
-                birth_month INTEGER NOT NULL,
-                birth_year INTEGER NOT NULL,
+                birth_month INTEGER,
+                birth_year INTEGER,
                 neutered BOOLEAN NOT NULL,
                 admission_timestamp INTEGER NOT NULL,
                 status TEXT NOT NULL,
@@ -207,7 +202,15 @@ impl DatabaseService {
     pub fn insert_animal(&self, animal: &Animal) -> Result<()> {
         // Auto-generate ID if not provided (or empty)
         let id = if animal.id.trim().is_empty() {
-            Self::generate_timestamp_ms_id()
+            let max_id: i64 = self
+                .connection
+                .query_row(
+                    "SELECT COALESCE(MAX(CAST(id AS INTEGER)), 0) FROM animals",
+                    [],
+                    |row| row.get(0),
+                )
+                .context("Failed to query max animal ID")?;
+            (max_id + 1).to_string()
         } else {
             animal.id.clone()
         };
@@ -412,7 +415,15 @@ impl DatabaseService {
     pub fn insert_adoption_request(&self, request: &AdoptionRequest) -> Result<()> {
         // Auto-generate ID if not provided (or empty)
         let id = if request.id.trim().is_empty() {
-            Self::generate_timestamp_ms_id()
+            let max_id: i64 = self
+                .connection
+                .query_row(
+                    "SELECT COALESCE(MAX(CAST(id AS INTEGER)), 0) FROM adoption_requests",
+                    [],
+                    |row| row.get(0),
+                )
+                .context("Failed to query max adoption request ID")?;
+            (max_id + 1).to_string()
         } else {
             request.id.clone()
         };
@@ -437,10 +448,7 @@ impl DatabaseService {
         ).context("Failed to insert adoption request into database")?;
 
         if rows_affected == 1 {
-            log::info!(
-                "Successfully inserted adoption request with ID: {}",
-                id
-            );
+            log::info!("Successfully inserted adoption request with ID: {}", id);
             Ok(())
         } else {
             bail!(

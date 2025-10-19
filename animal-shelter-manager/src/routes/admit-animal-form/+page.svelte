@@ -8,6 +8,8 @@ Allows staff to admit new animals to the shelter system.
 <script lang="ts">
   import { X, ImagePlus, Save } from "@lucide/svelte";
   import { goto } from "$app/navigation";
+  import { convertFileSrc } from "@tauri-apps/api/core";
+
   import FormTextField from "$lib/components/FormTextField/FormTextField.svelte";
   import FormDropdownButton from "$lib/components/FormDropdownButton/FormDropdownButton.svelte";
   import GenericButton from "$lib/components/GenericButton/GenericButton.svelte";
@@ -55,6 +57,11 @@ Allows staff to admit new animals to the shelter system.
   /** Path to uploaded animal image */
   let imagePath: string | null = $state(null);
 
+  /** URL for the uploaded image, derived from imagePath */
+  let imageUrl: string | null = $derived(
+    imagePath ? convertFileSrc(imagePath) : null,
+  );
+
   /** Flag to indicate if form submission is in progress */
   let isSaving: boolean = $state(false);
 
@@ -66,6 +73,7 @@ Allows staff to admit new animals to the shelter system.
 
   /** Generate month options (1-12) */
   const monthOptions: string[] = [
+    "Unknown",
     "January",
     "February",
     "March",
@@ -83,7 +91,7 @@ Allows staff to admit new animals to the shelter system.
   /** Generate year options (current year back to 1990) */
   const yearOptions: string[] = (() => {
     const currentYear = new Date().getFullYear();
-    const years: string[] = [];
+    const years: string[] = ["Unknown"];
     for (let year = currentYear; year >= 1990; year--) {
       years.push(year.toString());
     }
@@ -304,8 +312,12 @@ Allows staff to admit new animals to the shelter system.
         return;
       }
 
-      const monthNumber = monthOptions.indexOf(selectedMonth) + 1;
-      const yearNumber = parseInt(selectedYear);
+      const monthNumber =
+        selectedMonth === "Unknown"
+          ? null
+          : monthOptions.indexOf(selectedMonth);
+      const yearNumber =
+        selectedYear === "Unknown" ? null : parseInt(selectedYear);
 
       // Create animal object
       const animal: Animal = {
@@ -317,7 +329,7 @@ Allows staff to admit new animals to the shelter system.
         birth_month: monthNumber,
         birth_year: yearNumber,
         neutered: neuteredValue === "yes",
-        admission_timestamp: Math.floor(Date.now() / 1000), // Current timestamp in seconds
+        admission_timestamp: Math.floor(Date.now() / 1000),
         status: AnimalStatus.AVAILABLE,
         image_path: imagePath!,
         appearance: animalAppearance.trim(),
@@ -348,7 +360,7 @@ Allows staff to admit new animals to the shelter system.
           disabled={isUploadingImage}
         >
           {#if imagePath}
-            <img src={imagePath} alt="Animal" class="uploaded-image" />
+            <img src={imageUrl} alt="Animal" class="uploaded-image" />
           {:else}
             <div class="image-placeholder">
               <ImagePlus size={48} />
