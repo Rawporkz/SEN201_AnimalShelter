@@ -5,7 +5,7 @@
  * send adoption request page, such as country lists and income ranges.
  */
 
-/** List of common countries for dropdown selection */
+/** List of countries for dropdown selection */
 export const COUNTRY_OPTIONS: string[] = [
   "Thailand",
   "Myanmar",
