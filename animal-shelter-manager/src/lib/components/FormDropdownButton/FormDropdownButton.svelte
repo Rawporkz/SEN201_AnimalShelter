@@ -7,6 +7,7 @@ with customizable styling, placeholder text, and width for form interfaces.
 
 <script lang="ts">
   import { ChevronDown } from "@lucide/svelte";
+  import { onMount, onDestroy } from "svelte";
 
   // Props interface
   interface Props {
@@ -22,6 +23,12 @@ with customizable styling, placeholder text, and width for form interfaces.
     onSelect?: (selectedValue: string) => void;
     /** Maximum number of options to show before enabling scroll */
     maxOptions?: number;
+    /** Disable the dropdown (non-interactive, muted styles) */
+    disabled?: boolean;
+    /** When this value changes, the selection resets to placeholder */
+    resetOn?: unknown;
+    /** Flag to indicate if the input is invalid */
+    isInvalid?: boolean;
   }
 
   const {
@@ -31,6 +38,9 @@ with customizable styling, placeholder text, and width for form interfaces.
     label,
     onSelect,
     maxOptions = 5,
+    disabled = false,
+    resetOn,
+    isInvalid = false,
   }: Props = $props();
 
   /** Currently selected option, defaults to placeholder */
@@ -39,10 +49,36 @@ with customizable styling, placeholder text, and width for form interfaces.
   /** State to track whether the dropdown menu is currently open */
   let isOpen: boolean = $state(false);
 
+  /** Root element reference for outside-click detection */
+  let rootEl: HTMLDivElement | null = null;
+
+  /**
+   * Close the menu when disabled is turned on.
+   */
+  $effect(() => {
+    if (disabled && isOpen) {
+      isOpen = false;
+    }
+  });
+
+  /**
+   * Reset selection when resetOn changes (e.g., parent dependency changed).
+   * @returns void
+   */
+  let lastResetToken: unknown = undefined;
+  $effect(() => {
+    if (resetOn !== lastResetToken) {
+      lastResetToken = resetOn;
+      text = placeholder;
+      isOpen = false;
+    }
+  });
+
   /**
    * Toggles the dropdown menu's visibility state.
    */
   function toggle(): void {
+    if (disabled) return;
     isOpen = !isOpen;
   }
 
@@ -51,6 +87,7 @@ with customizable styling, placeholder text, and width for form interfaces.
    * @param option - The selected option string
    */
   function selectOption(option: string): void {
+    if (disabled) return;
     text = option;
     isOpen = false;
     if (onSelect) {
@@ -73,21 +110,62 @@ with customizable styling, placeholder text, and width for form interfaces.
   function shouldScroll(): boolean {
     return options.length > maxOptions;
   }
+
+  /*
+   * Handles clicks outside of this component to close the dropdown.
+   * @param event - The pointer event fired on the document
+   */
+  function handleDocumentPointerDown(event: PointerEvent): void {
+    if (!isOpen) return;
+    if (!rootEl) return;
+    const target = event.target as Node | null;
+    if (target && rootEl.contains(target)) return;
+    isOpen = false;
+  }
+
+  /*
+   * Handles the Escape key to close the dropdown when open.
+   * @param event - The keyboard event fired on the document
+   */
+  function handleDocumentKeyDown(event: KeyboardEvent): void {
+    if (!isOpen) return;
+    if (event.key === "Escape") {
+      isOpen = false;
+    }
+  }
+
+  onMount(() => {
+    document.addEventListener("pointerdown", handleDocumentPointerDown, true);
+    document.addEventListener("keydown", handleDocumentKeyDown, true);
+  });
+
+  onDestroy(() => {
+    document.removeEventListener(
+      "pointerdown",
+      handleDocumentPointerDown,
+      true,
+    );
+    document.removeEventListener("keydown", handleDocumentKeyDown, true);
+  });
 </script>
 
-<div class="dropdown-container" style="width: {width};">
-  <label class="dropdown-label" for="dropdown-label">
-    {label}
-  </label>
+<div class="dropdown-container" style="width: {width};" bind:this={rootEl}>
+  {#if label}
+    <label class="dropdown-label" for="dropdown-label">
+      {label}
+    </label>
+  {/if}
 
-  <div class="dropdown">
+  <div class="dropdown" class:disabled>
     <button
       class="dropdown-button"
       class:active={isOpen}
       class:chosen={optionChosen()}
+      class:error-border={isInvalid}
       onclick={toggle}
       style="width: {width};"
       type="button"
+      {disabled}
     >
       <span class="button-text">{text}</span>
       <div class="chevron" class:rotated={isOpen}>
@@ -106,7 +184,6 @@ with customizable styling, placeholder text, and width for form interfaces.
             class="dropdown-option"
             class:last={i === options.length - 1}
             onclick={() => selectOption(option)}
-            style="width: {width};"
             type="button"
           >
             {option}

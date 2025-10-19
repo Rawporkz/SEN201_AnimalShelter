@@ -25,6 +25,18 @@
 .dropdown {
   position: relative;
   width: 100%;
+
+  &.disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+.dropdown.disabled .dropdown-button {
+  background-color: colors.$grey-light;
+  border: 2px solid colors.$grey-light;
+  border-radius: 10px;
+  color: colors.$grey-border;
 }
 
 .dropdown-button {
@@ -38,6 +50,7 @@
   font-size: 14px;
   color: colors.$grey-text;
   cursor: pointer;
+  box-sizing: border-box;
 
   &.active {
     border-radius: 10px 10px 0 0;
@@ -47,6 +60,18 @@
   &.chosen {
     border-color: colors.$blue-main;
     color: black;
+  }
+
+  &.error-border {
+    border-color: colors.$red-vibrant;
+  }
+
+  &:disabled {
+    background-color: colors.$grey-light;
+    border-color: colors.$grey-light;
+    color: colors.$grey-border;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 
   .button-text {
@@ -71,6 +96,7 @@
   position: absolute;
   top: 100%;
   left: 0;
+  right: 0;
   width: 100%;
   background-color: white;
   border-left: 2px solid colors.$grey-light;
@@ -78,6 +104,9 @@
   border-bottom: 2px solid colors.$grey-light;
   border-radius: 0 0 10px 10px;
   overflow: hidden;
+  z-index: 2147483647;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 
   &.scrollable {
     max-height: var(--max-height);
@@ -117,6 +146,7 @@
   cursor: pointer;
   min-height: 40px;
   box-sizing: border-box;
+  width: 100%;
 
   &:hover {
     background: color.scale(white, $lightness: -10%);

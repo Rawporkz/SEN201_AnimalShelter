@@ -39,7 +39,7 @@ struct AppState {
 /// # Arguments
 /// * `state` - Mutable reference to the application state
 /// * `app_handle` - Reference to the Tauri application handle
-async fn lazy_init_file_service(
+async fn init_file_service_once(
     state: &mut AppState,
     app_handle: &AppHandle,
 ) -> Result<(), String> {
@@ -64,7 +64,7 @@ async fn lazy_init_file_service(
 /// # Arguments
 /// * `state` - Mutable reference to the application state
 /// * `app_handle` - Reference to the Tauri application handle
-async fn lazy_init_database_service(
+async fn init_database_service_once(
     state: &mut AppState,
     app_handle: &AppHandle,
 ) -> Result<(), String> {
@@ -91,7 +91,7 @@ async fn lazy_init_database_service(
 /// # Arguments
 /// * `state` - Mutable reference to the application state
 /// * `app_handle` - Reference to the Tauri application handle
-async fn lazy_init_authentication_service(
+async fn init_authentication_service_once(
     state: &mut AppState,
     app_handle: &AppHandle,
 ) -> Result<(), String> {
@@ -129,7 +129,7 @@ async fn get_all_animals(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the database service
-    lazy_init_database_service(&mut state_guard, &app_handle).await?;
+    init_database_service_once(&mut state_guard, &app_handle).await?;
 
     // Query all animals
     match state_guard
@@ -162,7 +162,7 @@ async fn get_animal_by_id(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the database service
-    lazy_init_database_service(&mut state_guard, &app_handle).await?;
+    init_database_service_once(&mut state_guard, &app_handle).await?;
 
     // Query animal by ID
     match state_guard
@@ -197,7 +197,7 @@ async fn create_animal(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the database service
-    lazy_init_database_service(&mut state_guard, &app_handle).await?;
+    init_database_service_once(&mut state_guard, &app_handle).await?;
 
     // Insert animal
     match state_guard
@@ -229,7 +229,7 @@ async fn update_animal(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the database service
-    lazy_init_database_service(&mut state_guard, &app_handle).await?;
+    init_database_service_once(&mut state_guard, &app_handle).await?;
 
     // Update animal
     match state_guard
@@ -261,7 +261,7 @@ async fn delete_animal(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the database service
-    lazy_init_database_service(&mut state_guard, &app_handle).await?;
+    init_database_service_once(&mut state_guard, &app_handle).await?;
 
     // Delete animal
     match state_guard
@@ -294,7 +294,7 @@ async fn get_all_adoption_requests(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the database service
-    lazy_init_database_service(&mut state_guard, &app_handle).await?;
+    init_database_service_once(&mut state_guard, &app_handle).await?;
 
     // Query all adoption requests
     match state_guard
@@ -327,7 +327,7 @@ async fn get_adoption_request_by_id(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the database service
-    lazy_init_database_service(&mut state_guard, &app_handle).await?;
+    init_database_service_once(&mut state_guard, &app_handle).await?;
 
     // Query adoption request by ID
     match state_guard
@@ -362,7 +362,7 @@ async fn create_adoption_request(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the database service
-    lazy_init_database_service(&mut state_guard, &app_handle).await?;
+    init_database_service_once(&mut state_guard, &app_handle).await?;
 
     // Insert adoption request
     match state_guard
@@ -394,7 +394,7 @@ async fn update_adoption_request(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the database service
-    lazy_init_database_service(&mut state_guard, &app_handle).await?;
+    init_database_service_once(&mut state_guard, &app_handle).await?;
 
     // Update adoption request
     match state_guard
@@ -426,7 +426,7 @@ async fn delete_adoption_request(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the database service
-    lazy_init_database_service(&mut state_guard, &app_handle).await?;
+    init_database_service_once(&mut state_guard, &app_handle).await?;
 
     // Delete adoption request
     match state_guard
@@ -467,7 +467,7 @@ async fn sign_up(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the authentication service
-    lazy_init_authentication_service(&mut state_guard, &app_handle).await?;
+    init_authentication_service_once(&mut state_guard, &app_handle).await?;
 
     // Get reference to authentication service
     let auth_service = state_guard.authentication_service.as_mut().unwrap();
@@ -501,7 +501,7 @@ async fn log_in(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the authentication service
-    lazy_init_authentication_service(&mut state_guard, &app_handle).await?;
+    init_authentication_service_once(&mut state_guard, &app_handle).await?;
 
     // Get reference to authentication service
     let auth_service = state_guard.authentication_service.as_mut().unwrap();
@@ -530,7 +530,7 @@ async fn get_current_user(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the authentication service
-    lazy_init_authentication_service(&mut state_guard, &app_handle).await?;
+    init_authentication_service_once(&mut state_guard, &app_handle).await?;
 
     // Get reference to authentication service
     let auth_service = state_guard.authentication_service.as_ref().unwrap();
@@ -554,7 +554,7 @@ async fn log_out(state: State<'_, Mutex<AppState>>, app_handle: AppHandle) -> Re
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the authentication service
-    lazy_init_authentication_service(&mut state_guard, &app_handle).await?;
+    init_authentication_service_once(&mut state_guard, &app_handle).await?;
 
     // Log out user
     state_guard
@@ -583,7 +583,7 @@ async fn upload_file(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the file service
-    lazy_init_file_service(&mut state_guard, &app_handle).await?;
+    init_file_service_once(&mut state_guard, &app_handle).await?;
 
     // Perform file upload
     match state_guard
@@ -612,7 +612,7 @@ async fn delete_file(
     let mut state_guard = state.lock().await;
 
     // Lazily initialize the file service
-    lazy_init_file_service(&mut state_guard, &app_handle).await?;
+    init_file_service_once(&mut state_guard, &app_handle).await?;
 
     // Perform file deletion
     match state_guard

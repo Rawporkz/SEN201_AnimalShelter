@@ -33,15 +33,32 @@
   color: black;
   padding: 8px 10px;
   background: transparent;
-  overflow: hidden;
   transition:
     border-color 0.15s ease,
     box-shadow 0.15s ease;
 }
 
+.text-field.single-line {
+  white-space: pre;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.text-field.multi-line {
+  white-space: pre-wrap;
+  overflow-x: hidden;
+  overflow-y: auto;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
 .text-field.has-content {
   border-color: colors.$blue-main;
   color: black;
+}
+
+.text-field.error-border {
+  border-color: colors.$red-vibrant;
 }
 
 .text-field::placeholder {

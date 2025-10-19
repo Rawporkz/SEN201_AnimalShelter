@@ -17,6 +17,8 @@ Reusable textarea component with configurable number of visible rows and width.
     boxWidth?: string;
     /** Number of visible rows for the textarea (controls height) */
     rows?: number;
+    /** Flag to indicate if the input is invalid */
+    isInvalid?: boolean;
   }
 
   let {
@@ -25,49 +27,16 @@ Reusable textarea component with configurable number of visible rows and width.
     value = $bindable(""),
     boxWidth = "350px",
     rows = 3,
+    isInvalid = false,
   }: Props = $props();
 
-  /** Last accepted value that fit within the visible rows; used to reject overflow input */
-  let prevValue: string = value;
-
-  /**
-   * Handle input events. If the new content causes the textarea to overflow
-   * its visible area, revert to the previously accepted value to enforce
-   * the visual limit.
-   *
-   * @param e - Input event from the textarea
-   */
-  function handleInput(e: Event): void {
-    const el = e.target as HTMLTextAreaElement;
-    // If new content causes overflow, revert completely
-    if (el.scrollHeight > el.clientHeight) {
-      const cursor = el.selectionStart;
-      el.value = prevValue; // revert
-      // place cursor at end of allowed content
-      el.selectionStart = el.selectionEnd = Math.min(
-        cursor - 1,
-        el.value.length,
-      );
-    } else {
-      prevValue = el.value; // accept new content
-      value = el.value;
-    }
-  }
-
-  /**
-   * Prevent adding newlines when the number of lines already equals the
-   * configured visible rows (hard stop behavior).
-   *
+  /*
+   * Prevent adding newlines in single-line mode.
    * @param e - Keyboard event from the textarea
    */
   function handleKeyDown(e: KeyboardEvent): void {
-    if (e.key === "Enter") {
-      const el = e.currentTarget as HTMLTextAreaElement;
-      const lineCount = el.value.split(/\n/).length;
-      // If already at max visible rows, block new line
-      if (lineCount >= rows) {
-        e.preventDefault();
-      }
+    if (rows === 1 && e.key === "Enter") {
+      e.preventDefault();
     }
   }
 </script>
@@ -78,10 +47,12 @@ Reusable textarea component with configurable number of visible rows and width.
   <textarea
     id="text-field"
     class="text-field {value ? 'has-content' : ''}"
+    class:single-line={rows === 1}
+    class:multi-line={rows > 1}
+    class:error-border={isInvalid}
     {placeholder}
     {rows}
     bind:value
-    oninput={handleInput}
     onkeydown={handleKeyDown}
   ></textarea>
 </div>
