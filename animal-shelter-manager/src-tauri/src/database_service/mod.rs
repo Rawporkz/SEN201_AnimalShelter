@@ -66,8 +66,8 @@ impl DatabaseService {
                 specie TEXT NOT NULL,
                 breed TEXT NOT NULL,
                 sex TEXT NOT NULL,
-                birth_month INTEGER NOT NULL,
-                birth_year INTEGER NOT NULL,
+                birth_month INTEGER,
+                birth_year INTEGER,
                 neutered BOOLEAN NOT NULL,
                 admission_timestamp INTEGER NOT NULL,
                 status TEXT NOT NULL,
@@ -200,10 +200,24 @@ impl DatabaseService {
     /// # Returns
     /// * `Result<()>` - Success or error
     pub fn insert_animal(&self, animal: &Animal) -> Result<()> {
+        // Auto-generate ID if not provided (or empty)
+        let id = if animal.id.trim().is_empty() {
+            let max_id: i64 = self
+                .connection
+                .query_row(
+                    "SELECT COALESCE(MAX(CAST(id AS INTEGER)), 0) FROM animals",
+                    [],
+                    |row| row.get(0),
+                )
+                .context("Failed to query max animal ID")?;
+            (max_id + 1).to_string()
+        } else {
+            animal.id.clone()
+        };
         let rows_affected = self.connection.execute(
             "INSERT INTO animals (id, name, specie, breed, sex, birth_month, birth_year, neutered, admission_timestamp, status, image_path, appearance, bio) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)",
             params![
-                animal.id,
+                id,
                 animal.name,
                 animal.specie,
                 animal.breed,
@@ -220,7 +234,7 @@ impl DatabaseService {
         ).context("Failed to insert animal into database")?;
 
         if rows_affected == 1 {
-            log::info!("Successfully inserted animal with ID: {}", animal.id);
+            log::info!("Successfully inserted animal with ID: {}", id);
             Ok(())
         } else {
             bail!(
@@ -399,10 +413,24 @@ impl DatabaseService {
     /// # Returns
     /// * `Result<()>` - Success or error
     pub fn insert_adoption_request(&self, request: &AdoptionRequest) -> Result<()> {
+        // Auto-generate ID if not provided (or empty)
+        let id = if request.id.trim().is_empty() {
+            let max_id: i64 = self
+                .connection
+                .query_row(
+                    "SELECT COALESCE(MAX(CAST(id AS INTEGER)), 0) FROM adoption_requests",
+                    [],
+                    |row| row.get(0),
+                )
+                .context("Failed to query max adoption request ID")?;
+            (max_id + 1).to_string()
+        } else {
+            request.id.clone()
+        };
         let rows_affected = self.connection.execute(
             "INSERT INTO adoption_requests (id, animal_id, name, email, tel_number, address, occupation, annual_income, num_people, num_children, request_timestamp, adoption_timestamp, status, country) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)",
             params![
-                request.id,
+                id,
                 request.animal_id,
                 request.name,
                 request.email,
@@ -420,10 +448,7 @@ impl DatabaseService {
         ).context("Failed to insert adoption request into database")?;
 
         if rows_affected == 1 {
-            log::info!(
-                "Successfully inserted adoption request with ID: {}",
-                request.id
-            );
+            log::info!("Successfully inserted adoption request with ID: {}", id);
             Ok(())
         } else {
             bail!(

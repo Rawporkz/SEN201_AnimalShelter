@@ -15,12 +15,13 @@ or the customer's home page based on the user's authentication status and role.
   let currentUser = $state(null);
 
   onMount(() => {
-    // Check if user is authenticated
-    if (currentUser === null) {
-      // Redirect to authentication page if not logged in
-      goto("/authentication");
-    } else {
-      // TODO: Handle authenticated user - show appropriate dashboard
-    }
+    goto("/admit-animal-form");
+    //   // Check if user is authenticated
+    //   if (currentUser === null) {
+    //     // Redirect to authentication page if not logged in
+    //     goto("/authentication");
+    //   } else {
+    //     // TODO: Handle authenticated user - show appropriate dashboard
+    //   }
   });
 </script>

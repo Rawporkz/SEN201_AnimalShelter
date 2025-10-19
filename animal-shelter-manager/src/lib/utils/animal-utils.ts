@@ -47,9 +47,9 @@ export interface Animal {
   /** Sex of the animal (e.g., "Male", "Female") */
   sex: string;
   /** Birth month of the animal (1-12) */
-  birth_month: number;
+  birth_month: number | null;
   /** Birth year of the animal */
-  birth_year: number;
+  birth_year: number | null;
   /** Whether the animal has been neutered */
   neutered: boolean;
   /** Timestamp when the animal was admitted to the shelter */
@@ -354,7 +354,13 @@ export function formatTimestamp(timestamp: number): string {
  * @param birthMonth - Birth month of the animal (1-12)
  * @returns string - Age in years and months
  */
-export function calculateAge(birthYear: number, birthMonth: number): string {
+export function calculateAge(
+  birthYear: number | null,
+  birthMonth: number | null,
+): string | null {
+  if (!birthYear || !birthMonth) {
+    return null;
+  }
   const now = new Date();
   const currentYear = now.getFullYear();
   const currentMonth = now.getMonth() + 1;
