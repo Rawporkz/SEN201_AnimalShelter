@@ -27,6 +27,8 @@ with customizable styling, placeholder text, and width for form interfaces.
     disabled?: boolean;
     /** When this value changes, the selection resets to placeholder */
     resetOn?: unknown;
+    /** Flag to indicate if the input is invalid */
+    isInvalid?: boolean;
   }
 
   const {
@@ -38,6 +40,7 @@ with customizable styling, placeholder text, and width for form interfaces.
     maxOptions = 5,
     disabled = false,
     resetOn,
+    isInvalid = false,
   }: Props = $props();
 
   /** Currently selected option, defaults to placeholder */
@@ -158,6 +161,7 @@ with customizable styling, placeholder text, and width for form interfaces.
       class="dropdown-button"
       class:active={isOpen}
       class:chosen={optionChosen()}
+      class:error-border={isInvalid}
       onclick={toggle}
       style="width: {width};"
       type="button"

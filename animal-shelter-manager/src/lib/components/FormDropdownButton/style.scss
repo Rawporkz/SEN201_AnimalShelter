@@ -62,6 +62,10 @@
     color: black;
   }
 
+  &.error-border {
+    border-color: colors.$red-vibrant;
+  }
+
   &:disabled {
     background-color: colors.$grey-light;
     border-color: colors.$grey-light;

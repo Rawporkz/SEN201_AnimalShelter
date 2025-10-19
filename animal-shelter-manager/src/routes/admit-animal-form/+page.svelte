@@ -68,6 +68,20 @@ Allows staff to admit new animals to the shelter system.
   /** Flag to indicate if image upload is in progress */
   let isUploadingImage: boolean = $state(false);
 
+  /** Validity states for form fields */
+  let isAnimalNameInvalid: boolean = $state(false);
+  let isSelectedMonthInvalid: boolean = $state(false);
+  let isSelectedYearInvalid: boolean = $state(false);
+  let isSelectedSpeciesInvalid: boolean = $state(false);
+  let isSelectedBreedInvalid: boolean = $state(false);
+  let isSelectedSexInvalid: boolean = $state(false);
+  let isSelectedNeuteredStatusInvalid: boolean = $state(false);
+  let isAnimalAppearanceInvalid: boolean = $state(false);
+  let isAnimalBioInvalid: boolean = $state(false);
+
+  /** Flag to indicate if the user has attempted to save the form */
+  let hasAttemptedSave: boolean = $state(false);
+
   /** Error message to display */
   let errorMessage: string = $state("");
 
@@ -228,52 +242,69 @@ Allows staff to admit new animals to the shelter system.
    * @returns boolean - True if form is valid, false otherwise
    */
   function validateForm(): boolean {
+    let isValid = true;
+
+    // Reset all invalid flags
+    isAnimalNameInvalid = false;
+    isSelectedMonthInvalid = false;
+    isSelectedYearInvalid = false;
+    isSelectedSpeciesInvalid = false;
+    isSelectedBreedInvalid = false;
+    isSelectedSexInvalid = false;
+    isSelectedNeuteredStatusInvalid = false;
+    isAnimalAppearanceInvalid = false;
+    isAnimalBioInvalid = false;
+
     if (!animalName.trim()) {
-      setError("Please enter the animal's name.");
-      return false;
+      isAnimalNameInvalid = true;
+      isValid = false;
     }
 
     if (!selectedMonth) {
-      setError("Please select a birth month.");
-      return false;
+      isSelectedMonthInvalid = true;
+      isValid = false;
     }
 
     if (!selectedYear) {
-      setError("Please select a birth year.");
-      return false;
+      isSelectedYearInvalid = true;
+      isValid = false;
     }
 
     if (!selectedSpecies) {
-      setError("Please select a species.");
-      return false;
+      isSelectedSpeciesInvalid = true;
+      isValid = false;
     }
 
     if (!selectedBreed) {
-      setError("Please select a breed.");
-      return false;
+      isSelectedBreedInvalid = true;
+      isValid = false;
     }
 
     if (!selectedSex) {
-      setError("Please select a sex.");
-      return false;
+      isSelectedSexInvalid = true;
+      isValid = false;
     }
 
     if (!selectedNeuteredStatus) {
-      setError("Please select a neutered status.");
-      return false;
+      isSelectedNeuteredStatusInvalid = true;
+      isValid = false;
     }
 
     if (!animalAppearance.trim()) {
-      setError("Please describe the animal's appearance.");
-      return false;
+      isAnimalAppearanceInvalid = true;
+      isValid = false;
     }
 
     if (!animalBio.trim()) {
-      setError("Please provide bio and characteristics.");
-      return false;
+      isAnimalBioInvalid = true;
+      isValid = false;
     }
 
-    return true;
+    if (!isValid) {
+      setError("Please fill in all required fields correctly.");
+    }
+
+    return isValid;
   }
 
   /**
@@ -288,6 +319,7 @@ Allows staff to admit new animals to the shelter system.
    */
   async function handleSave(): Promise<void> {
     clearError();
+    hasAttemptedSave = true;
 
     if (!validateForm()) {
       return;
@@ -384,6 +416,7 @@ Allows staff to admit new animals to the shelter system.
               bind:value={animalName}
               boxWidth="100%"
               rows={1}
+              isInvalid={hasAttemptedSave && isAnimalNameInvalid}
             />
           </div>
           <div class="form-field-right">
@@ -394,6 +427,7 @@ Allows staff to admit new animals to the shelter system.
                 width="100%"
                 label="Birthdate"
                 onSelect={handleMonthSelect}
+                isInvalid={hasAttemptedSave && isSelectedMonthInvalid}
               />
               <FormDropdownButton
                 options={yearOptions}
@@ -401,6 +435,7 @@ Allows staff to admit new animals to the shelter system.
                 width="100%"
                 label="‎"
                 onSelect={handleYearSelect}
+                isInvalid={hasAttemptedSave && isSelectedYearInvalid}
               />
             </div>
           </div>
@@ -415,6 +450,7 @@ Allows staff to admit new animals to the shelter system.
               width="100%"
               label="Species"
               onSelect={handleSpeciesSelect}
+              isInvalid={hasAttemptedSave && isSelectedSpeciesInvalid}
             />
           </div>
           <div class="form-field-right">
@@ -426,6 +462,7 @@ Allows staff to admit new animals to the shelter system.
               onSelect={handleBreedSelect}
               disabled={!selectedSpecies}
               resetOn={selectedSpecies}
+              isInvalid={hasAttemptedSave && isSelectedBreedInvalid}
             />
           </div>
         </div>
@@ -439,6 +476,7 @@ Allows staff to admit new animals to the shelter system.
               width="100%"
               label="Sex"
               onSelect={handleSexSelect}
+              isInvalid={hasAttemptedSave && isSelectedSexInvalid}
             />
           </div>
           <div class="form-field-right">
@@ -448,6 +486,7 @@ Allows staff to admit new animals to the shelter system.
               width="100%"
               label="Neutured Status"
               onSelect={handleNeuteredStatusSelect}
+              isInvalid={hasAttemptedSave && isSelectedNeuteredStatusInvalid}
             />
           </div>
         </div>
@@ -460,6 +499,7 @@ Allows staff to admit new animals to the shelter system.
             bind:value={animalAppearance}
             boxWidth="100%"
             rows={4}
+            isInvalid={hasAttemptedSave && isAnimalAppearanceInvalid}
           />
         </div>
 
@@ -471,6 +511,7 @@ Allows staff to admit new animals to the shelter system.
             bind:value={animalBio}
             boxWidth="100%"
             rows={4}
+            isInvalid={hasAttemptedSave && isAnimalBioInvalid}
           />
         </div>
       </div>
