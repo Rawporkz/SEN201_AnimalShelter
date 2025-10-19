@@ -57,6 +57,10 @@
   color: black;
 }
 
+.text-field.error-border {
+  border-color: colors.$red-vibrant;
+}
+
 .text-field::placeholder {
   color: colors.$grey-text;
 }

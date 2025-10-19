@@ -17,6 +17,8 @@ Reusable textarea component with configurable number of visible rows and width.
     boxWidth?: string;
     /** Number of visible rows for the textarea (controls height) */
     rows?: number;
+    /** Flag to indicate if the input is invalid */
+    isInvalid?: boolean;
   }
 
   let {
@@ -25,6 +27,7 @@ Reusable textarea component with configurable number of visible rows and width.
     value = $bindable(""),
     boxWidth = "350px",
     rows = 3,
+    isInvalid = false,
   }: Props = $props();
 
   /*
@@ -46,6 +49,7 @@ Reusable textarea component with configurable number of visible rows and width.
     class="text-field {value ? 'has-content' : ''}"
     class:single-line={rows === 1}
     class:multi-line={rows > 1}
+    class:error-border={isInvalid}
     {placeholder}
     {rows}
     bind:value
