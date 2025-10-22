@@ -87,7 +87,7 @@ This page displays all adoption requests for staff members to review and manage.
         id: "req-003",
         animal_id: "123121",
         name: "Win",
-        email: "someone@gmail.com",
+        email: "Win@gmail.com",
         adoption_timestamp: 1736380800,
         status: RequestStatus.APPROVED,
       } as AdoptionRequest,
