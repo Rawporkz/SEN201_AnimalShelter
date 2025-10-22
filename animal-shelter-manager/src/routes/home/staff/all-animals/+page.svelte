@@ -26,6 +26,7 @@ This page displays all animals in the shelter system for staff members.
     Pencil,
     ClipboardList,
   } from "@lucide/svelte";
+  import { goto } from "$app/navigation";
 
   // Mock data
   let animals: AnimalSummary[] = $state([
@@ -131,6 +132,7 @@ This page displays all animals in the shelter system for staff members.
    */
   function handleAdmitAnimal(): void {
     // Navigate to admit animal page
+    goto("/admit-animal-form");
     console.log("Admit new animal");
   }
 

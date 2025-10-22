@@ -10,12 +10,10 @@ or the customer's home page based on the user's authentication status and role.
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import { error } from "@tauri-apps/plugin-log";
-  import {
-    getCurrentUser,
-    type UserRole,
-  } from "$lib/utils/authentication-utils";
+  import { getCurrentUser, UserRole } from "$lib/utils/authentication-utils";
   import "./style.scss";
   import SideBar from "$lib/components/SideBar/SideBar.svelte";
+  import { User } from "@lucide/svelte";
 
   /** Current authenticated user object with role, null if not logged in */
   let currentUser: { username: string; role: UserRole } | null = $state(null);
@@ -31,6 +29,7 @@ or the customer's home page based on the user's authentication status and role.
       if (currentUser === null) {
         // Redirect to authentication page if not logged in
         goto("/authentication");
+        currentUser = { username: "aaa", role: UserRole.STAFF };
       } else {
         // Handle authenticated user - redirect to appropriate dashboard based on role
         if (currentUser.role === "staff") {
