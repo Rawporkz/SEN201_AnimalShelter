@@ -43,7 +43,7 @@ This page displays all animals in the shelter system for staff members.
     },
     {
       id: "542312",
-      name: "Besoz",
+      name: "Mr.Butters",
       specie: "Cat",
       breed: "Foldex",
       sex: "Female",
@@ -95,6 +95,8 @@ This page displays all animals in the shelter system for staff members.
    */
   function handleFilterClose(selections: FilterSelections): void {
     filterSelections = selections;
+    // print out all selections for demo
+    console.log("Filter selections:", filterSelections);
     isFilterModalOpen = false;
   }
 
@@ -133,7 +135,6 @@ This page displays all animals in the shelter system for staff members.
   function handleAdmitAnimal(): void {
     // Navigate to admit animal page
     goto("/admit-animal-form");
-    console.log("Admit new animal");
   }
 
   /**
