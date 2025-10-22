@@ -185,15 +185,14 @@ This page displays all animals in the shelter system for staff members.
     {#each filteredAnimals as animal (animal.id)}
       <AnimalInfoRow animalSummary={animal} showStatus={true}>
         {#snippet actions()}
-          <button
-            class="action-button view-button"
-            onclick={() => handleViewAnimal(animal)}
-          >
-            <Eye size={16} />
-            <span>View</span>
-          </button>
-
           {#if animal.status === "available"}
+            <button
+              class="action-button view-button"
+              onclick={() => handleViewAnimal(animal)}
+            >
+              <Eye size={16} />
+              <span>View</span>
+            </button>
             <button
               class="action-button edit-button"
               onclick={() => handleEditAnimal(animal.id)}

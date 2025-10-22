@@ -69,7 +69,8 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
-  height: 30px;
+  height: 31px;
+  width: 155px;
   margin-left: auto;
   transition: background-color 0.2s ease;
 
@@ -100,6 +101,8 @@
   cursor: pointer;
   transition: all 0.2s ease;
   white-space: nowrap;
+  width: 155px;
+  height: 31px;
 
   &.view-button {
     background-color: colors.$blue-main;
