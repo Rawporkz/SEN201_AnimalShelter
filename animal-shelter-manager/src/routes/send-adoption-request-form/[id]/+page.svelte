@@ -11,7 +11,6 @@
   import type { PageData } from "./$types";
   import { info, error } from "@tauri-apps/plugin-log";
   import { convertFileSrc } from "@tauri-apps/api/core";
-
   import FormTextField from "$lib/components/FormTextField/FormTextField.svelte";
   import FormDropdownButton from "$lib/components/FormDropdownButton/FormDropdownButton.svelte";
   import GenericButton from "$lib/components/GenericButton/GenericButton.svelte";

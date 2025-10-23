@@ -10,7 +10,6 @@ This page displays all adoption reports for staff members to review.
   import SideBar from "$lib/components/SideBar/SideBar.svelte";
   import { logoutUser } from "$lib/utils/authentication-utils";
   import type { PageData } from "./$types";
-
   import SearchBar from "$lib/components/SearchBar/SearchBar.svelte";
   import AnimalAdoptionInfoRow from "$lib/components/AnimalAdoptionInfoRow/AnimalAdoptionInfoRow.svelte";
   import FilterModal from "$lib/components/FilterModal/FilterModal.svelte";
@@ -28,6 +27,7 @@ This page displays all adoption reports for staff members to review.
     getAnimalById,
     getAdoptionRequestById,
     getAnimals,
+    RequestStatus,
     AnimalStatus,
   } from "$lib/utils/animal-utils";
   import { SlidersHorizontal, Eye } from "@lucide/svelte";

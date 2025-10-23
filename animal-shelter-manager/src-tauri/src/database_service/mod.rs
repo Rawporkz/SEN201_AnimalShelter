@@ -132,16 +132,22 @@ impl DatabaseService {
 
         if let Some(filters_map) = filters {
             if !filters_map.is_empty() {
-                for (criteria, value_option) in filters_map { // Renamed value to value_option
-                    if let Some(value) = value_option { // Added unwrap for Option<FilterValue>
+                for (criteria, value_option) in filters_map {
+                    // Renamed value to value_option
+                    if let Some(value) = value_option {
+                        // Added unwrap for Option<FilterValue>
                         match criteria {
                             FilterCriteria::Status => {
                                 if let FilterValue::ChooseMany(stati) = value {
                                     if stati.is_empty() {
                                         where_clauses.push("1=0".to_string()); // No matches if empty list
                                     } else {
-                                        let placeholders: Vec<_> = stati.iter().map(|_| "?").collect();
-                                        where_clauses.push(format!("status IN ({})", placeholders.join(",")));
+                                        let placeholders: Vec<_> =
+                                            stati.iter().map(|_| "?").collect();
+                                        where_clauses.push(format!(
+                                            "status IN ({})",
+                                            placeholders.join(",")
+                                        ));
                                         for s in stati {
                                             params.push(rusqlite::types::Value::from(s));
                                         }
@@ -153,8 +159,10 @@ impl DatabaseService {
                                     if sexes.is_empty() {
                                         where_clauses.push("1=0".to_string()); // No matches if empty list
                                     } else {
-                                        let placeholders: Vec<_> = sexes.iter().map(|_| "?").collect();
-                                        where_clauses.push(format!("sex IN ({})", placeholders.join(",")));
+                                        let placeholders: Vec<_> =
+                                            sexes.iter().map(|_| "?").collect();
+                                        where_clauses
+                                            .push(format!("sex IN ({})", placeholders.join(",")));
                                         for s in sexes {
                                             params.push(rusqlite::types::Value::from(s));
                                         }
@@ -182,9 +190,13 @@ impl DatabaseService {
                                             }
                                         }
                                         if species_clauses.is_empty() {
-                                            where_clauses.push("1=0".to_string()); // No matches if all nested breed lists are empty
+                                            where_clauses.push("1=0".to_string());
+                                        // No matches if all nested breed lists are empty
                                         } else {
-                                            where_clauses.push(format!("({})", species_clauses.join(" OR ")));
+                                            where_clauses.push(format!(
+                                                "({})",
+                                                species_clauses.join(" OR ")
+                                            ));
                                         }
                                     }
                                 }
@@ -203,7 +215,10 @@ impl DatabaseService {
             query.push_str(&where_clauses.join(" AND "));
         }
 
-        let mut statement = self.connection.prepare(&query).context(format!("Failed to prepare query for animals: {}", query))?;
+        let mut statement = self
+            .connection
+            .prepare(&query)
+            .context(format!("Failed to prepare query for animals: {}", query))?;
 
         let animal_iter = statement
             .query_map(rusqlite::params_from_iter(params.iter()), |row| {
@@ -412,7 +427,9 @@ impl DatabaseService {
         &self,
         filters: Option<HashMap<FilterCriteria, Option<FilterValue>>>,
     ) -> Result<Vec<AdoptionRequestSummary>> {
-        let mut query = "SELECT id, animal_id, name, email, request_timestamp FROM adoption_requests".to_string();
+        let mut query =
+            "SELECT id, animal_id, name, email, request_timestamp FROM adoption_requests"
+                .to_string();
         let mut where_clauses: Vec<String> = Vec::new();
         let mut params: Vec<rusqlite::types::Value> = Vec::new();
 
@@ -426,8 +443,12 @@ impl DatabaseService {
                                     if stati.is_empty() {
                                         where_clauses.push("1=0".to_string());
                                     } else {
-                                        let placeholders: Vec<_> = stati.iter().map(|_| "?").collect();
-                                        where_clauses.push(format!("status IN ({})", placeholders.join(",")));
+                                        let placeholders: Vec<_> =
+                                            stati.iter().map(|_| "?").collect();
+                                        where_clauses.push(format!(
+                                            "status IN ({})",
+                                            placeholders.join(",")
+                                        ));
                                         for s in stati {
                                             params.push(rusqlite::types::Value::from(s));
                                         }
@@ -439,7 +460,8 @@ impl DatabaseService {
                                     if sexes.is_empty() {
                                         where_clauses.push("1=0".to_string());
                                     } else {
-                                        let placeholders: Vec<_> = sexes.iter().map(|_| "?").collect();
+                                        let placeholders: Vec<_> =
+                                            sexes.iter().map(|_| "?").collect();
                                         where_clauses.push(format!("animal_id IN (SELECT id FROM animals WHERE sex IN ({}))", placeholders.join(",")));
                                         for s in sexes {
                                             params.push(rusqlite::types::Value::from(s));
@@ -470,7 +492,10 @@ impl DatabaseService {
                                         if species_clauses.is_empty() {
                                             where_clauses.push("1=0".to_string());
                                         } else {
-                                            where_clauses.push(format!("animal_id IN (SELECT id FROM animals WHERE {})", species_clauses.join(" OR ")));
+                                            where_clauses.push(format!(
+                                                "animal_id IN (SELECT id FROM animals WHERE {})",
+                                                species_clauses.join(" OR ")
+                                            ));
                                         }
                                     }
                                 }
@@ -509,7 +534,10 @@ impl DatabaseService {
                                 }
                             }
                             _ => {
-                                log::warn!("Unsupported filter criteria for adoption requests: {:?}", criteria);
+                                log::warn!(
+                                    "Unsupported filter criteria for adoption requests: {:?}",
+                                    criteria
+                                );
                             }
                         }
                     }
@@ -522,10 +550,10 @@ impl DatabaseService {
             query.push_str(&where_clauses.join(" AND "));
         }
 
-        let mut statement = self
-            .connection
-            .prepare(&query)
-            .context(format!("Failed to prepare query for adoption requests: {}", query))?;
+        let mut statement = self.connection.prepare(&query).context(format!(
+            "Failed to prepare query for adoption requests: {}",
+            query
+        ))?;
 
         let request_iter = statement
             .query_map(rusqlite::params_from_iter(params.iter()), |row| {
