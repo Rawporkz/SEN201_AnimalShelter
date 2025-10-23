@@ -5,6 +5,12 @@ This page displays all adoption reports for staff members to review.
 -->
 
 <script lang="ts">
+  import { goto } from "$app/navigation";
+  import { error } from "@tauri-apps/plugin-log";
+  import SideBar from "$lib/components/SideBar/SideBar.svelte";
+  import { logoutUser } from "$lib/utils/authentication-utils";
+  import type { PageData } from "./$types";
+
   import SearchBar from "$lib/components/SearchBar/SearchBar.svelte";
   import AnimalAdoptionInfoRow from "$lib/components/AnimalAdoptionInfoRow/AnimalAdoptionInfoRow.svelte";
   import FilterModal from "$lib/components/FilterModal/FilterModal.svelte";
@@ -12,7 +18,7 @@ This page displays all adoption reports for staff members to review.
   import {
     FilterCriteria,
     type FilterSelections,
-  } from "$lib/components/FilterModal/filter-utils";
+  } from "$lib/utils/filter-utils";
   import {
     type AnimalSummary,
     type Animal,
@@ -21,78 +27,47 @@ This page displays all adoption reports for staff members to review.
     RequestStatus,
   } from "$lib/utils/animal-utils";
   import { SlidersHorizontal, Eye, UserCheck } from "@lucide/svelte";
+  import { navigationMap } from "../navigation-utils";
+
+  interface Props {
+    data: PageData;
+  }
+
+  const { data }: Props = $props();
+
+  /**
+   * Handles navigation when a sidebar item is clicked.
+   * Navigates to the corresponding route based on the navigation mapping.
+   *
+   * @param item - The navigation item that was clicked
+   */
+  function handleNavigation(item: string): void {
+    const route: string | undefined = navigationMap[item];
+    if (route) {
+      goto(route);
+    }
+  }
+
+  /**
+   * Handles user sign out process.
+   * Logs out the user and redirects to the authentication page.
+   */
+  async function handleSignOut(): Promise<void> {
+    try {
+      const logoutSuccess: boolean = await logoutUser();
+      if (logoutSuccess) {
+        goto("/authentication");
+      }
+    } catch (err) {
+      error(`Sign out failed: ${err}`);
+    }
+  }
 
   // Mock data for adoption requests
   interface AdoptionRequestData {
     animal: AnimalSummary;
     request: AdoptionRequest;
   }
-
-  let adoptionRequests: AdoptionRequestData[] = $state([
-    {
-      animal: {
-        id: "120312",
-        name: "Bob",
-        specie: "Dog",
-        breed: "Golden Retriever",
-        sex: "Male",
-        admission_timestamp: 1728432000,
-        status: AnimalStatus.REQUESTED,
-        image_path:
-          "https://th.bing.com/th/id/R.9003028d7ec6ff58a70a2be15a05ffed?rik=9cLEFO6s9oiGeg&riu=http%3a%2f%2fwww.publicdomainpictures.net%2fpictures%2f40000%2fvelka%2fgolden-retriever-dog-1364426710r9x.jpg&ehk=Z8ZK9mRUJe0rT61EYByfWPUGg1BEToYpGPK3bCz1aTU%3d&risl=&pid=ImgRaw&r=0",
-      },
-      request: {
-        id: "req-001",
-        animal_id: "120392",
-        name: "Non",
-        email: "non@gmail.com",
-        adoption_timestamp: 1736380800,
-        status: RequestStatus.PENDING,
-      } as AdoptionRequest,
-    },
-    {
-      animal: {
-        id: "542312",
-        name: "Mr.Butters",
-        specie: "Cat",
-        breed: "Foldex",
-        sex: "Female",
-        admission_timestamp: 1736380800,
-        status: AnimalStatus.REQUESTED,
-        image_path:
-          "https://tse1.mm.bing.net/th/id/OIP.YurrNbVEnySArvYoqFUdXgHaE5?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3",
-      },
-      request: {
-        id: "req-002",
-        animal_id: "542312",
-        name: "Jira",
-        email: "amarin@gmail.com",
-        adoption_timestamp: 1736380800,
-        status: RequestStatus.PENDING,
-      } as AdoptionRequest,
-    },
-    {
-      animal: {
-        id: "123121",
-        name: "Jeff",
-        specie: "Dog",
-        breed: "Beagle",
-        sex: "Male",
-        admission_timestamp: 1757808000,
-        status: AnimalStatus.ADOPTED,
-        image_path:
-          "https://tse1.mm.bing.net/th/id/OIP.sn4JPFB9pw2PaI3Ao6DWigHaFX?cb=12&rs=1&pid=ImgDetMain&o=7&rm=3",
-      },
-      request: {
-        id: "req-003",
-        animal_id: "123121",
-        name: "Win",
-        email: "Win@gmail.com",
-        adoption_timestamp: 1736380800,
-        status: RequestStatus.APPROVED,
-      } as AdoptionRequest,
-    },
-  ]);
 
   // Search and filter state
   let searchQuery = $state("");
@@ -147,7 +122,7 @@ This page displays all adoption reports for staff members to review.
 
   // Filtered requests based on search query
   let filteredRequests = $derived(
-    adoptionRequests.filter((requestData) => {
+    (data.adoptionRequests || []).filter((requestData) => {
       if (!searchQuery) return true;
 
       const query = searchQuery.toLowerCase();
@@ -162,45 +137,55 @@ This page displays all adoption reports for staff members to review.
         request.name.toLowerCase().includes(query) ||
         request.email.toLowerCase().includes(query)
       );
-    })
+    }),
   );
 </script>
 
-<div class="adoption-reports-page">
-  <div class="page-header">
-    <h1 class="page-title">Adoption Requests</h1>
-  </div>
-
-  <div class="controls-bar">
-    <SearchBar
-      bind:value={searchQuery}
-      placeholder="Search for names, IDs, breeds, and more..."
+<div class="staff-layout">
+  <div class="sidebar-container">
+    <SideBar
+      username={data.currentUser?.username ?? "Staff User"}
+      role="Staff"
+      onNavigate={handleNavigation}
+      onSignOut={handleSignOut}
     />
-
-    <button class="filter-button" onclick={handleFilterClick}>
-      <SlidersHorizontal size={16} />
-      <span>Filters</span>
-    </button>
   </div>
+  <main class="main-content">
+    <div class="page-header">
+      <h1 class="page-title">Adoption Reports</h1>
+    </div>
 
-  <div class="report-list">
-    {#each filteredRequests as requestData (requestData.animal.id)}
-      <AnimalAdoptionInfoRow
-        animalSummary={requestData.animal}
-        adoptionRequest={requestData.request}
-      >
-        {#snippet actions()}
-          <button
-            class="action-button view-button"
-            onclick={() => handleViewRequest(requestData)}
-          >
-            <Eye size={16} />
-            <span>View</span>
-          </button>
-        {/snippet}
-      </AnimalAdoptionInfoRow>
-    {/each}
-  </div>
+    <div class="controls-bar">
+      <SearchBar
+        bind:value={searchQuery}
+        placeholder="Search for names, IDs, breeds, and more..."
+      />
+
+      <button class="filter-button" onclick={handleFilterClick}>
+        <SlidersHorizontal size={16} />
+        <span>Filters</span>
+      </button>
+    </div>
+
+    <div class="report-list">
+      {#each filteredRequests as requestData (requestData.animal.id)}
+        <AnimalAdoptionInfoRow
+          animalSummary={requestData.animal}
+          adoptionRequest={requestData.request}
+        >
+          {#snippet actions()}
+            <button
+              class="action-button view-button"
+              onclick={() => handleViewRequest(requestData)}
+            >
+              <Eye size={16} />
+              <span>View</span>
+            </button>
+          {/snippet}
+        </AnimalAdoptionInfoRow>
+      {/each}
+    </div>
+  </main>
 </div>
 
 <FilterModal

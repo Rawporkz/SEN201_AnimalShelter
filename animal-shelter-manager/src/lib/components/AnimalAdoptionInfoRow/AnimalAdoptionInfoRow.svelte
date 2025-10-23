@@ -10,6 +10,7 @@ information in a horizontal row layout.
   import { formatTimestamp } from "$lib/utils/animal-utils";
   import { ImageOff } from "@lucide/svelte";
   import type { Snippet } from "svelte";
+  import { convertFileSrc } from "@tauri-apps/api/core";
 
   // Props
   interface Props {
@@ -53,7 +54,7 @@ information in a horizontal row layout.
     <div class="animal-image-container">
       {#if animalSummary.image_path && hasValidImage}
         <img
-          src={animalSummary.image_path}
+          src={convertFileSrc(animalSummary.image_path)}
           alt="Photo of {animalSummary.name}"
           class="animal-image"
           onerror={handleImageError}

@@ -11,8 +11,11 @@ pub mod types;
 
 use anyhow::{bail, Context, Result};
 use rusqlite::{params, Connection};
+use std::collections::HashMap;
 use std::path::Path;
-use types::{AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary};
+use types::{
+    AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary, FilterCriteria, FilterValue,
+};
 
 /// Service for handling database operations in the animal shelter application
 pub struct DatabaseService {
@@ -112,20 +115,88 @@ impl DatabaseService {
 
     // ==================== ANIMALS TABLE OPERATIONS ====================
 
-    /// Retrieves summary information for all animals in the database
+    /// Retrieves summary information for all animals in the database, with optional filtering
+    ///
+    /// # Arguments
+    /// * `filters` - Optional map of filter criteria and values
     ///
     /// # Returns
     /// * `Result<Vec<AnimalSummary>>` - List of animal summaries or error
-    pub fn query_all_animals(&self) -> Result<Vec<AnimalSummary>> {
-        let mut statement = self
-            .connection
-            .prepare(
-                "SELECT id, name, specie, breed, sex, admission_timestamp, image_path FROM animals",
-            )
-            .context("Failed to prepare query for all animals")?;
+    pub fn query_animals(
+        &self,
+        filters: Option<HashMap<FilterCriteria, FilterValue>>,
+    ) -> Result<Vec<AnimalSummary>> {
+        let mut query = "SELECT id, name, specie, breed, sex, admission_timestamp, status, image_path FROM animals".to_string();
+        let mut where_clauses: Vec<String> = Vec::new();
+        let mut params: Vec<rusqlite::types::Value> = Vec::new();
+
+        if let Some(filters_map) = filters {
+            if !filters_map.is_empty() {
+                for (criteria, value) in filters_map {
+                    match criteria {
+                        FilterCriteria::Status => {
+                            if let FilterValue::ChooseMany(stati) = value {
+                                if !stati.is_empty() {
+                                    let placeholders: Vec<_> = stati.iter().map(|_| "?").collect();
+                                    where_clauses.push(format!("status IN ({})", placeholders.join(",")));
+                                    for s in stati {
+                                        params.push(rusqlite::types::Value::from(s));
+                                    }
+                                }
+                            }
+                        }
+                        FilterCriteria::Sex => {
+                            if let FilterValue::ChooseMany(sexes) = value {
+                                if !sexes.is_empty() {
+                                    let placeholders: Vec<_> = sexes.iter().map(|_| "?").collect();
+                                    where_clauses.push(format!("sex IN ({})", placeholders.join(",")));
+                                    for s in sexes {
+                                        params.push(rusqlite::types::Value::from(s));
+                                    }
+                                }
+                            }
+                        }
+                        FilterCriteria::SpeciesAndBreeds => {
+                            if let FilterValue::NestedChooseMany(species_map) = value {
+                                if !species_map.is_empty() {
+                                    let mut species_clauses = Vec::new();
+                                    for (specie, breeds) in species_map {
+                                        if !breeds.is_empty() {
+                                            let breed_placeholders: Vec<_> =
+                                                breeds.iter().map(|_| "?").collect();
+                                            species_clauses.push(format!(
+                                                "(specie = ? AND breed IN ({}))",
+                                                breed_placeholders.join(",")
+                                            ));
+                                            params.push(rusqlite::types::Value::from(specie));
+                                            for b in breeds {
+                                                params.push(rusqlite::types::Value::from(b));
+                                            }
+                                        }
+                                    }
+                                    if !species_clauses.is_empty() {
+                                        where_clauses.push(format!("({})", species_clauses.join(" OR ")));
+                                    }
+                                }
+                            }
+                        }
+                        _ => {
+                            log::warn!("Unsupported filter criteria: {:?}", criteria);
+                        }
+                    }
+                }
+            }
+        }
+
+        if !where_clauses.is_empty() {
+            query.push_str(" WHERE ");
+            query.push_str(&where_clauses.join(" AND "));
+        }
+
+        let mut statement = self.connection.prepare(&query).context(format!("Failed to prepare query for animals: {}", query))?;
 
         let animal_iter = statement
-            .query_map([], |row| {
+            .query_map(rusqlite::params_from_iter(params.iter()), |row| {
                 Ok(AnimalSummary {
                     id: row.get(0)?,
                     name: row.get(1)?,
@@ -133,10 +204,11 @@ impl DatabaseService {
                     breed: row.get(3)?,
                     sex: row.get(4)?,
                     admission_timestamp: row.get(5)?,
-                    image_path: row.get(6)?,
+                    status: row.get(6)?,
+                    image_path: row.get(7)?,
                 })
             })
-            .context("Failed to execute query for all animals")?;
+            .context("Failed to execute query for animals")?;
 
         let mut animals = Vec::new();
         for animal in animal_iter {

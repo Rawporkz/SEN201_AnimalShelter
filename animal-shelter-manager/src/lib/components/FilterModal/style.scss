@@ -20,6 +20,7 @@
   z-index: 1000;
   padding: 20px;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .modal-container {
@@ -29,6 +30,13 @@
   height: min(500px, 80vh);
   position: relative;
   overflow: hidden;
+}
+
+.close-button-wrapper {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 3;
 }
 
 .modal-header {
@@ -46,7 +54,6 @@
 
 .criteria-menu {
   width: 180px;
-  bottom: 0;
   display: flex;
   flex-direction: column;
   padding: 0px;

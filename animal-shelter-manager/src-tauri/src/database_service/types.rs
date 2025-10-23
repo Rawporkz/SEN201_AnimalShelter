@@ -7,6 +7,7 @@
 
 use rusqlite::{types::FromSql, ToSql};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use strum::{Display, EnumString};
 
 /// Status of an animal in the shelter system
@@ -117,6 +118,8 @@ pub struct AnimalSummary {
     pub sex: String,
     /// Timestamp when the animal was admitted to the shelter
     pub admission_timestamp: i64,
+    /// Current status of the animal
+    pub status: AnimalStatus,
     /// Path to the animal's image file
     pub image_path: Option<String>,
 }
@@ -167,4 +170,25 @@ pub struct AdoptionRequestSummary {
     pub email: String,
     /// Timestamp when the request was submitted
     pub request_timestamp: i64,
+}
+
+/// Represents the criteria available for filtering animals.
+/// This enum is designed to be sent from the TypeScript frontend.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Display, EnumString)]
+#[serde(rename_all = "snake_case")]
+pub enum FilterCriteria {
+    Status,
+    Sex,
+    SpeciesAndBreeds,
+    AdmissionDate,
+    AdoptionDate,
+}
+
+/// Represents the different types of values that can be associated with a filter criterion.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum FilterValue {
+    ChooseOne(String),
+    ChooseMany(Vec<String>),
+    NestedChooseMany(HashMap<String, Vec<String>>),
 }

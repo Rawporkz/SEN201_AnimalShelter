@@ -80,8 +80,8 @@ export interface AnimalSummary {
   admission_timestamp: number;
   /** Path to the animal's image file */
   image_path?: string;
-  /** Current status of the animal (optional for display) */
-  status?: AnimalStatus;
+  /** Current status of the animal */
+  status: AnimalStatus;
 }
 
 /** Represents an adoption request in the system */
@@ -130,19 +130,24 @@ export interface AdoptionRequestSummary {
   request_timestamp: number;
 }
 
+import type { FilterSelections } from "$lib/utils/filter-utils";
+
 // ==================== ANIMAL FUNCTIONS ====================
 
 /**
- * Retrieves all animals from the database.
+ * Retrieves animals from the database, with optional filtering.
  *
+ * @param filters - Optional map of filter criteria and values
  * @returns Promise<AnimalSummary[]> - List of animal summaries
  * @throws Error if the operation fails
  */
-export async function getAllAnimals(): Promise<AnimalSummary[]> {
+export async function getAnimals(
+  filters: FilterSelections | null,
+): Promise<AnimalSummary[]> {
   try {
-    return await invoke<AnimalSummary[]>("get_all_animals");
+    return await invoke<AnimalSummary[]>("get_animals", { filters });
   } catch (e) {
-    error(`Failed to get all animals: ${e}`);
+    error(`Failed to get animals: ${e}`);
     return [];
   }
 }
@@ -374,11 +379,11 @@ export function calculateAge(
   }
 
   if (ageYears === 0) {
-    return `${ageMonths} month${ageMonths !== 1 ? "s" : ""} old`;
+    return `${ageMonths} m old`;
   } else if (ageMonths === 0) {
-    return `${ageYears} year${ageYears !== 1 ? "s" : ""} old`;
+    return `${ageYears} y old`;
   } else {
-    return `${ageYears} year${ageYears !== 1 ? "s" : ""}, ${ageMonths} month${ageMonths !== 1 ? "s" : ""} old`;
+    return `${ageYears} y ${ageMonths} m old`;
   }
 }
 

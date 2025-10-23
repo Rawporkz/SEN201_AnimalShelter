@@ -11,6 +11,8 @@ This file defines a reusable AnimalInfo component.
     getStatusDisplayText,
   } from "../../../utils/animal-utils";
   import { ImageOff } from "@lucide/svelte";
+  import { convertFileSrc } from "@tauri-apps/api/core";
+  import ClosePopupButton from "../../ClosePopupButton/ClosePopupButton.svelte";
 
   // Props
   interface Props {
@@ -18,10 +20,12 @@ This file defines a reusable AnimalInfo component.
     animal: Animal;
     /** The adopter information (optional) */
     adoption_timestamp: number;
+    /** Callback function to close the popup */
+    onclose?: () => void;
   }
 
   /** Component props with default values */
-  const { animal, adoption_timestamp }: Props = $props();
+  const { animal, adoption_timestamp, onclose }: Props = $props();
 
   /** Helper to display neutered status as Yes/No */
   const getNeuteredText = (neutered: boolean) => (neutered ? "Yes" : "No");
@@ -40,10 +44,13 @@ This file defines a reusable AnimalInfo component.
 </script>
 
 <div class="animal-info-modal">
+  <div class="close-button-wrapper">
+    <ClosePopupButton onclick={onclose} />
+  </div>
   <div class="animal-profile-left">
     <div class="animal-image">
       {#if animal?.image_path}
-        <img src={animal.image_path} alt="" />
+        <img src={convertFileSrc(animal.image_path)} alt="" />
       {:else}
         <div class="placeholder-image">
           <ImageOff size={48} />
@@ -93,7 +100,7 @@ This file defines a reusable AnimalInfo component.
         <div class="info-item">
           <div class="info-label">Birth Month/Year</div>
           <div class="info-value">
-            {animal
+            {animal && animal.birth_year != null && animal.birth_month != null
               ? `${getBirthMonthYear(animal.birth_month, animal.birth_year)} (${calculateAge(animal.birth_year, animal.birth_month)})`
               : "Unknown"}
           </div>

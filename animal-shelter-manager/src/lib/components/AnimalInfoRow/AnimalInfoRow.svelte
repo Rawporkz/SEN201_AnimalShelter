@@ -13,6 +13,7 @@ showing animal image, name, ID, species/breed, sex, and admission date.
   } from "$lib/utils/animal-utils";
   import { ImageOff } from "@lucide/svelte";
   import type { Snippet } from "svelte";
+  import { convertFileSrc } from "@tauri-apps/api/core";
 
   // Props
   interface Props {
@@ -52,7 +53,7 @@ showing animal image, name, ID, species/breed, sex, and admission date.
   <div class="animal-image-container">
     {#if animalSummary.image_path && hasValidImage}
       <img
-        src={animalSummary.image_path}
+        src={convertFileSrc(animalSummary.image_path)}
         alt="Photo of {animalSummary.name}"
         class="animal-image"
         onerror={handleImageError}

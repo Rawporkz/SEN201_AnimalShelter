@@ -5,17 +5,23 @@ This file defines a reusable AdopterInfo component.
 -->
 <script lang="ts">
   import type { AdoptionRequest } from "../../../utils/animal-utils";
+  import ClosePopupButton from "../../ClosePopupButton/ClosePopupButton.svelte";
 
   // Props
   interface Props {
     /** The adopter information (optional) */
     adopter?: AdoptionRequest | null;
+    /** Callback function to close the popup */
+    onclose?: () => void;
   }
 
-  const { adopter }: Props = $props();
+  const { adopter, onclose }: Props = $props();
 </script>
 
 <div class="adopter-info-modal" role="dialog" aria-modal="true" tabindex="0">
+  <div class="close-button-wrapper">
+    <ClosePopupButton onclick={onclose} />
+  </div>
   <div class="adopter-info-header">
     <h1>Adopter Information</h1>
   </div>

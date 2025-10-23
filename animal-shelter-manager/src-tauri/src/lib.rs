@@ -15,10 +15,11 @@ use authentication_service::{
     AuthenticationService, CurrentUser,
 };
 use database_service::{
-    types::{AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary},
+    types::{AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary, FilterCriteria, FilterValue},
     DatabaseService,
 };
 use file_service::FileService;
+use std::collections::HashMap;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, State};
 use tokio::sync::Mutex;
@@ -115,15 +116,19 @@ async fn init_authentication_service_once(
 
 // ==================== ANIMAL TABLE COMMANDS ====================
 
-/// Command to retrieve all animals from the database
+/// Command to retrieve animals from the database, with optional filtering
+///
+/// # Arguments
+/// * `filters` - Optional map of filter criteria and values
 ///
 /// # Returns
 /// * `Ok(Vec<AnimalSummary>)` - List of animal summaries if successful
 /// * `Err(String)` - An error message if the query fails
 #[tauri::command]
-async fn get_all_animals(
+async fn get_animals(
     state: State<'_, Mutex<AppState>>,
     app_handle: AppHandle,
+    filters: Option<HashMap<FilterCriteria, FilterValue>>,
 ) -> Result<Vec<AnimalSummary>, String> {
     // Lock the state for safe concurrent access
     let mut state_guard = state.lock().await;
@@ -131,12 +136,12 @@ async fn get_all_animals(
     // Lazily initialize the database service
     init_database_service_once(&mut state_guard, &app_handle).await?;
 
-    // Query all animals
+    // Query animals with filters
     match state_guard
         .database_service
         .as_ref()
         .unwrap()
-        .query_all_animals()
+        .query_animals(filters)
     {
         Ok(animals) => Ok(animals),
         Err(e) => Err(format!("Failed to retrieve animals: {}", e)),
@@ -641,7 +646,7 @@ pub fn run() {
             get_current_user,
             log_out,
             // Animal commands
-            get_all_animals,
+            get_animals,
             get_animal_by_id,
             create_animal,
             update_animal,

@@ -76,16 +76,14 @@ about an animal and its adopter (if applicable).
         if (e.key === "Escape") closePopup();
       }}
     >
-      <div class="close-button-wrapper">
-        <ClosePopupButton onclick={closePopup} />
-      </div>
       <div class="tab-content">
         {#if adopter && activeTab === "adopter"}
-          <AdopterInfo {adopter} />
+          <AdopterInfo {adopter} onclose={closePopup} />
         {:else}
           <AnimalInfo
             {animal}
             adoption_timestamp={adopter?.adoption_timestamp ?? 0}
+            onclose={closePopup}
           />
         {/if}
       </div>
