@@ -12,6 +12,7 @@ export enum FilterCriteria {
   SPECIES_AND_BREEDS = "species_and_breeds",
   ADMISSION_DATE = "admission_date",
   ADOPTION_DATE = "adoption_date",
+  REQUEST_DATE = "request_date",
 }
 
 /** Types of filter components available */
@@ -63,6 +64,11 @@ export const FILTER_CRITERIA_CONFIGS: Record<
     criteria: FilterCriteria.ADOPTION_DATE,
     type: FilterType.CHOOSE_ONE,
     displayName: "Adoption Date",
+  },
+  [FilterCriteria.REQUEST_DATE]: {
+    criteria: FilterCriteria.REQUEST_DATE,
+    type: FilterType.CHOOSE_ONE,
+    displayName: "Request Date",
   },
 };
 

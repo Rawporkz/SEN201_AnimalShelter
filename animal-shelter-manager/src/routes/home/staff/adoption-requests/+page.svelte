@@ -23,6 +23,10 @@ This page displays all adoption requests for staff members to review and manage.
     type AnimalSummary,
     type Animal,
     type AdoptionRequest,
+    getAdoptionRequests,
+    getAnimalById,
+    getAdoptionRequestById,
+    getAnimals,
     AnimalStatus,
     RequestStatus,
   } from "$lib/utils/animal-utils";
@@ -39,7 +43,7 @@ This page displays all adoption requests for staff members to review and manage.
    * Handles navigation when a sidebar item is clicked.
    * Navigates to the corresponding route based on the navigation mapping.
    *
-   * @param item - The navigation item that was clicked
+   * @param item - The navigation item that was clicked.
    */
   function handleNavigation(item: string): void {
     const route: string | undefined = navigationMap[item];
@@ -63,77 +67,111 @@ This page displays all adoption requests for staff members to review and manage.
     }
   }
 
-  // Mock data for adoption requests
-  interface AdoptionRequestData {
-    animal: AnimalSummary;
-    request: AdoptionRequest;
-  }
-
-  // Search and filter state
+  /** The current search query entered by the user. */
   let searchQuery = $state("");
+  /** Controls the visibility of the filter modal. */
   let isFilterModalOpen = $state(false);
+  /** Stores the current filter selections made by the user. */
   let filterSelections: FilterSelections | null = $state(null);
 
-  // View modal state
+  /** Controls the visibility of the animal view modal. */
   let isViewModalOpen = $state(false);
+  /** The animal currently selected for viewing in the modal. */
   let selectedAnimal: Animal | null = $state(null);
+  /** The adopter information associated with the selected animal, if applicable. */
   let selectedAdopter: AdoptionRequest | null = $state(null);
 
-  // Filter criteria to show in modal
+  /** List of filter criteria to display in the filter modal. */
   const filterCriteria = [
     FilterCriteria.SEX,
     FilterCriteria.SPECIES_AND_BREEDS,
     FilterCriteria.ADMISSION_DATE,
+    FilterCriteria.REQUEST_DATE,
   ];
 
   /**
-   * Opens the filter modal
+   * Opens the filter modal.
    */
   function handleFilterClick(): void {
     isFilterModalOpen = true;
   }
 
+  /** Store of adoption requests to be displayed. */
+  let displayedRequests: { animal: Animal; request: AdoptionRequestSummary }[] = $state(data.adoptionRequests || []);
+
   /**
-   * Handles filter modal close and updates selections
+   * Handles filter modal close and updates selections.
+   * @param selections - The filter selections made by the user.
    */
-  function handleFilterClose(selections: FilterSelections): void {
+  async function handleFilterClose(
+    selections: FilterSelections,
+  ): Promise<void> {
     filterSelections = selections;
+    info("Filter selections:" + filterSelections);
     isFilterModalOpen = false;
+
+    const requestSummaries = await getAdoptionRequests({
+      ...filterSelections,
+      status: [RequestStatus.PENDING],
+    });
+    const animalSummaries = await getAnimals({
+      ...filterSelections,
+      status: [AnimalStatus.REQUESTED],
+    });
+
+    displayedRequests = requestSummaries
+      .map((request) => {
+        const animal = animalSummaries.find((a) => a.id === request.animal_id);
+        return animal ? { animal, request } : null;
+      })
+      .filter(Boolean) as { animal: Animal; request: AdoptionRequestSummary }[];
   }
 
   /**
-   * Handles viewing animal and adopter details
+   * Handles viewing animal and adopter details.
+   *
+   * @param animalSummary - The summary of the animal.
+   * @param requestSummary - The summary of the adoption request.
    */
-  function handleViewRequest(requestData: AdoptionRequestData): void {
-    selectedAnimal = requestData.animal as any;
-    selectedAdopter = requestData.request;
+  async function handleViewRequest(animalSummary: AnimalSummary, requestSummary: AdoptionRequestSummary): Promise<void> {
+    selectedAnimal = await getAnimalById(animalSummary.id);
+    selectedAdopter = await getAdoptionRequestById(requestSummary.id);
     isViewModalOpen = true;
   }
 
   /**
-   * Handles the main action for the request (approve, reject, etc.)
+   * Handles the main action for the request (approve, reject, etc.).
+   *
+   * @param animalSummary - The summary of the animal.
+   * @param requestSummary - The summary of the adoption request.
    */
-  function handleManageRequest(requestData: AdoptionRequestData): void {
-    info("Handle request for: " + requestData.animal.id);
+  function handleManageRequest(animalSummary: AnimalSummary, requestSummary: AdoptionRequestSummary): void {
+    info("Handle request for: " + animalSummary.id);
     // Navigate to request management or open action modal
   }
 
   /**
-   * Handles approving a request
+   * Handles approving a request.
+   *
+   * @param animalSummary - The summary of the animal.
+   * @param requestSummary - The summary of the adoption request to approve.
    */
-  function handleApprove(requestData: AdoptionRequestData): void {
-    info("Approve request: " + requestData.request.id);
+  function handleApprove(animalSummary: AnimalSummary, requestSummary: AdoptionRequestSummary): void {
+    info("Approve request: " + requestSummary.id);
   }
 
   /**
-   * Handles rejecting a request
+   * Handles rejecting a request.
+   *
+   * @param animalSummary - The summary of the animal.
+   * @param requestSummary - The summary of the adoption request to reject.
    */
-  function handleReject(requestData: AdoptionRequestData): void {
-    info("Reject request: " + requestData.request.id);
+  function handleReject(animalSummary: AnimalSummary, requestSummary: AdoptionRequestSummary): void {
+    info("Reject request: " + requestSummary.id);
   }
 
   /**
-   * Closes the view modal
+   * Closes the view modal.
    */
   function handleCloseViewModal(): void {
     isViewModalOpen = false;
@@ -141,14 +179,12 @@ This page displays all adoption requests for staff members to review and manage.
     selectedAdopter = null;
   }
 
-  // Filtered requests based on search query
+  /** Derived store of adoption requests filtered based on search query. */
   let filteredRequests = $derived(
-    (data.adoptionRequests || []).filter((requestData) => {
+    (displayedRequests || []).filter(({ animal, request }) => {
       if (!searchQuery) return true;
 
       const query = searchQuery.toLowerCase();
-      const animal = requestData.animal;
-      const request = requestData.request;
 
       return (
         animal.name.toLowerCase().includes(query) ||
@@ -189,22 +225,22 @@ This page displays all adoption requests for staff members to review and manage.
     </div>
 
     <div class="requests-list">
-      {#each filteredRequests as requestData (requestData.animal.id)}
+      {#each filteredRequests as { animal, request } (animal.id)}
         <AnimalAdoptionInfoRow
-          animalSummary={requestData.animal}
-          adoptionRequest={requestData.request}
+          animalSummary={animal}
+          adoptionRequest={request}
         >
           {#snippet actions()}
             <button
               class="action-button view-button"
-              onclick={() => handleViewRequest(requestData)}
+              onclick={() => handleViewRequest(animal, request)}
             >
               <Eye size={16} />
               <span>View</span>
             </button>
             <button
               class="action-button handle-button"
-              onclick={() => handleManageRequest(requestData)}
+              onclick={() => handleManageRequest(animal, request)}
             >
               <UserCheck size={16} />
               <span>Handle</span>
@@ -220,7 +256,7 @@ This page displays all adoption requests for staff members to review and manage.
   isVisible={isFilterModalOpen}
   criteriaList={filterCriteria}
   currentSelections={filterSelections}
-  onclose={handleFilterClose}
+  onClose={handleFilterClose}
 />
 
 {#if selectedAnimal}

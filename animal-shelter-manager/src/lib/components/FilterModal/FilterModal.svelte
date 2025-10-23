@@ -7,6 +7,7 @@ data filtering throughout the application.
 -->
 
 <script lang="ts">
+  import { info } from "@tauri-apps/plugin-log";
   import {
     FilterCriteria,
     FilterType,
@@ -36,14 +37,14 @@ data filtering throughout the application.
     /** Current filter selections (for pre-populating the modal) */
     currentSelections?: FilterSelections | null;
     /** Callback function called when modal closes with filter selections */
-    onclose?: (selections: FilterSelections) => void;
+    onClose?: (selections: FilterSelections) => void;
   }
 
   const {
     isVisible = false,
     criteriaList = [],
     currentSelections = null,
-    onclose,
+    onClose: onClose,
   }: Props = $props();
 
   // Currently selected criteria for showing in the content area
@@ -69,8 +70,9 @@ data filtering throughout the application.
    * Handles closing the modal and returning the current selections.
    */
   function handleClose(): void {
-    if (onclose) {
-      onclose(workingSelections);
+    if (onClose) {
+      info("Filter selections: " + JSON.stringify(workingSelections));
+      onClose(workingSelections);
     }
     resetModal();
   }

@@ -130,6 +130,12 @@ export interface AdoptionRequestSummary {
   request_timestamp: number;
 }
 
+/** Interface for combining AnimalSummary and AdoptionRequest data. */
+export interface AdoptionRequestData {
+  animal: AnimalSummary;
+  request: AdoptionRequest;
+}
+
 import type { FilterSelections } from "$lib/utils/filter-utils";
 
 // ==================== ANIMAL FUNCTIONS ====================
@@ -222,11 +228,13 @@ export async function deleteAnimal(animalId: string): Promise<boolean> {
  * @returns Promise<AdoptionRequestSummary[]> - List of adoption request summaries
  * @throws Error if the operation fails
  */
-export async function getAllAdoptionRequests(): Promise<
-  AdoptionRequestSummary[]
-> {
+export async function getAdoptionRequests(
+  filters: FilterSelections | null,
+): Promise<AdoptionRequestSummary[]> {
   try {
-    return await invoke<AdoptionRequestSummary[]>("get_all_adoption_requests");
+    return await invoke<AdoptionRequestSummary[]>("get_adoption_requests", {
+      filters,
+    });
   } catch (e) {
     error(`Failed to get all adoption requests: ${e}`);
     return [];

@@ -128,7 +128,7 @@ async fn init_authentication_service_once(
 async fn get_animals(
     state: State<'_, Mutex<AppState>>,
     app_handle: AppHandle,
-    filters: Option<HashMap<FilterCriteria, FilterValue>>,
+    filters: Option<HashMap<FilterCriteria, Option<FilterValue>>>,
 ) -> Result<Vec<AnimalSummary>, String> {
     // Lock the state for safe concurrent access
     let mut state_guard = state.lock().await;

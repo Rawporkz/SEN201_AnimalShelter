@@ -7,10 +7,10 @@ This page displays all animals in the shelter system for staff members.
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { error } from "@tauri-apps/plugin-log";
+  import { info } from "@tauri-apps/plugin-log";
   import SideBar from "$lib/components/SideBar/SideBar.svelte";
   import { logoutUser } from "$lib/utils/authentication-utils";
   import type { PageData } from "./$types";
-
   import SearchBar from "$lib/components/SearchBar/SearchBar.svelte";
   import AnimalInfoRow from "$lib/components/AnimalInfoRow/AnimalInfoRow.svelte";
   import FilterModal from "$lib/components/FilterModal/FilterModal.svelte";
@@ -23,9 +23,9 @@ This page displays all animals in the shelter system for staff members.
     type AnimalSummary,
     type Animal,
     type AdoptionRequest,
-    AnimalStatus,
+    getAnimals,
     getAnimalById,
-    getAllAdoptionRequests,
+    getAdoptionRequests,
     getAdoptionRequestById,
   } from "$lib/utils/animal-utils";
   import {
@@ -37,7 +37,9 @@ This page displays all animals in the shelter system for staff members.
   } from "@lucide/svelte";
   import { navigationMap } from "../navigation-utils";
 
+  // Props
   interface Props {
+    /** The data passed to the page component. */
     data: PageData;
   }
 
@@ -47,7 +49,7 @@ This page displays all animals in the shelter system for staff members.
    * Handles navigation when a sidebar item is clicked.
    * Navigates to the corresponding route based on the navigation mapping.
    *
-   * @param item - The navigation item that was clicked
+   * @param item - The navigation item that was clicked.
    */
   function handleNavigation(item: string): void {
     const route: string | undefined = navigationMap[item];
@@ -71,17 +73,21 @@ This page displays all animals in the shelter system for staff members.
     }
   }
 
-  // Search and filter state
-  let searchQuery = $state("");
-  let isFilterModalOpen = $state(false);
+  /** The current search query entered by the user. */
+  let searchQuery: string = $state("");
+  /** Controls the visibility of the filter modal. */
+  let isFilterModalOpen: boolean = $state(false);
+  /** Stores the current filter selections made by the user. */
   let filterSelections: FilterSelections | null = $state(null);
 
-  // View modal state
-  let isViewModalOpen = $state(false);
+  /** Controls the visibility of the animal view modal. */
+  let isViewModalOpen: boolean = $state(false);
+  /** The animal currently selected for viewing in the modal. */
   let selectedAnimal: Animal | null = $state(null);
+  /** The adopter information associated with the selected animal, if applicable. */
   let selectedAdopter: AdoptionRequest | null = $state(null);
 
-  // Filter criteria to show in modal
+  /** List of filter criteria to display in the filter modal. */
   const filterCriteria = [
     FilterCriteria.STATUS,
     FilterCriteria.SEX,
@@ -90,30 +96,41 @@ This page displays all animals in the shelter system for staff members.
   ];
 
   /**
-   * Opens the filter modal
+   * Opens the filter modal.
    */
   function handleFilterClick(): void {
     isFilterModalOpen = true;
   }
 
   /**
-   * Handles filter modal close and updates selections
+   * Handles filter modal close and updates selections.
+   *
+   * @param selections - The filter selections made by the user.
    */
-  function handleFilterClose(selections: FilterSelections): void {
+  async function handleFilterClose(
+    selections: FilterSelections,
+  ): Promise<void> {
     filterSelections = selections;
-    // print out all selections for demo
-    console.log("Filter selections:", filterSelections);
+    info("Filter selections:" + filterSelections);
     isFilterModalOpen = false;
+    displayedAnimals = await getAnimals(filterSelections);
   }
 
   /**
-   * Handles viewing animal details
+   * Handles viewing animal details.
+   *
+   * @param animalSummary - The summary of the animal to view.
    */
   async function handleViewAnimal(animalSummary: AnimalSummary): Promise<void> {
     selectedAnimal = await getAnimalById(animalSummary.id);
 
-    if (animalSummary.status === "adopted" || animalSummary.status === "requested") {
-      const allRequests = await getAllAdoptionRequests();
+    if (
+      animalSummary.status === "adopted" ||
+      animalSummary.status === "requested"
+    ) {
+      const allRequests = await getAdoptionRequests({
+        animal_id: animalSummary.id,
+      });
       const requestSummary = allRequests.find(
         (req) => req.animal_id === animalSummary.id,
       );
@@ -130,19 +147,23 @@ This page displays all animals in the shelter system for staff members.
   }
 
   /**
-   * Handles editing animal details
+   * Handles editing animal details.
+   *
+   * @param animalId - The ID of the animal to edit.
    */
   function handleEditAnimal(animalId: string): void {
     // Navigate to edit page or open edit modal
-    console.log("Edit animal:", animalId);
+    info("Edit animal:" + animalId);
   }
 
   /**
-   * Handles adoption request management
+   * Handles adoption request management.
+   *
+   * @param animalId - The ID of the animal for which to manage requests.
    */
   function handleManageRequest(animalId: string): void {
     // Navigate to request management or open modal
-    console.log("Handle request for:", animalId);
+    info("Handle request for:" + animalId);
   }
 
   /**
@@ -162,9 +183,12 @@ This page displays all animals in the shelter system for staff members.
     selectedAdopter = null;
   }
 
-  // Filtered animals based on search query
+  /** Store of animals to be displayed. */
+  let displayedAnimals: AnimalSummary[] = $state(data.animals || []);
+
+  /** Derived store of animals filtered based on search query and filter selections. */
   let filteredAnimals = $derived(
-    (data.animals || []).filter((animal) => {
+    (displayedAnimals || []).filter((animal) => {
       if (!searchQuery) return true;
 
       const query = searchQuery.toLowerCase();
@@ -264,7 +288,7 @@ This page displays all animals in the shelter system for staff members.
   isVisible={isFilterModalOpen}
   criteriaList={filterCriteria}
   currentSelections={filterSelections}
-  onclose={handleFilterClose}
+  onClose={(selections) => handleFilterClose(selections)}
 />
 
 {#if selectedAnimal}

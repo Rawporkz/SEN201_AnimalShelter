@@ -6,7 +6,7 @@ This page displays all adoption reports for staff members to review.
 
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { error } from "@tauri-apps/plugin-log";
+  import { info, error } from "@tauri-apps/plugin-log";
   import SideBar from "$lib/components/SideBar/SideBar.svelte";
   import { logoutUser } from "$lib/utils/authentication-utils";
   import type { PageData } from "./$types";
@@ -21,12 +21,16 @@ This page displays all adoption reports for staff members to review.
   } from "$lib/utils/filter-utils";
   import {
     type AnimalSummary,
+    type AdoptionRequestSummary,
     type Animal,
     type AdoptionRequest,
+    getAdoptionRequests,
+    getAnimalById,
+    getAdoptionRequestById,
+    getAnimals,
     AnimalStatus,
-    RequestStatus,
   } from "$lib/utils/animal-utils";
-  import { SlidersHorizontal, Eye, UserCheck } from "@lucide/svelte";
+  import { SlidersHorizontal, Eye } from "@lucide/svelte";
   import { navigationMap } from "../navigation-utils";
 
   interface Props {
@@ -39,7 +43,7 @@ This page displays all adoption reports for staff members to review.
    * Handles navigation when a sidebar item is clicked.
    * Navigates to the corresponding route based on the navigation mapping.
    *
-   * @param item - The navigation item that was clicked
+   * @param item - The navigation item that was clicked.
    */
   function handleNavigation(item: string): void {
     const route: string | undefined = navigationMap[item];
@@ -63,56 +67,84 @@ This page displays all adoption reports for staff members to review.
     }
   }
 
-  // Mock data for adoption requests
-  interface AdoptionRequestData {
-    animal: AnimalSummary;
-    request: AdoptionRequest;
-  }
-
-  // Search and filter state
+  /** The current search query entered by the user. */
   let searchQuery = $state("");
+  /** Controls the visibility of the filter modal. */
   let isFilterModalOpen = $state(false);
+  /** Stores the current filter selections made by the user. */
   let filterSelections: FilterSelections | null = $state(null);
 
-  // View modal state
+  /** Controls the visibility of the animal view modal. */
   let isViewModalOpen = $state(false);
+  /** The animal currently selected for viewing in the modal. */
   let selectedAnimal: Animal | null = $state(null);
+  /** The adopter information associated with the selected animal, if applicable. */
   let selectedAdopter: AdoptionRequest | null = $state(null);
 
-  // Filter criteria to show in modal
+  /** List of filter criteria to display in the filter modal. */
   const filterCriteria = [
     FilterCriteria.SEX,
     FilterCriteria.SPECIES_AND_BREEDS,
     FilterCriteria.ADMISSION_DATE,
+    FilterCriteria.ADOPTION_DATE,
   ];
 
   /**
-   * Opens the filter modal
+   * Opens the filter modal.
    */
   function handleFilterClick(): void {
     isFilterModalOpen = true;
   }
 
+  /** Store of adoption requests to be displayed. */
+  let displayedRequests: { animal: Animal; request: AdoptionRequestSummary }[] =
+    $state(data.adoptionRequests || []);
+
   /**
-   * Handles filter modal close and updates selections
+   * Handles filter modal close and updates selections.
+   * @param selections - The filter selections made by the user.
    */
-  function handleFilterClose(selections: FilterSelections): void {
+  async function handleFilterClose(
+    selections: FilterSelections,
+  ): Promise<void> {
     filterSelections = selections;
     console.log("Filter selections:", filterSelections);
     isFilterModalOpen = false;
+
+    const requestSummaries = await getAdoptionRequests({
+      ...filterSelections,
+      status: [RequestStatus.APPROVED],
+    });
+    const animalSummaries = await getAnimals({
+      ...filterSelections,
+      status: [AnimalStatus.ADOPTED],
+    });
+
+    displayedRequests = requestSummaries
+      .map((request) => {
+        const animal = animalSummaries.find((a) => a.id === request.animal_id);
+        return animal ? { animal, request } : null;
+      })
+      .filter(Boolean) as { animal: Animal; request: AdoptionRequestSummary }[];
   }
 
   /**
-   * Handles viewing animal and adopter details
+   * Handles viewing animal and adopter details.
+   *
+   * @param animalSummary - The summary of the animal.
+   * @param requestSummary - The summary of the adoption request.
    */
-  function handleViewRequest(requestData: AdoptionRequestData): void {
-    selectedAnimal = requestData.animal as any;
-    selectedAdopter = requestData.request;
+  async function handleViewRequest(
+    animalSummary: AnimalSummary,
+    requestSummary: AdoptionRequestSummary,
+  ): Promise<void> {
+    selectedAnimal = await getAnimalById(animalSummary.id);
+    selectedAdopter = await getAdoptionRequestById(requestSummary.id);
     isViewModalOpen = true;
   }
 
   /**
-   * Closes the view modal
+   * Closes the view modal.
    */
   function handleCloseViewModal(): void {
     isViewModalOpen = false;
@@ -120,14 +152,12 @@ This page displays all adoption reports for staff members to review.
     selectedAdopter = null;
   }
 
-  // Filtered requests based on search query
+  /** Derived store of adoption requests filtered based on search query. */
   let filteredRequests = $derived(
-    (data.adoptionRequests || []).filter((requestData) => {
+    (displayedRequests || []).filter(({ animal, request }) => {
       if (!searchQuery) return true;
 
       const query = searchQuery.toLowerCase();
-      const animal = requestData.animal;
-      const request = requestData.request;
 
       return (
         animal.name.toLowerCase().includes(query) ||
@@ -168,15 +198,12 @@ This page displays all adoption reports for staff members to review.
     </div>
 
     <div class="report-list">
-      {#each filteredRequests as requestData (requestData.animal.id)}
-        <AnimalAdoptionInfoRow
-          animalSummary={requestData.animal}
-          adoptionRequest={requestData.request}
-        >
+      {#each filteredRequests as { animal, request } (animal.id)}
+        <AnimalAdoptionInfoRow animalSummary={animal} adoptionRequest={request}>
           {#snippet actions()}
             <button
               class="action-button view-button"
-              onclick={() => handleViewRequest(requestData)}
+              onclick={() => handleViewRequest(animal, request)}
             >
               <Eye size={16} />
               <span>View</span>
@@ -192,7 +219,7 @@ This page displays all adoption reports for staff members to review.
   isVisible={isFilterModalOpen}
   criteriaList={filterCriteria}
   currentSelections={filterSelections}
-  onclose={handleFilterClose}
+  onClose={handleFilterClose}
 />
 
 {#if selectedAnimal}

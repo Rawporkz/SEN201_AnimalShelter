@@ -182,6 +182,7 @@ pub enum FilterCriteria {
     SpeciesAndBreeds,
     AdmissionDate,
     AdoptionDate,
+    RequestDate,
 }
 
 /// Represents the different types of values that can be associated with a filter criterion.

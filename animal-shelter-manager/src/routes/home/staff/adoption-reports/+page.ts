@@ -5,17 +5,24 @@
  */
 
 import { goto } from "$app/navigation";
-import { getCurrentUser, type CurrentUser } from "$lib/utils/authentication-utils";
+import {
+  getCurrentUser,
+  type CurrentUser,
+} from "$lib/utils/authentication-utils";
 import type { PageLoad } from "./$types";
 import { error } from "@tauri-apps/plugin-log";
 import {
-  getAllAdoptionRequests,
-  getAdoptionRequestById,
-  getAnimalById,
+  getAdoptionRequests,
   RequestStatus,
+  AnimalStatus,
+  getAnimals,
+  type Animal,
+  type AdoptionRequestSummary,
 } from "$lib/utils/animal-utils";
 
-/** adoption-reports page data loader */
+/**
+ * Adoption reports page data loader.
+ */
 export const load: PageLoad = async () => {
   try {
     // Check if user is authenticated
@@ -28,29 +35,22 @@ export const load: PageLoad = async () => {
       return; // prevent returning data
     }
 
-    // TODO: Add role-based access control
-    // if (currentUser.role !== "staff") {
-    //   goto('/authentication');
-    // }
+    const requestSummaries = await getAdoptionRequests({
+      status: [RequestStatus.APPROVED],
+    });
 
-    const requestSummaries = await getAllAdoptionRequests();
+    const animalSummaries = await getAnimals({
+      status: [AnimalStatus.ADOPTED],
+    });
 
-    const adoptionRequestsData = await Promise.all(
-      requestSummaries.map(async (summary) => {
-        const [animal, request] = await Promise.all([
-          getAnimalById(summary.animal_id),
-          getAdoptionRequestById(summary.id),
-        ]);
-        return { animal, request };
-      }),
-    );
+    const adoptionRequestsData = requestSummaries.map((request) => {
+      const animal = animalSummaries.find((a) => a.id === request.animal_id);
+      return animal ? { animal, request } : null;
+    });
 
     const completedRequests = adoptionRequestsData.filter(
-      (data) =>
-        data.animal &&
-        data.request &&
-        data.request.status !== RequestStatus.PENDING,
-    );
+      (data) => data && data.animal && data.request,
+    ) as { animal: Animal; request: AdoptionRequestSummary }[];
 
     return {
       currentUser,
@@ -59,6 +59,6 @@ export const load: PageLoad = async () => {
   } catch (e) {
     // Authentication check failed, redirect to authentication
     error(`Error during page load: ${e}`);
-    goto("/authentication");
+    goto("/");
   }
 };

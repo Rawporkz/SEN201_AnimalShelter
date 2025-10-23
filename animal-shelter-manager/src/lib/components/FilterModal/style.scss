@@ -21,6 +21,7 @@
   padding: 20px;
   box-sizing: border-box;
   overflow: hidden;
+  backdrop-filter: blur(8px);
 }
 
 .modal-container {
