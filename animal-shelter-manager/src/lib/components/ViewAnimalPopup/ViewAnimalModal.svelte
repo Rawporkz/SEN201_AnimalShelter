@@ -9,7 +9,6 @@ about an animal and its adopter (if applicable).
   import { User, Dog } from "@lucide/svelte";
   import AdopterInfo from "./AdopterInfo/AdopterInfo.svelte";
   import AnimalInfo from "./AnimalInfo/AnimalInfo.svelte";
-  import ClosePopupButton from "../ClosePopupButton/ClosePopupButton.svelte";
   import type { Animal } from "../../utils/animal-utils";
   import type { AdoptionRequest } from "../../utils/animal-utils";
 

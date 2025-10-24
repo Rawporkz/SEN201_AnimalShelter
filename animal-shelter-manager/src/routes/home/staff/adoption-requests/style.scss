@@ -114,22 +114,4 @@
       background-color: color.adjust(colors.$blue-main, $lightness: -10%);
     }
   }
-
-  &.approve-button {
-    background-color: colors.$green-vibrant;
-    color: white;
-
-    &:hover {
-      background-color: color.adjust(colors.$green-vibrant, $lightness: -10%);
-    }
-  }
-
-  &.reject-button {
-    background-color: colors.$red-vibrant;
-    color: white;
-
-    &:hover {
-      background-color: color.adjust(colors.$red-vibrant, $lightness: -10%);
-    }
-  }
 }

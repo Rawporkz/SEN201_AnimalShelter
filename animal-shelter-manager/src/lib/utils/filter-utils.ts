@@ -12,7 +12,6 @@ export enum FilterCriteria {
   SPECIES_AND_BREEDS = "species_and_breeds",
   ADMISSION_DATE = "admission_date",
   ADOPTION_DATE = "adoption_date",
-  REQUEST_DATE = "request_date",
 }
 
 /** Types of filter components available */
@@ -33,7 +32,9 @@ export interface FilterCriteriaConfig {
 export type FilterValue = string | string[] | Record<string, string[]>;
 
 /** Complete filter selections mapped by criteria */
-export type FilterSelections = Record<FilterCriteria, FilterValue | null>;
+export type FilterSelections = Partial<
+  Record<FilterCriteria, FilterValue | null>
+>;
 
 /** Configuration mapping for each criteria */
 export const FILTER_CRITERIA_CONFIGS: Record<
@@ -64,11 +65,6 @@ export const FILTER_CRITERIA_CONFIGS: Record<
     criteria: FilterCriteria.ADOPTION_DATE,
     type: FilterType.CHOOSE_ONE,
     displayName: "Adoption Date",
-  },
-  [FilterCriteria.REQUEST_DATE]: {
-    criteria: FilterCriteria.REQUEST_DATE,
-    type: FilterType.CHOOSE_ONE,
-    displayName: "Request Date",
   },
 };
 

@@ -217,6 +217,7 @@ mod database_service_tests {
         animal1.breed = "Golden Retriever".to_string();
         animal1.sex = "Male".to_string();
         animal1.status = AnimalStatus::Available;
+        animal1.admission_timestamp = Utc::now().timestamp() - 86400 * 30; // 30 days ago
 
         let mut animal2 = sample_animal("a2");
         animal2.name = "Lucy".to_string();
@@ -224,6 +225,7 @@ mod database_service_tests {
         animal2.breed = "Siamese".to_string();
         animal2.sex = "Female".to_string();
         animal2.status = AnimalStatus::Available;
+        animal2.admission_timestamp = Utc::now().timestamp() - 86400 * 5; // 5 days ago
 
         let mut animal3 = sample_animal("a3");
         animal3.name = "Rocky".to_string();
@@ -231,10 +233,41 @@ mod database_service_tests {
         animal3.breed = "German Shepherd".to_string();
         animal3.sex = "Male".to_string();
         animal3.status = AnimalStatus::Adopted;
+        animal3.admission_timestamp = Utc::now().timestamp() - 86400 * 60; // 60 days ago
 
         db.insert_animal(&animal1).unwrap();
         db.insert_animal(&animal2).unwrap();
         db.insert_animal(&animal3).unwrap();
+
+        // For adoption date filter test
+        let mut animal4 = sample_animal("a4");
+        animal4.name = "Milo".to_string();
+        animal4.specie = "Dog".to_string();
+        animal4.breed = "Labrador".to_string();
+        animal4.sex = "Male".to_string();
+        animal4.status = AnimalStatus::Adopted;
+        animal4.admission_timestamp = Utc::now().timestamp() - 86400 * 10; // 10 days ago
+        db.insert_animal(&animal4).unwrap();
+
+        let mut request1 = sample_request("r1", "a4");
+        request1.status = RequestStatus::Approved;
+        request1.adoption_timestamp = Utc::now().timestamp() - 86400 * 2; // 2 days ago
+        db.insert_adoption_request(&request1).unwrap();
+
+        // another adopted animal but outside date range
+        let mut animal5 = sample_animal("a5");
+        animal5.name = "Coco".to_string();
+        animal5.specie = "Cat".to_string();
+        animal5.breed = "Persian".to_string();
+        animal5.sex = "Female".to_string();
+        animal5.status = AnimalStatus::Adopted;
+        animal5.admission_timestamp = Utc::now().timestamp() - 86400 * 20; // 20 days ago
+        db.insert_animal(&animal5).unwrap();
+
+        let mut request2 = sample_request("r2", "a5");
+        request2.status = RequestStatus::Approved;
+        request2.adoption_timestamp = Utc::now().timestamp() - 86400 * 15; // 15 days ago
+        db.insert_adoption_request(&request2).unwrap();
 
         // Test filter by status
         let mut filters = HashMap::new();
@@ -244,36 +277,37 @@ mod database_service_tests {
                 AnimalStatus::Available.to_string()
             ])),
         );
-        let animals = db.query_animals(Some(filters)).unwrap();
+        let animals = db.query_animals(Some(filters.clone())).unwrap();
         assert_eq!(animals.len(), 2);
         assert!(animals.iter().any(|a| a.id == "a1"));
         assert!(animals.iter().any(|a| a.id == "a2"));
 
         // Test filter by sex
-        let mut filters = HashMap::new();
+        filters.clear();
         filters.insert(
             FilterCriteria::Sex,
             Some(FilterValue::ChooseMany(vec!["Male".to_string()])),
         );
-        let animals = db.query_animals(Some(filters)).unwrap();
-        assert_eq!(animals.len(), 2);
+        let animals = db.query_animals(Some(filters.clone())).unwrap();
+        assert_eq!(animals.len(), 3);
         assert!(animals.iter().any(|a| a.id == "a1"));
         assert!(animals.iter().any(|a| a.id == "a3"));
+        assert!(animals.iter().any(|a| a.id == "a4"));
 
         // Test filter by species and breeds
-        let mut filters = HashMap::new();
+        filters.clear();
         let mut species_map = HashMap::new();
         species_map.insert("Dog".to_string(), vec!["Golden Retriever".to_string()]);
         filters.insert(
             FilterCriteria::SpeciesAndBreeds,
             Some(FilterValue::NestedChooseMany(species_map)),
         );
-        let animals = db.query_animals(Some(filters)).unwrap();
+        let animals = db.query_animals(Some(filters.clone())).unwrap();
         assert_eq!(animals.len(), 1);
         assert_eq!(animals[0].id, "a1");
 
         // Test combined filters (status and sex)
-        let mut filters = HashMap::new();
+        filters.clear();
         filters.insert(
             FilterCriteria::Status,
             Some(FilterValue::ChooseMany(vec![
@@ -284,9 +318,34 @@ mod database_service_tests {
             FilterCriteria::Sex,
             Some(FilterValue::ChooseMany(vec!["Female".to_string()])),
         );
-        let animals = db.query_animals(Some(filters)).unwrap();
+        let animals = db.query_animals(Some(filters.clone())).unwrap();
         assert_eq!(animals.len(), 1);
         assert_eq!(animals[0].id, "a2");
+
+        // Test filter by admission date
+        filters.clear();
+        let start_date = (Utc::now().timestamp() - 86400 * 7).to_string(); // 7 days ago
+        let end_date = Utc::now().timestamp().to_string();
+        filters.insert(
+            FilterCriteria::AdmissionDate,
+            Some(FilterValue::ChooseMany(vec![
+                start_date.clone(),
+                end_date.clone(),
+            ])),
+        );
+        let animals = db.query_animals(Some(filters.clone())).unwrap();
+        assert_eq!(animals.len(), 1);
+        assert_eq!(animals[0].id, "a2");
+
+        // Test filter by adoption date
+        filters.clear();
+        filters.insert(
+            FilterCriteria::AdoptionDate,
+            Some(FilterValue::ChooseMany(vec![start_date, end_date])),
+        );
+        let animals = db.query_animals(Some(filters)).unwrap();
+        assert_eq!(animals.len(), 1);
+        assert_eq!(animals[0].id, "a4");
     }
 
     // ==================== ADOPTION REQUESTS TESTS ====================
@@ -300,18 +359,8 @@ mod database_service_tests {
         // Insert animal first (for foreign key)
         db.insert_animal(&animal).unwrap();
 
-        // Test empty query initially
-        let requests = db.query_adoption_requests(None).unwrap();
-        assert_eq!(requests.len(), 0);
-
         // Test insert
         db.insert_adoption_request(&request).unwrap();
-
-        // Test query all after insert
-        let requests = db.query_adoption_requests(None).unwrap();
-        assert_eq!(requests.len(), 1);
-        assert_eq!(requests[0].id, "r1");
-        assert_eq!(requests[0].name, "Jira Pit");
 
         // Test query by ID
         let found = db.query_adoption_request_by_id("r1").unwrap().unwrap();
@@ -383,126 +432,40 @@ mod database_service_tests {
     }
 
     #[test]
-    fn test_requests_multiple_records() {
-        let db = create_test_db("test_requests_multiple_records");
-        let animal = sample_animal("a1");
-        let request1 = sample_request("r1", "a1");
-        let mut request2 = sample_request("r2", "a1");
-        request2.name = "Non Prajogo".to_string();
-        request2.email = "non.prajogo@gmail.com".to_string();
-        request2.tel_number = "9876543210".to_string();
-        request2.annual_income = "50000".to_string();
-        request2.country = "Indonesia".to_string();
-
-        db.insert_animal(&animal).unwrap();
-        db.insert_adoption_request(&request1).unwrap();
-        db.insert_adoption_request(&request2).unwrap();
-
-        // Verify all are returned
-        let requests = db.query_adoption_requests(None).unwrap();
-        assert_eq!(requests.len(), 2);
-
-        let ids: Vec<&str> = requests.iter().map(|r| r.id.as_str()).collect();
-        assert!(ids.contains(&"r1"));
-        assert!(ids.contains(&"r2"));
-    }
-
-    #[test]
-    fn test_requests_filter() {
-        let db = create_test_db("test_requests_filter");
-
-        let now = Utc::now().timestamp();
-
-        let mut animal1 = sample_animal("a1");
-        animal1.sex = "Male".to_string();
-        animal1.specie = "Dog".to_string();
-        animal1.breed = "Golden Retriever".to_string();
-        animal1.admission_timestamp = now - 86400 * 2; // 2 days ago
-
-        let mut animal2 = sample_animal("a2");
-        animal2.sex = "Female".to_string();
-        animal2.specie = "Cat".to_string();
-        animal2.breed = "Siamese".to_string();
-        animal2.admission_timestamp = now - 86400 * 8; // 8 days ago
+    fn test_query_adoption_requests_by_animal_id() {
+        let db = create_test_db("test_query_adoption_requests_by_animal_id");
+        let animal1 = sample_animal("a1");
+        let animal2 = sample_animal("a2");
 
         db.insert_animal(&animal1).unwrap();
         db.insert_animal(&animal2).unwrap();
 
-        let mut request1 = sample_request("r1", "a1");
-        request1.status = RequestStatus::Pending;
-        request1.request_timestamp = now - 86400; // 1 day ago
-        request1.adoption_timestamp = 0;
-
-        let mut request2 = sample_request("r2", "a2");
-        request2.status = RequestStatus::Approved;
-        request2.request_timestamp = now - 86400 * 10; // 10 days ago
-        request2.adoption_timestamp = now - 86400 * 3; // 3 days ago
+        let request1 = sample_request("r1", "a1");
+        let request2 = sample_request("r2", "a1"); // Another request for animal1
+        let request3 = sample_request("r3", "a2");
 
         db.insert_adoption_request(&request1).unwrap();
         db.insert_adoption_request(&request2).unwrap();
+        db.insert_adoption_request(&request3).unwrap();
 
-        // Test filter by status
-        let mut filters = HashMap::new();
-        filters.insert(
-            FilterCriteria::Status,
-            Some(FilterValue::ChooseMany(vec![
-                RequestStatus::Pending.to_string()
-            ])),
-        );
-        let requests = db.query_adoption_requests(Some(filters)).unwrap();
-        assert_eq!(requests.len(), 1);
-        assert_eq!(requests[0].id, "r1");
+        // Query requests for animal1
+        let requests_for_a1 = db.query_adoption_requests_by_animal_id("a1").unwrap();
+        assert_eq!(requests_for_a1.len(), 2);
+        assert!(requests_for_a1.iter().any(|r| r.id == "r1"));
+        assert!(requests_for_a1.iter().any(|r| r.id == "r2"));
+        assert_eq!(requests_for_a1[0].animal_id, "a1");
+        assert_eq!(requests_for_a1[0].name, "Jira Pit"); // Check a field from AdoptionRequest
 
-        // Test filter by animal sex
-        let mut filters = HashMap::new();
-        filters.insert(
-            FilterCriteria::Sex,
-            Some(FilterValue::ChooseMany(vec!["Female".to_string()])),
-        );
-        let requests = db.query_adoption_requests(Some(filters)).unwrap();
-        assert_eq!(requests.len(), 1);
-        assert_eq!(requests[0].id, "r2");
+        // Query requests for animal2
+        let requests_for_a2 = db.query_adoption_requests_by_animal_id("a2").unwrap();
+        assert_eq!(requests_for_a2.len(), 1);
+        assert!(requests_for_a2.iter().any(|r| r.id == "r3"));
+        assert_eq!(requests_for_a2[0].animal_id, "a2");
 
-        // Test filter by animal species and breeds
-        let mut filters = HashMap::new();
-        let mut species_map = HashMap::new();
-        species_map.insert("Dog".to_string(), vec!["Golden Retriever".to_string()]);
-        filters.insert(
-            FilterCriteria::SpeciesAndBreeds,
-            Some(FilterValue::NestedChooseMany(species_map)),
-        );
-        let requests = db.query_adoption_requests(Some(filters)).unwrap();
-        assert_eq!(requests.len(), 1);
-        assert_eq!(requests[0].id, "r1");
-
-        // Test filter by admission date (past week)
-        let mut filters = HashMap::new();
-        filters.insert(
-            FilterCriteria::AdmissionDate,
-            Some(FilterValue::ChooseOne("past_week".to_string())),
-        );
-        let requests = db.query_adoption_requests(Some(filters)).unwrap();
-        assert_eq!(requests.len(), 1);
-        assert_eq!(requests[0].id, "r1");
-
-        // Test filter by request date (past week)
-        let mut filters = HashMap::new();
-        filters.insert(
-            FilterCriteria::RequestDate,
-            Some(FilterValue::ChooseOne("past_week".to_string())),
-        );
-        let requests = db.query_adoption_requests(Some(filters)).unwrap();
-        assert_eq!(requests.len(), 1);
-        assert_eq!(requests[0].id, "r1");
-
-        // Test filter by adoption date (past week)
-        let mut filters = HashMap::new();
-        filters.insert(
-            FilterCriteria::AdoptionDate,
-            Some(FilterValue::ChooseOne("past_week".to_string())),
-        );
-        let requests = db.query_adoption_requests(Some(filters)).unwrap();
-        assert_eq!(requests.len(), 1);
-        assert_eq!(requests[0].id, "r2");
+        // Query for non-existent animal
+        let requests_for_nonexistent = db
+            .query_adoption_requests_by_animal_id("nonexistent")
+            .unwrap();
+        assert_eq!(requests_for_nonexistent.len(), 0);
     }
 }

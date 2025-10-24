@@ -1,4 +1,4 @@
-/*
+/**
  * routes/home/staff/all-animals/+page.ts
  *
  * Data loading functions for staff/all-animals page authentication and routing.
@@ -13,9 +13,6 @@ import type { PageLoad } from "./$types";
 import { error } from "@tauri-apps/plugin-log";
 import { getAnimals } from "$lib/utils/animal-utils";
 
-/**
- * All-animals page data loader.
- */
 export const load: PageLoad = async () => {
   try {
     // Check if user is authenticated

@@ -116,26 +116,6 @@ export interface AdoptionRequest {
   country: string;
 }
 
-/** Simplified adoption request information for listing views */
-export interface AdoptionRequestSummary {
-  /** Unique identifier for the adoption request */
-  id: string;
-  /** ID of the animal being requested for adoption */
-  animal_id: string;
-  /** Full name of the person requesting adoption */
-  name: string;
-  /** Email address of the requester */
-  email: string;
-  /** Timestamp when the request was submitted */
-  request_timestamp: number;
-}
-
-/** Interface for combining AnimalSummary and AdoptionRequest data. */
-export interface AdoptionRequestData {
-  animal: AnimalSummary;
-  request: AdoptionRequest;
-}
-
 import type { FilterSelections } from "$lib/utils/filter-utils";
 
 // ==================== ANIMAL FUNCTIONS ====================
@@ -144,8 +124,7 @@ import type { FilterSelections } from "$lib/utils/filter-utils";
  * Retrieves animals from the database, with optional filtering.
  *
  * @param filters - Optional map of filter criteria and values
- * @returns Promise<AnimalSummary[]> - List of animal summaries
- * @throws Error if the operation fails
+ * @returns Promise<AnimalSummary[]> - List of animal summaries. Returns an empty array if the operation fails.
  */
 export async function getAnimals(
   filters: FilterSelections | null,
@@ -162,8 +141,7 @@ export async function getAnimals(
  * Retrieves a specific animal by ID.
  *
  * @param animalId - The ID of the animal to retrieve
- * @returns Promise<Animal | null> - The animal data if found, null if not found
- * @throws Error if the operation fails
+ * @returns Promise<Animal | null> - The animal data if found, null if not found. Returns null if the operation fails.
  */
 export async function getAnimalById(animalId: string): Promise<Animal | null> {
   try {
@@ -175,10 +153,48 @@ export async function getAnimalById(animalId: string): Promise<Animal | null> {
 }
 
 /**
+ * Retrieves an animal and its associated accepted adoption in parallel.
+ *
+ * @param animalId - The ID of the animal.
+ * @param animalStatus - The status of the animal, to determine if a request should be fetched.
+ * @returns A promise that resolves to an object containing the animal and optional adopter details. Returns `{ animal: null, adopter: null }` if the operation fails.
+ */
+export async function getAnimalWithAcceptedAdoption(
+  animalId: string,
+  animalStatus: AnimalStatus,
+): Promise<{ animal: Animal | null; adopter: AdoptionRequest | null }> {
+  try {
+    const animalPromise = getAnimalById(animalId);
+    let adopterPromise: Promise<AdoptionRequest | null> = Promise.resolve(null);
+
+    if (animalStatus === AnimalStatus.ADOPTED) {
+      adopterPromise = getAdoptionRequestsByAnimalId(animalId).then(
+        (requests) => {
+          // Find the request with the APPROVED status
+          const foundApprovedRequest = requests.find(
+            (request) => request && request.status === RequestStatus.APPROVED,
+          );
+          return foundApprovedRequest || null;
+        },
+      );
+    }
+
+    const [animal, adopter] = await Promise.all([
+      animalPromise,
+      adopterPromise,
+    ]);
+    return { animal, adopter };
+  } catch (e) {
+    error(`Failed to get animal ${animalId} with adoption request: ${e}`);
+    return { animal: null, adopter: null };
+  }
+}
+
+/**
  * Creates a new animal in the database.
  *
  * @param animal - The animal data to create
- * @throws Error if the operation fails
+ * @returns Promise<void> - A promise that resolves when the operation is complete. Logs an error if the operation fails.
  */
 export async function createAnimal(animal: Animal): Promise<void> {
   try {
@@ -192,8 +208,7 @@ export async function createAnimal(animal: Animal): Promise<void> {
  * Updates an existing animal in the database.
  *
  * @param animal - The updated animal data
- * @returns Promise<boolean> - True if animal was found and updated, false if not found
- * @throws Error if the operation fails
+ * @returns Promise<boolean> - True if animal was found and updated, false if not found. Returns false if the operation fails.
  */
 export async function updateAnimal(animal: Animal): Promise<boolean> {
   try {
@@ -208,8 +223,7 @@ export async function updateAnimal(animal: Animal): Promise<boolean> {
  * Deletes an animal from the database.
  *
  * @param animalId - The ID of the animal to delete
- * @returns Promise<boolean> - True if animal was found and deleted, false if not found
- * @throws Error if the operation fails
+ * @returns Promise<boolean> - True if animal was found and deleted, false if not found. Returns false if the operation fails.
  */
 export async function deleteAnimal(animalId: string): Promise<boolean> {
   try {
@@ -223,30 +237,10 @@ export async function deleteAnimal(animalId: string): Promise<boolean> {
 // ==================== ADOPTION REQUEST FUNCTIONS ====================
 
 /**
- * Retrieves all adoption requests from the database.
- *
- * @returns Promise<AdoptionRequestSummary[]> - List of adoption request summaries
- * @throws Error if the operation fails
- */
-export async function getAdoptionRequests(
-  filters: FilterSelections | null,
-): Promise<AdoptionRequestSummary[]> {
-  try {
-    return await invoke<AdoptionRequestSummary[]>("get_adoption_requests", {
-      filters,
-    });
-  } catch (e) {
-    error(`Failed to get all adoption requests: ${e}`);
-    return [];
-  }
-}
-
-/**
  * Retrieves a specific adoption request by ID.
  *
  * @param requestId - The ID of the adoption request to retrieve
- * @returns Promise<AdoptionRequest | null> - The adoption request data if found, null if not found
- * @throws Error if the operation fails
+ * @returns Promise<AdoptionRequest | null> - The adoption request data if found, null if not found. Returns null if the operation fails.
  */
 export async function getAdoptionRequestById(
   requestId: string,
@@ -262,10 +256,30 @@ export async function getAdoptionRequestById(
 }
 
 /**
+ * Retrieves all adoption requests for a specific animal ID.
+ *
+ * @param animalId - The ID of the animal to retrieve requests for
+ * @returns Promise<AdoptionRequest[]> - List of adoption requests. Returns an empty array if the operation fails.
+ */
+export async function getAdoptionRequestsByAnimalId(
+  animalId: string,
+): Promise<AdoptionRequest[]> {
+  try {
+    return await invoke<AdoptionRequest[]>(
+      "get_adoption_requests_by_animal_id",
+      { animalId },
+    );
+  } catch (e) {
+    error(`Failed to get adoption requests for animal ID ${animalId}: ${e}`);
+    return [];
+  }
+}
+
+/**
  * Creates a new adoption request in the database.
  *
  * @param request - The adoption request data to create
- * @throws Error if the operation fails
+ * @returns Promise<void> - A promise that resolves when the operation is complete. Logs an error if the operation fails.
  */
 export async function createAdoptionRequest(
   request: AdoptionRequest,
@@ -281,8 +295,7 @@ export async function createAdoptionRequest(
  * Updates an existing adoption request in the database.
  *
  * @param request - The updated adoption request data
- * @returns Promise<boolean> - True if request was found and updated, false if not found
- * @throws Error if the operation fails
+ * @returns Promise<boolean> - True if request was found and updated, false if not found. Returns false if the operation fails.
  */
 export async function updateAdoptionRequest(
   request: AdoptionRequest,
@@ -299,8 +312,7 @@ export async function updateAdoptionRequest(
  * Deletes an adoption request from the database.
  *
  * @param requestId - The ID of the adoption request to delete
- * @returns Promise<boolean> - True if request was found and deleted, false if not found
- * @throws Error if the operation fails
+ * @returns Promise<boolean> - True if request was found and deleted, false if not found. Returns false if the operation fails.
  */
 export async function deleteAdoptionRequest(
   requestId: string,
@@ -318,8 +330,7 @@ export async function deleteAdoptionRequest(
 /**
  * Uploads a file selected by the user for animal images.
  *
- * @returns Promise<string | null> - The path of the uploaded file if successful, null if canceled
- * @throws Error if the upload fails
+ * @returns Promise<string | null> - The path of the uploaded file if successful, null if canceled. Returns null if the upload fails.
  */
 export async function uploadAnimalImage(): Promise<string | null> {
   try {
@@ -334,7 +345,7 @@ export async function uploadAnimalImage(): Promise<string | null> {
  * Deletes a file from the specified path.
  *
  * @param filePath - The path of the file to be deleted
- * @throws Error if the deletion fails
+ * @returns Promise<void> - A promise that resolves when the operation is complete. Logs an error if the deletion fails.
  */
 export async function deleteFile(filePath: string): Promise<void> {
   try {

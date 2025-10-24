@@ -1,4 +1,4 @@
-/*
+/**
  * routes/home/staff/adoption-reports/+page.ts
  *
  * Data loading functions for staff/adoption-reports page authentication and routing.
@@ -12,17 +12,10 @@ import {
 import type { PageLoad } from "./$types";
 import { error } from "@tauri-apps/plugin-log";
 import {
-  getAdoptionRequests,
-  RequestStatus,
-  AnimalStatus,
-  getAnimals,
-  type Animal,
-  type AdoptionRequestSummary,
-} from "$lib/utils/animal-utils";
+  type AnimalAdoptionReport,
+  get_adoption_reports,
+} from "./adoption-reports-utils";
 
-/**
- * Adoption reports page data loader.
- */
 export const load: PageLoad = async () => {
   try {
     // Check if user is authenticated
@@ -35,26 +28,14 @@ export const load: PageLoad = async () => {
       return; // prevent returning data
     }
 
-    const requestSummaries = await getAdoptionRequests({
-      status: [RequestStatus.APPROVED],
-    });
-
-    const animalSummaries = await getAnimals({
-      status: [AnimalStatus.ADOPTED],
-    });
-
-    const adoptionRequestsData = requestSummaries.map((request) => {
-      const animal = animalSummaries.find((a) => a.id === request.animal_id);
-      return animal ? { animal, request } : null;
-    });
-
-    const completedRequests = adoptionRequestsData.filter(
-      (data) => data && data.animal && data.request,
-    ) as { animal: Animal; request: AdoptionRequestSummary }[];
+    // Fetch adoption reports without filters initially
+    const adoptionRequests: AnimalAdoptionReport[] = await get_adoption_reports(
+      {},
+    );
 
     return {
       currentUser,
-      adoptionRequests: completedRequests,
+      adoptionRequests,
     };
   } catch (e) {
     // Authentication check failed, redirect to authentication

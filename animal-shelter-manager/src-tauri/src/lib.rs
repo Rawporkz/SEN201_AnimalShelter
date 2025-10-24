@@ -15,9 +15,7 @@ use authentication_service::{
     AuthenticationService, CurrentUser,
 };
 use database_service::{
-    types::{
-        AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary, FilterCriteria, FilterValue,
-    },
+    types::{AdoptionRequest, Animal, AnimalSummary, FilterCriteria, FilterValue},
     DatabaseService,
 };
 use file_service::FileService;
@@ -287,35 +285,6 @@ async fn delete_animal(
 
 // ==================== ADOPTION REQUEST TABLE COMMANDS ====================
 
-/// Command to retrieve all adoption requests from the database
-///
-/// # Returns
-/// * `Ok(Vec<AdoptionRequestSummary>)` - List of adoption request summaries if successful
-/// * `Err(String)` - An error message if the query fails
-#[tauri::command]
-async fn get_adoption_requests(
-    state: State<'_, Mutex<AppState>>,
-    app_handle: AppHandle,
-    filters: Option<HashMap<FilterCriteria, Option<FilterValue>>>,
-) -> Result<Vec<AdoptionRequestSummary>, String> {
-    // Lock the state for safe concurrent access
-    let mut state_guard = state.lock().await;
-
-    // Lazily initialize the database service
-    init_database_service_once(&mut state_guard, &app_handle).await?;
-
-    // Query all adoption requests
-    match state_guard
-        .database_service
-        .as_ref()
-        .unwrap()
-        .query_adoption_requests(filters)
-    {
-        Ok(requests) => Ok(requests),
-        Err(e) => Err(format!("Failed to retrieve adoption requests: {}", e)),
-    }
-}
-
 /// Command to retrieve a specific adoption request by ID
 ///
 /// # Arguments
@@ -447,6 +416,41 @@ async fn delete_adoption_request(
         Err(e) => Err(format!(
             "Failed to delete adoption request with ID {}: {}",
             request_id, e
+        )),
+    }
+}
+
+/// Command to retrieve all adoption requests from the database for a specific animal ID
+///
+/// # Arguments
+/// * `animal_id` - The ID of the animal to retrieve requests for
+///
+/// # Returns
+/// * `Ok(Vec<AdoptionRequest>)` - List of adoption requests if successful
+/// * `Err(String)` - An error message if the query fails
+#[tauri::command]
+async fn get_adoption_requests_by_animal_id(
+    state: State<'_, Mutex<AppState>>,
+    app_handle: AppHandle,
+    animal_id: String,
+) -> Result<Vec<AdoptionRequest>, String> {
+    // Lock the state for safe concurrent access
+    let mut state_guard = state.lock().await;
+
+    // Lazily initialize the database service
+    init_database_service_once(&mut state_guard, &app_handle).await?;
+
+    // Query adoption requests by animal ID
+    match state_guard
+        .database_service
+        .as_ref()
+        .unwrap()
+        .query_adoption_requests_by_animal_id(&animal_id)
+    {
+        Ok(requests) => Ok(requests),
+        Err(e) => Err(format!(
+            "Failed to retrieve adoption requests for animal ID {}: {}",
+            animal_id, e
         )),
     }
 }
@@ -655,8 +659,8 @@ pub fn run() {
             update_animal,
             delete_animal,
             // Adoption request commands
-            get_adoption_requests,
             get_adoption_request_by_id,
+            get_adoption_requests_by_animal_id,
             create_adoption_request,
             update_adoption_request,
             delete_adoption_request,

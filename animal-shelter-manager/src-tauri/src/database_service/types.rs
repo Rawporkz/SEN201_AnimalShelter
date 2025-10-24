@@ -157,21 +157,6 @@ pub struct AdoptionRequest {
     pub country: String,
 }
 
-/// Simplified adoption request information for listing views
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AdoptionRequestSummary {
-    /// Unique identifier for the adoption request
-    pub id: String,
-    /// ID of the animal being requested for adoption
-    pub animal_id: String,
-    /// Full name of the person requesting adoption
-    pub name: String,
-    /// Email address of the requester
-    pub email: String,
-    /// Timestamp when the request was submitted
-    pub request_timestamp: i64,
-}
-
 /// Represents the criteria available for filtering animals.
 /// This enum is designed to be sent from the TypeScript frontend.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Display, EnumString)]
@@ -182,7 +167,6 @@ pub enum FilterCriteria {
     SpeciesAndBreeds,
     AdmissionDate,
     AdoptionDate,
-    RequestDate,
 }
 
 /// Represents the different types of values that can be associated with a filter criterion.

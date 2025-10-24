@@ -6,10 +6,7 @@ information in a horizontal row layout.
 -->
 
 <script lang="ts">
-  import type {
-    AnimalSummary,
-    AdoptionRequestSummary,
-  } from "$lib/utils/animal-utils";
+  import type { AnimalSummary, AdoptionRequest } from "$lib/utils/animal-utils";
   import { formatTimestamp } from "$lib/utils/animal-utils";
   import { ImageOff } from "@lucide/svelte";
   import type { Snippet } from "svelte";
@@ -20,7 +17,7 @@ information in a horizontal row layout.
     /** Animal summary data to display */
     animalSummary: AnimalSummary;
     /** Adoption request data to display (for adopter info) */
-    adoptionRequest: AdoptionRequestSummary;
+    adoptionRequest: AdoptionRequest;
     /** Whether to show the "by" word between animal and adopter columns */
     showBySeparator?: boolean;
     /** Action buttons or components to display on the right side */

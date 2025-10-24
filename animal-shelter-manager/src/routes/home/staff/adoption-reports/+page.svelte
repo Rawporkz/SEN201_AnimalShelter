@@ -1,5 +1,5 @@
 <!-- 
-adoption-reports/+page.svelte
+routes/home/staff/adoption-reports/+page.svelte
 
 This page displays all adoption reports for staff members to review.
 -->
@@ -20,16 +20,15 @@ This page displays all adoption reports for staff members to review.
   } from "$lib/utils/filter-utils";
   import {
     type AnimalSummary,
-    type AdoptionRequestSummary,
     type Animal,
     type AdoptionRequest,
-    getAdoptionRequests,
     getAnimalById,
     getAdoptionRequestById,
-    getAnimals,
-    RequestStatus,
-    AnimalStatus,
   } from "$lib/utils/animal-utils";
+  import {
+    type AnimalAdoptionReport,
+    get_adoption_reports,
+  } from "./adoption-reports-utils";
   import { SlidersHorizontal, Eye } from "@lucide/svelte";
   import { navigationMap } from "../navigation-utils";
 
@@ -38,6 +37,33 @@ This page displays all adoption reports for staff members to review.
   }
 
   const { data }: Props = $props();
+
+  /** The current search query entered by the user. */
+  let searchQuery = $state("");
+  /** Controls the visibility of the filter modal. */
+  let isFilterModalOpen = $state(false);
+  /** Stores the current filter selections made by the user. */
+  let filterSelections: FilterSelections | null = $state(null);
+
+  /** Controls the visibility of the animal view modal. */
+  let isViewModalOpen = $state(false);
+  /** The animal currently selected for viewing in the modal. */
+  let selectedAnimal: Animal | null = $state(null);
+  /** The adopter information associated with the selected animal, if applicable. */
+  let selectedAdopter: AdoptionRequest | null = $state(null);
+
+  /** Store of adoption requests to be displayed. */
+  let displayedRequests: AnimalAdoptionReport[] = $state(
+    data.adoptionRequests || [],
+  );
+
+  /** List of filter criteria to display in the filter modal. */
+  const filterCriteria = [
+    FilterCriteria.SEX,
+    FilterCriteria.SPECIES_AND_BREEDS,
+    FilterCriteria.ADMISSION_DATE,
+    FilterCriteria.ADOPTION_DATE,
+  ];
 
   /**
    * Handles navigation when a sidebar item is clicked.
@@ -67,28 +93,6 @@ This page displays all adoption reports for staff members to review.
     }
   }
 
-  /** The current search query entered by the user. */
-  let searchQuery = $state("");
-  /** Controls the visibility of the filter modal. */
-  let isFilterModalOpen = $state(false);
-  /** Stores the current filter selections made by the user. */
-  let filterSelections: FilterSelections | null = $state(null);
-
-  /** Controls the visibility of the animal view modal. */
-  let isViewModalOpen = $state(false);
-  /** The animal currently selected for viewing in the modal. */
-  let selectedAnimal: Animal | null = $state(null);
-  /** The adopter information associated with the selected animal, if applicable. */
-  let selectedAdopter: AdoptionRequest | null = $state(null);
-
-  /** List of filter criteria to display in the filter modal. */
-  const filterCriteria = [
-    FilterCriteria.SEX,
-    FilterCriteria.SPECIES_AND_BREEDS,
-    FilterCriteria.ADMISSION_DATE,
-    FilterCriteria.ADOPTION_DATE,
-  ];
-
   /**
    * Opens the filter modal.
    */
@@ -96,36 +100,22 @@ This page displays all adoption reports for staff members to review.
     isFilterModalOpen = true;
   }
 
-  /** Store of adoption requests to be displayed. */
-  let displayedRequests: { animal: Animal; request: AdoptionRequestSummary }[] =
-    $state(data.adoptionRequests || []);
-
   /**
    * Handles filter modal close and updates selections.
-   * @param selections - The filter selections made by the user.
+   * @param filterSelections - The filter selections made by the user.
    */
   async function handleFilterClose(
-    selections: FilterSelections,
+    filterSelections: FilterSelections,
   ): Promise<void> {
-    filterSelections = selections;
-    console.log("Filter selections:", filterSelections);
+    info("Filter selections:" + filterSelections);
+    filterSelections = filterSelections;
     isFilterModalOpen = false;
 
-    const requestSummaries = await getAdoptionRequests({
-      ...filterSelections,
-      status: [RequestStatus.APPROVED],
-    });
-    const animalSummaries = await getAnimals({
-      ...filterSelections,
-      status: [AnimalStatus.ADOPTED],
-    });
+    // Fetch adoption reports without filters initially
+    const adoptionRequests: AnimalAdoptionReport[] =
+      await get_adoption_reports(filterSelections);
 
-    displayedRequests = requestSummaries
-      .map((request) => {
-        const animal = animalSummaries.find((a) => a.id === request.animal_id);
-        return animal ? { animal, request } : null;
-      })
-      .filter(Boolean) as { animal: Animal; request: AdoptionRequestSummary }[];
+    displayedRequests = adoptionRequests;
   }
 
   /**
@@ -136,10 +126,14 @@ This page displays all adoption reports for staff members to review.
    */
   async function handleViewRequest(
     animalSummary: AnimalSummary,
-    requestSummary: AdoptionRequestSummary,
+    requestSummary: AdoptionRequest,
   ): Promise<void> {
-    selectedAnimal = await getAnimalById(animalSummary.id);
-    selectedAdopter = await getAdoptionRequestById(requestSummary.id);
+    const [animal, adopter] = await Promise.all([
+      getAnimalById(animalSummary.id),
+      getAdoptionRequestById(requestSummary.id),
+    ]);
+    selectedAnimal = animal;
+    selectedAdopter = adopter;
     isViewModalOpen = true;
   }
 
@@ -153,8 +147,8 @@ This page displays all adoption reports for staff members to review.
   }
 
   /** Derived store of adoption requests filtered based on search query. */
-  let filteredRequests = $derived(
-    (displayedRequests || []).filter(({ animal, request }) => {
+  let searchedRequests = $derived(
+    (displayedRequests || []).filter(({ animal, adoption }) => {
       if (!searchQuery) return true;
 
       const query = searchQuery.toLowerCase();
@@ -164,8 +158,8 @@ This page displays all adoption reports for staff members to review.
         animal.id.toLowerCase().includes(query) ||
         animal.breed.toLowerCase().includes(query) ||
         animal.specie.toLowerCase().includes(query) ||
-        request.name.toLowerCase().includes(query) ||
-        request.email.toLowerCase().includes(query)
+        adoption.name.toLowerCase().includes(query) ||
+        adoption.email.toLowerCase().includes(query)
       );
     }),
   );
@@ -184,26 +178,26 @@ This page displays all adoption reports for staff members to review.
     <div class="page-header">
       <h1 class="page-title">Adoption Reports</h1>
     </div>
-
     <div class="controls-bar">
       <SearchBar
         bind:value={searchQuery}
         placeholder="Search for names, IDs, breeds, and more..."
       />
-
       <button class="filter-button" onclick={handleFilterClick}>
         <SlidersHorizontal size={16} />
         <span>Filters</span>
       </button>
     </div>
-
     <div class="report-list">
-      {#each filteredRequests as { animal, request } (animal.id)}
-        <AnimalAdoptionInfoRow animalSummary={animal} adoptionRequest={request}>
+      {#each searchedRequests as { animal, adoption } (animal.id)}
+        <AnimalAdoptionInfoRow
+          animalSummary={animal}
+          adoptionRequest={adoption}
+        >
           {#snippet actions()}
             <button
               class="action-button view-button"
-              onclick={() => handleViewRequest(animal, request)}
+              onclick={() => handleViewRequest(animal, adoption)}
             >
               <Eye size={16} />
               <span>View</span>
@@ -214,14 +208,12 @@ This page displays all adoption reports for staff members to review.
     </div>
   </main>
 </div>
-
 <FilterModal
   isVisible={isFilterModalOpen}
   criteriaList={filterCriteria}
   currentSelections={filterSelections}
   onClose={handleFilterClose}
 />
-
 {#if selectedAnimal}
   <ViewAnimalModal
     animal={selectedAnimal}

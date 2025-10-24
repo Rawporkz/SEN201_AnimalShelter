@@ -1,5 +1,5 @@
 <!-- 
-all-animals/+page.svelte
+routes/home/staff/all-animals/+page.svelte
 
 This page displays all animals in the shelter system for staff members.
 -->
@@ -24,9 +24,7 @@ This page displays all animals in the shelter system for staff members.
     type Animal,
     type AdoptionRequest,
     getAnimals,
-    getAnimalById,
-    getAdoptionRequests,
-    getAdoptionRequestById,
+    getAnimalWithAcceptedAdoption,
   } from "$lib/utils/animal-utils";
   import {
     Plus,
@@ -122,27 +120,12 @@ This page displays all animals in the shelter system for staff members.
    * @param animalSummary - The summary of the animal to view.
    */
   async function handleViewAnimal(animalSummary: AnimalSummary): Promise<void> {
-    selectedAnimal = await getAnimalById(animalSummary.id);
-
-    if (
-      animalSummary.status === "adopted" ||
-      animalSummary.status === "requested"
-    ) {
-      const allRequests = await getAdoptionRequests({
-        animal_id: animalSummary.id,
-      });
-      const requestSummary = allRequests.find(
-        (req) => req.animal_id === animalSummary.id,
-      );
-      if (requestSummary) {
-        selectedAdopter = await getAdoptionRequestById(requestSummary.id);
-      } else {
-        selectedAdopter = null;
-      }
-    } else {
-      selectedAdopter = null;
-    }
-
+    const { animal, adopter } = await getAnimalWithAcceptedAdoption(
+      animalSummary.id,
+      animalSummary.status,
+    );
+    selectedAnimal = animal;
+    selectedAdopter = adopter;
     isViewModalOpen = true;
   }
 

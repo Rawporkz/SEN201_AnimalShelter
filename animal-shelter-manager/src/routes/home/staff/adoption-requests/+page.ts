@@ -1,4 +1,4 @@
-/*
+/**
  * routes/home/staff/adoption-requests/+page.ts
  *
  * Data loading functions for staff/adoption-requests page authentication and routing.
@@ -12,18 +12,11 @@ import {
 import type { PageLoad } from "./$types";
 import { error } from "@tauri-apps/plugin-log";
 import {
-  getAdoptionRequests,
-  RequestStatus,
-  AnimalStatus,
-  getAnimals,
-  type Animal,
-  type AdoptionRequestSummary,
-} from "$lib/utils/animal-utils";
+  AnimalAdoptionRequests,
+  get_adoption_requests,
+} from "./adoption-requests-utils";
 
-/**
- * Adoption requests page data loader.
- */
-export const load: PageLoad = async () => {
+export const load: PageLoad = async ({ url }) => {
   try {
     // Check if user is authenticated
     let currentUser: CurrentUser | null = await getCurrentUser();
@@ -35,26 +28,16 @@ export const load: PageLoad = async () => {
       return; // prevent returning data
     }
 
-    const requestSummaries = await getAdoptionRequests({
-      status: [RequestStatus.PENDING],
-    });
+    /** Get animal ID from URL parameters */
+    const animal_id = url.searchParams.get("animal_id");
 
-    const animalSummaries = await getAnimals({
-      status: [AnimalStatus.REQUESTED],
-    });
-
-    const adoptionRequestsData = requestSummaries.map((request) => {
-      const animal = animalSummaries.find((a) => a.id === request.animal_id);
-      return animal ? { animal, request } : null;
-    });
-
-    const pendingRequests = adoptionRequestsData.filter(
-      (data) => data && data.animal && data.request,
-    ) as { animal: Animal; request: AdoptionRequestSummary }[];
+    // Fetch adoption requests without filters initially
+    const adoptionRequests: AnimalAdoptionRequests[] =
+      await get_adoption_requests({}, animal_id);
 
     return {
       currentUser,
-      adoptionRequests: pendingRequests,
+      adoptionRequests,
     };
   } catch (e) {
     // Authentication check failed, redirect to authentication

@@ -13,9 +13,7 @@ use anyhow::{bail, Context, Result};
 use rusqlite::{params, Connection};
 use std::collections::HashMap;
 use std::path::Path;
-use types::{
-    AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary, FilterCriteria, FilterValue,
-};
+use types::{AdoptionRequest, Animal, AnimalSummary, FilterCriteria, FilterValue};
 
 /// Service for handling database operations in the animal shelter application
 pub struct DatabaseService {
@@ -201,9 +199,46 @@ impl DatabaseService {
                                     }
                                 }
                             }
-                            _ => {
-                                log::warn!("Unsupported filter criteria: {:?}", criteria);
+                            FilterCriteria::AdmissionDate => {
+                                if let FilterValue::ChooseMany(dates) = value {
+                                    if dates.len() == 2 {
+                                        if let (Ok(start), Ok(end)) =
+                                            (dates[0].parse::<i64>(), dates[1].parse::<i64>())
+                                        {
+                                            where_clauses
+                                                .push("admission_timestamp BETWEEN ? AND ?".to_string());
+                                            params.push(rusqlite::types::Value::Integer(start));
+                                            params.push(rusqlite::types::Value::Integer(end));
+                                        } else {
+                                            log::warn!(
+                                                "Failed to parse admission date filter values: {:?}",
+                                                dates
+                                            );
+                                        }
+                                    }
+                                }
                             }
+                            FilterCriteria::AdoptionDate => {
+                                if let FilterValue::ChooseMany(dates) = value {
+                                    if dates.len() == 2 {
+                                        if let (Ok(start), Ok(end)) =
+                                            (dates[0].parse::<i64>(), dates[1].parse::<i64>())
+                                        {
+                                            where_clauses.push(
+                                                "EXISTS (SELECT 1 FROM adoption_requests ar WHERE ar.animal_id = animals.id AND ar.status = 'approved' AND ar.adoption_timestamp BETWEEN ? AND ?)".to_string()
+                                            );
+                                            params.push(rusqlite::types::Value::Integer(start));
+                                            params.push(rusqlite::types::Value::Integer(end));
+                                        } else {
+                                            log::warn!(
+                                                "Failed to parse adoption date filter values: {:?}",
+                                                dates
+                                            );
+                                        }
+                                    }
+                                }
+                            }
+
                         }
                     }
                 }
@@ -419,147 +454,46 @@ impl DatabaseService {
 
     // ==================== ADOPTION_REQUESTS TABLE OPERATIONS ====================
 
-    /// Retrieves summary information for all adoption requests in the database
+    /// Retrieves complete information for all adoption requests associated with a specific animal ID
+    ///
+    /// # Arguments
+    /// * `animal_id` - The ID of the animal to retrieve requests for
     ///
     /// # Returns
-    /// * `Result<Vec<AdoptionRequestSummary>>` - List of adoption request summaries or error
-    pub fn query_adoption_requests(
+    /// * `Result<Vec<AdoptionRequest>>` - List of adoption requests or error
+    pub fn query_adoption_requests_by_animal_id(
         &self,
-        filters: Option<HashMap<FilterCriteria, Option<FilterValue>>>,
-    ) -> Result<Vec<AdoptionRequestSummary>> {
-        let mut query =
-            "SELECT id, animal_id, name, email, request_timestamp FROM adoption_requests"
-                .to_string();
-        let mut where_clauses: Vec<String> = Vec::new();
-        let mut params: Vec<rusqlite::types::Value> = Vec::new();
-
-        if let Some(filters_map) = filters {
-            if !filters_map.is_empty() {
-                for (criteria, value_option) in filters_map {
-                    if let Some(value) = value_option {
-                        match criteria {
-                            FilterCriteria::Status => {
-                                if let FilterValue::ChooseMany(stati) = value {
-                                    if stati.is_empty() {
-                                        where_clauses.push("1=0".to_string());
-                                    } else {
-                                        let placeholders: Vec<_> =
-                                            stati.iter().map(|_| "?").collect();
-                                        where_clauses.push(format!(
-                                            "status IN ({})",
-                                            placeholders.join(",")
-                                        ));
-                                        for s in stati {
-                                            params.push(rusqlite::types::Value::from(s));
-                                        }
-                                    }
-                                }
-                            }
-                            FilterCriteria::Sex => {
-                                if let FilterValue::ChooseMany(sexes) = value {
-                                    if sexes.is_empty() {
-                                        where_clauses.push("1=0".to_string());
-                                    } else {
-                                        let placeholders: Vec<_> =
-                                            sexes.iter().map(|_| "?").collect();
-                                        where_clauses.push(format!("animal_id IN (SELECT id FROM animals WHERE sex IN ({}))", placeholders.join(",")));
-                                        for s in sexes {
-                                            params.push(rusqlite::types::Value::from(s));
-                                        }
-                                    }
-                                }
-                            }
-                            FilterCriteria::SpeciesAndBreeds => {
-                                if let FilterValue::NestedChooseMany(species_map) = value {
-                                    if species_map.is_empty() {
-                                        where_clauses.push("1=0".to_string());
-                                    } else {
-                                        let mut species_clauses = Vec::new();
-                                        for (specie, breeds) in species_map {
-                                            if !breeds.is_empty() {
-                                                let breed_placeholders: Vec<_> =
-                                                    breeds.iter().map(|_| "?").collect();
-                                                species_clauses.push(format!(
-                                                    "(specie = ? AND breed IN ({}))",
-                                                    breed_placeholders.join(",")
-                                                ));
-                                                params.push(rusqlite::types::Value::from(specie));
-                                                for b in breeds {
-                                                    params.push(rusqlite::types::Value::from(b));
-                                                }
-                                            }
-                                        }
-                                        if species_clauses.is_empty() {
-                                            where_clauses.push("1=0".to_string());
-                                        } else {
-                                            where_clauses.push(format!(
-                                                "animal_id IN (SELECT id FROM animals WHERE {})",
-                                                species_clauses.join(" OR ")
-                                            ));
-                                        }
-                                    }
-                                }
-                            }
-                            FilterCriteria::AdmissionDate => {
-                                if let FilterValue::ChooseOne(date_range) = value {
-                                    match date_range.as_str() {
-                                        "past_day" => where_clauses.push("animal_id IN (SELECT id FROM animals WHERE admission_timestamp >= strftime('%s', date('now', '-1 day')))".to_string()),
-                                        "past_week" => where_clauses.push("animal_id IN (SELECT id FROM animals WHERE admission_timestamp >= strftime('%s', date('now', '-7 days')))".to_string()),
-                                        "past_month" => where_clauses.push("animal_id IN (SELECT id FROM animals WHERE admission_timestamp >= strftime('%s', date('now', '-1 month')))".to_string()),
-                                        "past_year" => where_clauses.push("animal_id IN (SELECT id FROM animals WHERE admission_timestamp >= strftime('%s', date('now', '-1 year')))".to_string()),
-                                        _ => log::warn!("Unsupported admission date filter: {}", date_range),
-                                    }
-                                }
-                            }
-                            FilterCriteria::RequestDate => {
-                                if let FilterValue::ChooseOne(date_range) = value {
-                                    match date_range.as_str() {
-                                        "past_day" => where_clauses.push("request_timestamp >= strftime('%s', date('now', '-1 day'))".to_string()),
-                                        "past_week" => where_clauses.push("request_timestamp >= strftime('%s', date('now', '-7 days'))".to_string()),
-                                        "past_month" => where_clauses.push("request_timestamp >= strftime('%s', date('now', '-1 month'))".to_string()),
-                                        "past_year" => where_clauses.push("request_timestamp >= strftime('%s', date('now', '-1 year'))".to_string()),
-                                        _ => log::warn!("Unsupported request date filter: {}", date_range),
-                                    }
-                                }
-                            }
-                            FilterCriteria::AdoptionDate => {
-                                if let FilterValue::ChooseOne(date_range) = value {
-                                    match date_range.as_str() {
-                                        "past_day" => where_clauses.push("adoption_timestamp >= strftime('%s', date('now', '-1 day'))".to_string()),
-                                        "past_week" => where_clauses.push("adoption_timestamp >= strftime('%s', date('now', '-7 days'))".to_string()),
-                                        "past_month" => where_clauses.push("adoption_timestamp >= strftime('%s', date('now', '-1 month'))".to_string()),
-                                        "past_year" => where_clauses.push("adoption_timestamp >= strftime('%s', date('now', '-1 year'))".to_string()),
-                                        _ => log::warn!("Unsupported adoption date filter: {}", date_range),
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if !where_clauses.is_empty() {
-            query.push_str(" WHERE ");
-            query.push_str(&where_clauses.join(" AND "));
-        }
+        animal_id: &str,
+    ) -> Result<Vec<AdoptionRequest>> {
+        let query =
+                "SELECT id, animal_id, name, email, tel_number, address, occupation, annual_income, num_people, num_children, request_timestamp, adoption_timestamp, status, country FROM adoption_requests WHERE animal_id = ?1"
+                    .to_string();
 
         let mut statement = self.connection.prepare(&query).context(format!(
-            "Failed to prepare query for adoption requests: {}",
+            "Failed to prepare query for adoption requests by animal ID: {}",
             query
         ))?;
 
         let request_iter = statement
-            .query_map(rusqlite::params_from_iter(params.iter()), |row| {
-                Ok(AdoptionRequestSummary {
+            .query_map(rusqlite::params![animal_id], |row| {
+                Ok(AdoptionRequest {
                     id: row.get(0)?,
                     animal_id: row.get(1)?,
                     name: row.get(2)?,
                     email: row.get(3)?,
-                    request_timestamp: row.get(4)?,
+                    tel_number: row.get(4)?,
+                    address: row.get(5)?,
+                    occupation: row.get(6)?,
+                    annual_income: row.get(7)?,
+                    num_people: row.get(8)?,
+                    num_children: row.get(9)?,
+                    request_timestamp: row.get(10)?,
+                    adoption_timestamp: row.get(11)?,
+                    status: row.get(12)?,
+                    country: row.get(13)?,
                 })
             })
-            .context("Failed to execute query for adoption requests")?;
+            .context("Failed to execute query for adoption requests by animal ID")?;
 
         let mut requests = Vec::new();
         for request in request_iter {
@@ -567,8 +501,9 @@ impl DatabaseService {
         }
 
         log::debug!(
-            "Retrieved {} adoption requests from database",
-            requests.len()
+            "Retrieved {} adoption requests for animal ID: {}",
+            requests.len(),
+            animal_id
         );
         Ok(requests)
     }
@@ -585,9 +520,8 @@ impl DatabaseService {
         request_id: &str,
     ) -> Result<Option<AdoptionRequest>> {
         let mut statement = self.connection.prepare(
-            "SELECT id, animal_id, name, email, tel_number, address, occupation, annual_income, num_people, num_children, request_timestamp, adoption_timestamp, status, country FROM adoption_requests WHERE id = ?1"
-        ).context("Failed to prepare query for adoption request by ID")?;
-
+                "SELECT id, animal_id, name, email, tel_number, address, occupation, annual_income, num_people, num_children, request_timestamp, adoption_timestamp, status, country FROM adoption_requests WHERE id = ?1"
+            ).context("Failed to prepare query for adoption request by ID")?;
         let mut rows = statement
             .query_map(params![request_id], |row| {
                 Ok(AdoptionRequest {

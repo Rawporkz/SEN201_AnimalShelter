@@ -13,7 +13,6 @@ or the customer's home page based on the user's authentication status and role.
   import { getCurrentUser, UserRole } from "$lib/utils/authentication-utils";
   import "./style.scss";
   import SideBar from "$lib/components/SideBar/SideBar.svelte";
-  import { User } from "@lucide/svelte";
 
   /** Current authenticated user object with role, null if not logged in */
   let currentUser: { username: string; role: UserRole } | null = $state(null);

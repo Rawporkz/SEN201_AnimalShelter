@@ -1,16 +1,15 @@
 <!-- 
-adoption-requests/+page.svelte
+routes/home/staff/adoption-requests/+page.svelte
 
 This page displays all adoption requests for staff members to review and manage.
 -->
 
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { error } from "@tauri-apps/plugin-log";
+  import { error, info } from "@tauri-apps/plugin-log";
   import SideBar from "$lib/components/SideBar/SideBar.svelte";
   import { logoutUser } from "$lib/utils/authentication-utils";
   import type { PageData } from "./$types";
-  import { info } from "@tauri-apps/plugin-log";
   import SearchBar from "$lib/components/SearchBar/SearchBar.svelte";
   import AnimalAdoptionInfoRow from "$lib/components/AnimalAdoptionInfoRow/AnimalAdoptionInfoRow.svelte";
   import FilterModal from "$lib/components/FilterModal/FilterModal.svelte";
@@ -23,15 +22,15 @@ This page displays all adoption requests for staff members to review and manage.
     type AnimalSummary,
     type Animal,
     type AdoptionRequest,
-    getAdoptionRequests,
     getAnimalById,
     getAdoptionRequestById,
-    getAnimals,
-    AnimalStatus,
-    RequestStatus,
   } from "$lib/utils/animal-utils";
   import { SlidersHorizontal, Eye, UserCheck } from "@lucide/svelte";
   import { navigationMap } from "../navigation-utils";
+  import {
+    AnimalAdoptionRequests,
+    get_adoption_requests,
+  } from "./adoption-requests-utils";
 
   interface Props {
     data: PageData;
@@ -86,7 +85,6 @@ This page displays all adoption requests for staff members to review and manage.
     FilterCriteria.SEX,
     FilterCriteria.SPECIES_AND_BREEDS,
     FilterCriteria.ADMISSION_DATE,
-    FilterCriteria.REQUEST_DATE,
   ];
 
   /**
@@ -97,7 +95,9 @@ This page displays all adoption requests for staff members to review and manage.
   }
 
   /** Store of adoption requests to be displayed. */
-  let displayedRequests: { animal: Animal; request: AdoptionRequestSummary }[] = $state(data.adoptionRequests || []);
+  let displayedRequests: AnimalAdoptionRequests[] = $state(
+    data.adoptionRequests || [],
+  );
 
   /**
    * Handles filter modal close and updates selections.
@@ -110,21 +110,11 @@ This page displays all adoption requests for staff members to review and manage.
     info("Filter selections:" + filterSelections);
     isFilterModalOpen = false;
 
-    const requestSummaries = await getAdoptionRequests({
-      ...filterSelections,
-      status: [RequestStatus.PENDING],
-    });
-    const animalSummaries = await getAnimals({
-      ...filterSelections,
-      status: [AnimalStatus.REQUESTED],
-    });
+    // Fetch adoption reports without filters initially
+    const adoptionRequests: AnimalAdoptionRequests[] =
+      await get_adoption_requests(filterSelections);
 
-    displayedRequests = requestSummaries
-      .map((request) => {
-        const animal = animalSummaries.find((a) => a.id === request.animal_id);
-        return animal ? { animal, request } : null;
-      })
-      .filter(Boolean) as { animal: Animal; request: AdoptionRequestSummary }[];
+    displayedRequests = adoptionRequests;
   }
 
   /**
@@ -133,9 +123,16 @@ This page displays all adoption requests for staff members to review and manage.
    * @param animalSummary - The summary of the animal.
    * @param requestSummary - The summary of the adoption request.
    */
-  async function handleViewRequest(animalSummary: AnimalSummary, requestSummary: AdoptionRequestSummary): Promise<void> {
-    selectedAnimal = await getAnimalById(animalSummary.id);
-    selectedAdopter = await getAdoptionRequestById(requestSummary.id);
+  async function handleViewRequest(
+    animalSummary: AnimalSummary,
+    requestSummary: AdoptionRequest,
+  ): Promise<void> {
+    const [animal, adopter] = await Promise.all([
+      getAnimalById(animalSummary.id),
+      getAdoptionRequestById(requestSummary.id),
+    ]);
+    selectedAnimal = animal;
+    selectedAdopter = adopter;
     isViewModalOpen = true;
   }
 
@@ -143,31 +140,10 @@ This page displays all adoption requests for staff members to review and manage.
    * Handles the main action for the request (approve, reject, etc.).
    *
    * @param animalSummary - The summary of the animal.
-   * @param requestSummary - The summary of the adoption request.
    */
-  function handleManageRequest(animalSummary: AnimalSummary, requestSummary: AdoptionRequestSummary): void {
-    info("Handle request for: " + animalSummary.id);
-    // Navigate to request management or open action modal
-  }
-
-  /**
-   * Handles approving a request.
-   *
-   * @param animalSummary - The summary of the animal.
-   * @param requestSummary - The summary of the adoption request to approve.
-   */
-  function handleApprove(animalSummary: AnimalSummary, requestSummary: AdoptionRequestSummary): void {
-    info("Approve request: " + requestSummary.id);
-  }
-
-  /**
-   * Handles rejecting a request.
-   *
-   * @param animalSummary - The summary of the animal.
-   * @param requestSummary - The summary of the adoption request to reject.
-   */
-  function handleReject(animalSummary: AnimalSummary, requestSummary: AdoptionRequestSummary): void {
-    info("Reject request: " + requestSummary.id);
+  function handleManageRequest(animalSummary: AnimalSummary): void {
+    error("Handle request for: " + animalSummary.id);
+    //TODO: Navigate to request management or open action modal
   }
 
   /**
@@ -226,10 +202,7 @@ This page displays all adoption requests for staff members to review and manage.
 
     <div class="requests-list">
       {#each filteredRequests as { animal, request } (animal.id)}
-        <AnimalAdoptionInfoRow
-          animalSummary={animal}
-          adoptionRequest={request}
-        >
+        <AnimalAdoptionInfoRow animalSummary={animal} adoptionRequest={request}>
           {#snippet actions()}
             <button
               class="action-button view-button"
@@ -240,7 +213,7 @@ This page displays all adoption requests for staff members to review and manage.
             </button>
             <button
               class="action-button handle-button"
-              onclick={() => handleManageRequest(animal, request)}
+              onclick={() => handleManageRequest(animal)}
             >
               <UserCheck size={16} />
               <span>Handle</span>

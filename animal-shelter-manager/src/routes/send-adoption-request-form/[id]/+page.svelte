@@ -1,7 +1,7 @@
 <!--
-  routes/send-adoption-request-form/[id]/+page.svelte
+routes/send-adoption-request-form/[id]/+page.svelte
 
-  This file defines the page for sending an adoption request for a specific animal.
+This file defines the page for sending an adoption request for a specific animal.
 -->
 
 <script lang="ts">
