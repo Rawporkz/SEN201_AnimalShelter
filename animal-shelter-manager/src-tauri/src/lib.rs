@@ -15,7 +15,9 @@ use authentication_service::{
     AuthenticationService, CurrentUser,
 };
 use database_service::{
-    types::{AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary, FilterCriteria, FilterValue},
+    types::{
+        AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary, FilterCriteria, FilterValue,
+    },
     DatabaseService,
 };
 use file_service::FileService;
@@ -291,9 +293,10 @@ async fn delete_animal(
 /// * `Ok(Vec<AdoptionRequestSummary>)` - List of adoption request summaries if successful
 /// * `Err(String)` - An error message if the query fails
 #[tauri::command]
-async fn get_all_adoption_requests(
+async fn get_adoption_requests(
     state: State<'_, Mutex<AppState>>,
     app_handle: AppHandle,
+    filters: Option<HashMap<FilterCriteria, Option<FilterValue>>>,
 ) -> Result<Vec<AdoptionRequestSummary>, String> {
     // Lock the state for safe concurrent access
     let mut state_guard = state.lock().await;
@@ -306,7 +309,7 @@ async fn get_all_adoption_requests(
         .database_service
         .as_ref()
         .unwrap()
-        .query_all_adoption_requests()
+        .query_adoption_requests(filters)
     {
         Ok(requests) => Ok(requests),
         Err(e) => Err(format!("Failed to retrieve adoption requests: {}", e)),
@@ -652,7 +655,7 @@ pub fn run() {
             update_animal,
             delete_animal,
             // Adoption request commands
-            get_all_adoption_requests,
+            get_adoption_requests,
             get_adoption_request_by_id,
             create_adoption_request,
             update_adoption_request,

@@ -7,10 +7,13 @@
 #[cfg(test)]
 mod database_service_tests {
     use super::super::{
-        types::{AdoptionRequest, Animal, AnimalStatus, RequestStatus},
+        types::{
+            AdoptionRequest, Animal, AnimalStatus, FilterCriteria, FilterValue, RequestStatus,
+        },
         DatabaseService,
     };
     use chrono::Utc;
+    use std::collections::HashMap;
     use std::fs;
     use std::path::PathBuf;
 
@@ -98,14 +101,14 @@ mod database_service_tests {
         let mut animal = sample_animal("a1");
 
         // Test empty query initially
-        let animals = db.query_all_animals().unwrap();
+        let animals = db.query_animals(None).unwrap();
         assert_eq!(animals.len(), 0);
 
         // Test insert
         db.insert_animal(&animal).unwrap();
 
         // Test query all after insert
-        let animals = db.query_all_animals().unwrap();
+        let animals = db.query_animals(None).unwrap();
         assert_eq!(animals.len(), 1);
         assert_eq!(animals[0].id, "a1");
         assert_eq!(animals[0].name, "Buddy");
@@ -196,12 +199,94 @@ mod database_service_tests {
         db.insert_animal(&animal2).unwrap();
 
         // Verify all are returned
-        let animals = db.query_all_animals().unwrap();
+        let animals = db.query_animals(None).unwrap();
         assert_eq!(animals.len(), 2);
 
         let ids: Vec<&str> = animals.iter().map(|a| a.id.as_str()).collect();
         assert!(ids.contains(&"a1"));
         assert!(ids.contains(&"a2"));
+    }
+
+    #[test]
+    fn test_animals_filter() {
+        let db = create_test_db("test_animals_filter");
+
+        let mut animal1 = sample_animal("a1");
+        animal1.name = "Buddy".to_string();
+        animal1.specie = "Dog".to_string();
+        animal1.breed = "Golden Retriever".to_string();
+        animal1.sex = "Male".to_string();
+        animal1.status = AnimalStatus::Available;
+
+        let mut animal2 = sample_animal("a2");
+        animal2.name = "Lucy".to_string();
+        animal2.specie = "Cat".to_string();
+        animal2.breed = "Siamese".to_string();
+        animal2.sex = "Female".to_string();
+        animal2.status = AnimalStatus::Available;
+
+        let mut animal3 = sample_animal("a3");
+        animal3.name = "Rocky".to_string();
+        animal3.specie = "Dog".to_string();
+        animal3.breed = "German Shepherd".to_string();
+        animal3.sex = "Male".to_string();
+        animal3.status = AnimalStatus::Adopted;
+
+        db.insert_animal(&animal1).unwrap();
+        db.insert_animal(&animal2).unwrap();
+        db.insert_animal(&animal3).unwrap();
+
+        // Test filter by status
+        let mut filters = HashMap::new();
+        filters.insert(
+            FilterCriteria::Status,
+            Some(FilterValue::ChooseMany(vec![
+                AnimalStatus::Available.to_string()
+            ])),
+        );
+        let animals = db.query_animals(Some(filters)).unwrap();
+        assert_eq!(animals.len(), 2);
+        assert!(animals.iter().any(|a| a.id == "a1"));
+        assert!(animals.iter().any(|a| a.id == "a2"));
+
+        // Test filter by sex
+        let mut filters = HashMap::new();
+        filters.insert(
+            FilterCriteria::Sex,
+            Some(FilterValue::ChooseMany(vec!["Male".to_string()])),
+        );
+        let animals = db.query_animals(Some(filters)).unwrap();
+        assert_eq!(animals.len(), 2);
+        assert!(animals.iter().any(|a| a.id == "a1"));
+        assert!(animals.iter().any(|a| a.id == "a3"));
+
+        // Test filter by species and breeds
+        let mut filters = HashMap::new();
+        let mut species_map = HashMap::new();
+        species_map.insert("Dog".to_string(), vec!["Golden Retriever".to_string()]);
+        filters.insert(
+            FilterCriteria::SpeciesAndBreeds,
+            Some(FilterValue::NestedChooseMany(species_map)),
+        );
+        let animals = db.query_animals(Some(filters)).unwrap();
+        assert_eq!(animals.len(), 1);
+        assert_eq!(animals[0].id, "a1");
+
+        // Test combined filters (status and sex)
+        let mut filters = HashMap::new();
+        filters.insert(
+            FilterCriteria::Status,
+            Some(FilterValue::ChooseMany(vec![
+                AnimalStatus::Available.to_string()
+            ])),
+        );
+        filters.insert(
+            FilterCriteria::Sex,
+            Some(FilterValue::ChooseMany(vec!["Female".to_string()])),
+        );
+        let animals = db.query_animals(Some(filters)).unwrap();
+        assert_eq!(animals.len(), 1);
+        assert_eq!(animals[0].id, "a2");
     }
 
     // ==================== ADOPTION REQUESTS TESTS ====================
@@ -216,14 +301,14 @@ mod database_service_tests {
         db.insert_animal(&animal).unwrap();
 
         // Test empty query initially
-        let requests = db.query_all_adoption_requests().unwrap();
+        let requests = db.query_adoption_requests(None).unwrap();
         assert_eq!(requests.len(), 0);
 
         // Test insert
         db.insert_adoption_request(&request).unwrap();
 
         // Test query all after insert
-        let requests = db.query_all_adoption_requests().unwrap();
+        let requests = db.query_adoption_requests(None).unwrap();
         assert_eq!(requests.len(), 1);
         assert_eq!(requests[0].id, "r1");
         assert_eq!(requests[0].name, "Jira Pit");
@@ -314,11 +399,110 @@ mod database_service_tests {
         db.insert_adoption_request(&request2).unwrap();
 
         // Verify all are returned
-        let requests = db.query_all_adoption_requests().unwrap();
+        let requests = db.query_adoption_requests(None).unwrap();
         assert_eq!(requests.len(), 2);
 
         let ids: Vec<&str> = requests.iter().map(|r| r.id.as_str()).collect();
         assert!(ids.contains(&"r1"));
         assert!(ids.contains(&"r2"));
+    }
+
+    #[test]
+    fn test_requests_filter() {
+        let db = create_test_db("test_requests_filter");
+
+        let now = Utc::now().timestamp();
+
+        let mut animal1 = sample_animal("a1");
+        animal1.sex = "Male".to_string();
+        animal1.specie = "Dog".to_string();
+        animal1.breed = "Golden Retriever".to_string();
+        animal1.admission_timestamp = now - 86400 * 2; // 2 days ago
+
+        let mut animal2 = sample_animal("a2");
+        animal2.sex = "Female".to_string();
+        animal2.specie = "Cat".to_string();
+        animal2.breed = "Siamese".to_string();
+        animal2.admission_timestamp = now - 86400 * 8; // 8 days ago
+
+        db.insert_animal(&animal1).unwrap();
+        db.insert_animal(&animal2).unwrap();
+
+        let mut request1 = sample_request("r1", "a1");
+        request1.status = RequestStatus::Pending;
+        request1.request_timestamp = now - 86400; // 1 day ago
+        request1.adoption_timestamp = 0;
+
+        let mut request2 = sample_request("r2", "a2");
+        request2.status = RequestStatus::Approved;
+        request2.request_timestamp = now - 86400 * 10; // 10 days ago
+        request2.adoption_timestamp = now - 86400 * 3; // 3 days ago
+
+        db.insert_adoption_request(&request1).unwrap();
+        db.insert_adoption_request(&request2).unwrap();
+
+        // Test filter by status
+        let mut filters = HashMap::new();
+        filters.insert(
+            FilterCriteria::Status,
+            Some(FilterValue::ChooseMany(vec![
+                RequestStatus::Pending.to_string()
+            ])),
+        );
+        let requests = db.query_adoption_requests(Some(filters)).unwrap();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].id, "r1");
+
+        // Test filter by animal sex
+        let mut filters = HashMap::new();
+        filters.insert(
+            FilterCriteria::Sex,
+            Some(FilterValue::ChooseMany(vec!["Female".to_string()])),
+        );
+        let requests = db.query_adoption_requests(Some(filters)).unwrap();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].id, "r2");
+
+        // Test filter by animal species and breeds
+        let mut filters = HashMap::new();
+        let mut species_map = HashMap::new();
+        species_map.insert("Dog".to_string(), vec!["Golden Retriever".to_string()]);
+        filters.insert(
+            FilterCriteria::SpeciesAndBreeds,
+            Some(FilterValue::NestedChooseMany(species_map)),
+        );
+        let requests = db.query_adoption_requests(Some(filters)).unwrap();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].id, "r1");
+
+        // Test filter by admission date (past week)
+        let mut filters = HashMap::new();
+        filters.insert(
+            FilterCriteria::AdmissionDate,
+            Some(FilterValue::ChooseOne("past_week".to_string())),
+        );
+        let requests = db.query_adoption_requests(Some(filters)).unwrap();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].id, "r1");
+
+        // Test filter by request date (past week)
+        let mut filters = HashMap::new();
+        filters.insert(
+            FilterCriteria::RequestDate,
+            Some(FilterValue::ChooseOne("past_week".to_string())),
+        );
+        let requests = db.query_adoption_requests(Some(filters)).unwrap();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].id, "r1");
+
+        // Test filter by adoption date (past week)
+        let mut filters = HashMap::new();
+        filters.insert(
+            FilterCriteria::AdoptionDate,
+            Some(FilterValue::ChooseOne("past_week".to_string())),
+        );
+        let requests = db.query_adoption_requests(Some(filters)).unwrap();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].id, "r2");
     }
 }

@@ -533,12 +533,6 @@ impl DatabaseService {
                                     }
                                 }
                             }
-                            _ => {
-                                log::warn!(
-                                    "Unsupported filter criteria for adoption requests: {:?}",
-                                    criteria
-                                );
-                            }
                         }
                     }
                 }
