@@ -30,6 +30,7 @@ This page displays all adoption reports for staff members to review.
     get_adoption_reports,
   } from "./adoption-reports-utils";
   import { SlidersHorizontal, Eye } from "@lucide/svelte";
+  import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
   import { navigationMap } from "../navigation-utils";
 
   interface Props {
@@ -195,13 +196,12 @@ This page displays all adoption reports for staff members to review.
           adoptionRequest={adoption}
         >
           {#snippet actions()}
-            <button
-              class="action-button view-button"
+            <ActionButton
+              label="View"
+              icon={Eye}
+              width="155px"
               onclick={() => handleViewRequest(animal, adoption)}
-            >
-              <Eye size={16} />
-              <span>View</span>
-            </button>
+            />
           {/snippet}
         </AnimalAdoptionInfoRow>
       {/each}

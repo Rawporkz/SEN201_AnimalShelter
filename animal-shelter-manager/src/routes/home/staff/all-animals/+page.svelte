@@ -26,13 +26,8 @@ This page displays all animals in the shelter system for staff members.
     getAnimals,
     getAnimalWithAcceptedAdoption,
   } from "$lib/utils/animal-utils";
-  import {
-    Plus,
-    SlidersHorizontal,
-    Eye,
-    Pencil,
-    ClipboardList,
-  } from "@lucide/svelte";
+  import { Plus, Eye, Pencil, ClipboardList, Funnel } from "@lucide/svelte";
+  import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
   import { navigationMap } from "../navigation-utils";
 
   // Props
@@ -199,22 +194,24 @@ This page displays all animals in the shelter system for staff members.
     <div class="page-header">
       <h1 class="page-title">All Animals</h1>
     </div>
-
     <div class="controls-bar">
       <SearchBar
         bind:value={searchQuery}
         placeholder="Search for names, IDs, breeds, and more..."
       />
-
-      <button class="filter-button" onclick={handleFilterClick}>
-        <SlidersHorizontal size={16} />
-        <span>Filters</span>
-      </button>
-
-      <button class="admit-button" onclick={handleAdmitAnimal}>
-        <Plus size={16} />
-        <span>Admit Animal</span>
-      </button>
+      <ActionButton
+        label="Filter"
+        icon={Funnel}
+        width="110px"
+        onclick={handleFilterClick}
+      ></ActionButton>
+      <!-- TODO: Replace with the real ActionDropdownButton -->
+      <ActionButton
+        label="Admit Animal"
+        icon={Plus}
+        width="150px"
+        onclick={handleAdmitAnimal}
+      ></ActionButton>
     </div>
 
     <div class="animals-list">
@@ -222,43 +219,38 @@ This page displays all animals in the shelter system for staff members.
         <AnimalInfoRow animalSummary={animal} showStatus={true}>
           {#snippet actions()}
             {#if animal.status === "available"}
-              <button
-                class="action-button view-button"
+              <ActionButton
+                label="View"
+                icon={Eye}
+                width="155px"
                 onclick={() => handleViewAnimal(animal)}
-              >
-                <Eye size={16} />
-                <span>View</span>
-              </button>
-              <button
-                class="action-button edit-button"
+              />
+              <ActionButton
+                label="Edit"
+                icon={Pencil}
+                width="155px"
                 onclick={() => handleEditAnimal(animal.id)}
-              >
-                <Pencil size={16} />
-                <span>Edit</span>
-              </button>
+              />
             {:else if animal.status === "requested"}
-              <button
-                class="action-button view-button"
+              <ActionButton
+                label="View"
+                icon={Eye}
+                width="155px"
                 onclick={() => handleViewAnimal(animal)}
-              >
-                <Eye size={16} />
-                <span>View</span>
-              </button>
-              <button
-                class="action-button request-button"
+              />
+              <ActionButton
+                label="Handle Request"
+                icon={ClipboardList}
+                width="155px"
                 onclick={() => handleManageRequest(animal.id)}
-              >
-                <ClipboardList size={16} />
-                <span>Handle Request</span>
-              </button>
+              />
             {:else if animal.status === "adopted"}
-              <button
-                class="action-button view-button"
+              <ActionButton
+                label="View"
+                icon={Eye}
+                width="155px"
                 onclick={() => handleViewAnimal(animal)}
-              >
-                <Eye size={16} />
-                <span>View</span>
-              </button>
+              />
             {/if}
           {/snippet}
         </AnimalInfoRow>

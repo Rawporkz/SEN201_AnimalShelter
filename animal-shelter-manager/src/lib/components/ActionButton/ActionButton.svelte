@@ -11,8 +11,8 @@
   // Props interface
   interface Props {
     /** Text content displayed on the button */
-    text: string;
-    /** Lucide icon component to display */
+    label: string;
+    /** Icon component to display */
     icon: Component<any>;
     /** Width of the button */
     width?: string;
@@ -23,7 +23,7 @@
   }
 
   const {
-    text,
+    label,
     icon,
     width = "auto",
     disabled = false,
@@ -44,10 +44,9 @@
       <IconComponent size={18} />
     </div>
   {/if}
-  <span class="button-text">{text}</span>
+  <span class="button-text">{label}</span>
 </button>
 
 <style lang="scss">
   @use "./style.scss";
 </style>
-

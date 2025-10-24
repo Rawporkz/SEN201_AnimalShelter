@@ -25,12 +25,14 @@ This page displays all adoption requests for staff members to review and manage.
     getAnimalById,
     getAdoptionRequestById,
   } from "$lib/utils/animal-utils";
-  import { SlidersHorizontal, Eye, UserCheck } from "@lucide/svelte";
+  import { SlidersHorizontal, Eye, FileCheck } from "@lucide/svelte";
+  import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
   import { navigationMap } from "../navigation-utils";
   import {
     AnimalAdoptionRequests,
     get_adoption_requests,
   } from "./adoption-requests-utils";
+  import ActionDropdownButton from "$lib/components/ActionDropdownButton/ActionDropdownButton.svelte";
 
   interface Props {
     data: PageData;
@@ -137,16 +139,6 @@ This page displays all adoption requests for staff members to review and manage.
   }
 
   /**
-   * Handles the main action for the request (approve, reject, etc.).
-   *
-   * @param animalSummary - The summary of the animal.
-   */
-  function handleManageRequest(animalSummary: AnimalSummary): void {
-    error("Handle request for: " + animalSummary.id);
-    //TODO: Navigate to request management or open action modal
-  }
-
-  /**
    * Closes the view modal.
    */
   function handleCloseViewModal(): void {
@@ -187,37 +179,46 @@ This page displays all adoption requests for staff members to review and manage.
     <div class="page-header">
       <h1 class="page-title">Adoption Requests</h1>
     </div>
-
     <div class="controls-bar">
       <SearchBar
         bind:value={searchQuery}
         placeholder="Search for names, IDs, breeds, and more..."
       />
-
       <button class="filter-button" onclick={handleFilterClick}>
         <SlidersHorizontal size={16} />
         <span>Filters</span>
       </button>
     </div>
-
     <div class="requests-list">
       {#each filteredRequests as { animal, request } (animal.id)}
         <AnimalAdoptionInfoRow animalSummary={animal} adoptionRequest={request}>
           {#snippet actions()}
-            <button
-              class="action-button view-button"
+            <ActionButton
+              label="View"
+              icon={Eye}
+              width="155px"
               onclick={() => handleViewRequest(animal, request)}
-            >
-              <Eye size={16} />
-              <span>View</span>
-            </button>
-            <button
-              class="action-button handle-button"
-              onclick={() => handleManageRequest(animal)}
-            >
-              <UserCheck size={16} />
-              <span>Handle</span>
-            </button>
+            />
+            <ActionDropdownButton
+              label="Handle Requests"
+              icon={FileCheck}
+              options={[
+                {
+                  label: "Approve",
+                  icon: FileCheck,
+                  onclick: () => {
+                    //TODO: Implement approve functionality
+                  },
+                },
+                {
+                  label: "Reject",
+                  icon: FileCheck,
+                  onclick: () => {
+                    //TODO: Implement reject functionality
+                  },
+                },
+              ]}
+            />
           {/snippet}
         </AnimalAdoptionInfoRow>
       {/each}

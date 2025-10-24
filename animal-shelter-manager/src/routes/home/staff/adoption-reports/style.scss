@@ -82,27 +82,3 @@
   gap: 16px;
 }
 
-.action-button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-  width: 155px;
-  height: 31px;
-
-  &.view-button {
-    background-color: colors.$blue-main;
-    color: white;
-
-    &:hover {
-      background-color: color.adjust(colors.$blue-main, $lightness: -10%);
-    }
-  }
-}
