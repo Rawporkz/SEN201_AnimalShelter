@@ -12,7 +12,7 @@ import {
   getAnimalById,
   type AdoptionRequest,
   type AnimalSummary,
-} from "$lib/utils/animal-utils";
+} from "$lib/utils/data-utils";
 
 /** Structure for a user's adoption request, combining animal summary and the adoption request. */
 export type MyAdoptionRequest = {

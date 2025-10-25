@@ -24,7 +24,7 @@ Allows staff to admit new animals to the shelter system.
     createAnimal,
     type Animal,
     AnimalStatus,
-  } from "$lib/utils/animal-utils";
+  } from "$lib/utils/data-utils";
   import { info, error } from "@tauri-apps/plugin-log";
 
   /** Animal name entered by user */

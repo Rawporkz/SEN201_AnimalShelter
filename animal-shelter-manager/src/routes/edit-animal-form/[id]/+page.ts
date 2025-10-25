@@ -5,7 +5,7 @@
  * which is responsible for fetching the animal's data before the page is rendered.
  */
 import { error } from "@sveltejs/kit";
-import { getAnimalById } from "$lib/utils/animal-utils";
+import { getAnimalById } from "$lib/utils/data-utils";
 import type { PageLoad } from "./$types";
 
 /**

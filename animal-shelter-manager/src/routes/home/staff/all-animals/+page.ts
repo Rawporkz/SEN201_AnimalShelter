@@ -11,7 +11,7 @@ import {
 } from "$lib/utils/authentication-utils";
 import type { PageLoad } from "./$types";
 import { error } from "@tauri-apps/plugin-log";
-import { getAnimals } from "$lib/utils/animal-utils";
+import { getAnimals } from "$lib/utils/data-utils";
 
 export const load: PageLoad = async () => {
   try {

@@ -26,7 +26,7 @@ This page displays available animals to customers.
     type AdoptionRequest,
     getAnimals,
     getAnimalWithAcceptedAdoption,
-  } from "$lib/utils/animal-utils";
+  } from "$lib/utils/data-utils";
   import { Eye, Send, Funnel } from "@lucide/svelte";
   import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
   import NothingToShowIcon from "$lib/components/NothingToShowIcon/NothingToShowIcon.svelte";

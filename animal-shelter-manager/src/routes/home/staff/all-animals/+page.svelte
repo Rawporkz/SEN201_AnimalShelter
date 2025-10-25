@@ -26,7 +26,7 @@ This page displays all animals in the shelter system for staff members.
     type AdoptionRequest,
     getAnimals,
     getAnimalWithAcceptedAdoption,
-  } from "$lib/utils/animal-utils";
+  } from "$lib/utils/data-utils";
   import { Plus, Eye, Pencil, ClipboardList, Funnel } from "@lucide/svelte";
   import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
   import NothingToShowIcon from "$lib/components/NothingToShowIcon/NothingToShowIcon.svelte";

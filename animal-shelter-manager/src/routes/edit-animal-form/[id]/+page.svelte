@@ -27,7 +27,7 @@ Allows staff to edit existing animals in the shelter system.
     deleteAnimal,
     type Animal,
     AnimalStatus,
-  } from "$lib/utils/animal-utils";
+  } from "$lib/utils/data-utils";
   import { info, error } from "@tauri-apps/plugin-log";
 
   const { data }: { data: PageData } = $props();

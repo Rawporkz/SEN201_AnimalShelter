@@ -1,5 +1,5 @@
 /**
- * animal-utils.ts
+ * lib/utils/data-utils.ts
  *
  * This module contains TypeScript types and utility functions for animal-related
  * operations, including invoking Tauri backend functions for animal management.

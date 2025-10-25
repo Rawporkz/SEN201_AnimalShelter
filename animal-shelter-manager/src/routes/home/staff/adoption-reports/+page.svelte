@@ -24,7 +24,7 @@ This page displays all adoption reports for staff members to review.
     type Animal,
     type AdoptionRequest,
     getAnimalById,
-  } from "$lib/utils/animal-utils";
+  } from "$lib/utils/data-utils";
   import {
     type AnimalAdoptionReport,
     getAdoptionReports,

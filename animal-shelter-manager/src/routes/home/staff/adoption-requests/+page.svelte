@@ -24,13 +24,15 @@ This page displays all adoption requests for staff members to review and manage.
     type Animal,
     type AdoptionRequest,
     getAnimalById,
-  } from "$lib/utils/animal-utils";
+  } from "$lib/utils/data-utils";
   import { Funnel, Eye, FileCheck, CheckIcon, X } from "@lucide/svelte";
   import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
   import { navigationMap } from "../navigation-utils";
   import {
     type AnimalAdoptionRequests,
+    approveRequest,
     getAdoptionRequests,
+    rejectRequest,
   } from "./adoption-requests-utils";
   import ActionDropdownButton from "$lib/components/ActionDropdownButton/ActionDropdownButton.svelte";
   import NothingToShowIcon from "$lib/components/NothingToShowIcon/NothingToShowIcon.svelte";
@@ -223,15 +225,17 @@ This page displays all adoption requests for staff members to review and manage.
                   {
                     label: "Approve",
                     icon: CheckIcon,
-                    onclick: () => {
-                      //TODO: Implement approve functionality
+                    onclick: async () => {
+                      info(`Approving request ID: ${request.id}`);
+                      await approveRequest(request);
                     },
                   },
                   {
                     label: "Reject",
                     icon: X,
-                    onclick: () => {
-                      //TODO: Implement reject functionality
+                    onclick: async () => {
+                      info(`Rejecting request ID: ${request.id}`);
+                      await rejectRequest(request);
                     },
                   },
                 ]}

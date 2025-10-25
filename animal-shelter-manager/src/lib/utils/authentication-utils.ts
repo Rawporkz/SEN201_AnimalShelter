@@ -1,5 +1,5 @@
 /**
- * authentication-utils.ts
+ * lib/utils/authentication-utils.ts
  *
  * This module contains utility functions for authentication-related operations
  * that communicate with the Tauri backend for user login and account creation.

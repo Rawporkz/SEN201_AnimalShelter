@@ -1,5 +1,5 @@
 /**
- * filter-utils.ts
+ * lib/utils/filter-utils.ts
  *
  * This module contains utility types, enums, and functions for the FilterModal
  * component system, including filter criteria definitions and selection handling.

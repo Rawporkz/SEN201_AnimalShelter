@@ -4,15 +4,15 @@ ViewAnimalModal/AnimalInfo.svelte
 This file defines a reusable AnimalInfo component.
 -->
 <script lang="ts">
-  import type { Animal } from "../../../utils/animal-utils";
   import {
+    type Animal,
     formatTimestamp,
     calculateAge,
     getStatusDisplayText,
-  } from "../../../utils/animal-utils";
+  } from "$lib/utils/data-utils";
   import { ImageOff } from "@lucide/svelte";
   import { convertFileSrc } from "@tauri-apps/api/core";
-  import ClosePopupButton from "../../ClosePopupButton/ClosePopupButton.svelte";
+  import ClosePopupButton from "$lib/components/ClosePopupButton/ClosePopupButton.svelte";
 
   // Props
   interface Props {

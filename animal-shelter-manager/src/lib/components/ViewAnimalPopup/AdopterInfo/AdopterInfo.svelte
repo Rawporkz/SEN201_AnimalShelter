@@ -4,8 +4,8 @@ ViewAnimalModal/AdopterInfo.svelte
 This file defines a reusable AdopterInfo component.
 -->
 <script lang="ts">
-  import type { AdoptionRequest } from "../../../utils/animal-utils";
-  import ClosePopupButton from "../../ClosePopupButton/ClosePopupButton.svelte";
+  import { type AdoptionRequest } from "$lib/utils/data-utils";
+  import ClosePopupButton from "$lib/components/ClosePopupButton/ClosePopupButton.svelte";
 
   // Props
   interface Props {

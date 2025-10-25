@@ -6,7 +6,7 @@
  */
 
 import { error } from "@sveltejs/kit";
-import { getAnimalById } from "$lib/utils/animal-utils";
+import { getAnimalById } from "$lib/utils/data-utils";
 import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ params }) => {

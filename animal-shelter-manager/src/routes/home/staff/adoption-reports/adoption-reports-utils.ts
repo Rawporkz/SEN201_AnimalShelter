@@ -13,7 +13,7 @@ import {
   RequestStatus,
   AnimalStatus,
   getAdoptionRequestsByAnimalId,
-} from "$lib/utils/animal-utils";
+} from "$lib/utils/data-utils";
 import { error } from "@tauri-apps/plugin-log";
 import { FilterSelections } from "$lib/utils/filter-utils";
 

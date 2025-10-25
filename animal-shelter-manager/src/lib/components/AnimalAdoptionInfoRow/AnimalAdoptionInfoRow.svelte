@@ -6,8 +6,7 @@ information in a horizontal row layout.
 -->
 
 <script lang="ts">
-  import type { AnimalSummary, AdoptionRequest } from "$lib/utils/animal-utils";
-  import { formatTimestamp } from "$lib/utils/animal-utils";
+  import type { AnimalSummary, AdoptionRequest, formatTimestamp } from "$lib/utils/data-utils";
   import { ImageOff } from "@lucide/svelte";
   import type { Snippet } from "svelte";
   import { convertFileSrc } from "@tauri-apps/api/core";

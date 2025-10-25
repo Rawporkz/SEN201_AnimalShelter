@@ -11,7 +11,7 @@ import {
 } from "$lib/utils/authentication-utils";
 import type { PageLoad } from "./$types";
 import { error } from "@tauri-apps/plugin-log";
-import { getAnimals, AnimalStatus } from "$lib/utils/animal-utils";
+import { getAnimals, AnimalStatus } from "$lib/utils/data-utils";
 
 /**
  * Loads the necessary data for the available animals page.

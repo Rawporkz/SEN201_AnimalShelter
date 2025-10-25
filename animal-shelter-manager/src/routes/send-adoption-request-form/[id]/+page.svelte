@@ -14,11 +14,14 @@ This file defines the page for sending an adoption request for a specific animal
   import FormTextField from "$lib/components/FormTextField/FormTextField.svelte";
   import FormDropdownButton from "$lib/components/FormDropdownButton/FormDropdownButton.svelte";
   import GenericButton from "$lib/components/GenericButton/GenericButton.svelte";
-  import { calculateAge } from "$lib/utils/animal-utils";
-  import type { AdoptionRequest } from "$lib/utils/animal-utils";
-  import { createAdoptionRequest, RequestStatus } from "$lib/utils/animal-utils";
+  import {
+    type AdoptionRequest,
+    RequestStatus,
+    calculateAge,
+  } from "$lib/utils/data-utils";
   import { COUNTRY_OPTIONS, INCOME_OPTIONS } from "./form-options-utils";
   import { getCurrentUser } from "$lib/utils/authentication-utils";
+  import { sendAdoptionRequest } from "./send-request-utils";
 
   /** Props passed from the load function */
   const { data }: { data: PageData } = $props();
@@ -172,7 +175,6 @@ This file defines the page for sending an adoption request for a specific animal
     goto("/");
   }
 
-  /** Handles the save action */
   /**
    * Handles the save action, validates the form, and submits the adoption request.
    */
@@ -215,7 +217,7 @@ This file defines the page for sending an adoption request for a specific animal
       };
 
       info(`Creating adoption request: ${JSON.stringify(adoptionRequest)}`);
-      await createAdoptionRequest(adoptionRequest);
+      await sendAdoptionRequest(adoptionRequest);
       goto("/");
     } catch (e) {
       error(`Failed to send adoption request: ${e}`);

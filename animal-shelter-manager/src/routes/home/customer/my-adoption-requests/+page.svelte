@@ -20,7 +20,7 @@ This page displays the user's adoption requests.
     type AdoptionRequest,
     getAnimalById,
     deleteAdoptionRequest,
-  } from "$lib/utils/animal-utils";
+  } from "$lib/utils/data-utils";
   import { Eye, X } from "@lucide/svelte";
   import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
   import NothingToShowIcon from "$lib/components/NothingToShowIcon/NothingToShowIcon.svelte";

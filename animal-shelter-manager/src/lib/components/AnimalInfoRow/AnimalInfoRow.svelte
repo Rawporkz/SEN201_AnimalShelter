@@ -6,11 +6,11 @@ showing animal image, name, ID, species/breed, sex, and admission date.
 -->
 
 <script lang="ts">
-  import type { AnimalSummary } from "$lib/utils/animal-utils";
+  import type { AnimalSummary } from "$lib/utils/data-utils";
   import {
     formatTimestamp,
     getStatusDisplayText,
-  } from "$lib/utils/animal-utils";
+  } from "$lib/utils/data-utils";
   import { ImageOff } from "@lucide/svelte";
   import type { Snippet } from "svelte";
   import { convertFileSrc } from "@tauri-apps/api/core";

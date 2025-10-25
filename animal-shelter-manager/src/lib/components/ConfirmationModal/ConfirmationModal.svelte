@@ -6,7 +6,7 @@ providing cancel/confirm buttons, keyboard navigation, and backdrop interaction.
 -->
 
 <script lang="ts">
-  import GenericButton from "../GenericButton/GenericButton.svelte";
+  import GenericButton from "$lib/components/GenericButton/GenericButton.svelte";
   import type { Snippet } from "svelte";
 
   // Props interface

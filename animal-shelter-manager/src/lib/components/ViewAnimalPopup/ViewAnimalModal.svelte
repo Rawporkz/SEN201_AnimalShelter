@@ -9,8 +9,7 @@ about an animal and its adopter (if applicable).
   import { User, Dog } from "@lucide/svelte";
   import AdopterInfo from "./AdopterInfo/AdopterInfo.svelte";
   import AnimalInfo from "./AnimalInfo/AnimalInfo.svelte";
-  import type { Animal } from "../../utils/animal-utils";
-  import type { AdoptionRequest } from "../../utils/animal-utils";
+  import { type Animal, type AdoptionRequest } from "$lib/utils/data-utils";
 
   /** Type definition for tab selection in the adoption info popup */
   type Tab = "animal" | "adopter";

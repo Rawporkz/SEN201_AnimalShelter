@@ -2,8 +2,6 @@
  * routes/home/staff/adoption-requests/adoption-requests-utils.ts
  *
  * This file contains utility functions for the adoption requests page.
- * It includes functions to fetch adoption requests, which combine animal data
- * with their corresponding pending adoption requests.
  */
 
 import {
@@ -14,8 +12,10 @@ import {
   AnimalStatus,
   getAdoptionRequestsByAnimalId,
   getAnimalById,
+  updateAdoptionRequest,
   Animal,
-} from "$lib/utils/animal-utils";
+  updateAnimal,
+} from "$lib/utils/data-utils";
 import { error } from "@tauri-apps/plugin-log";
 import { FilterSelections } from "$lib/utils/filter-utils";
 
@@ -97,5 +97,80 @@ export async function getAdoptionRequests(
   } catch (e) {
     error(`Error fetching adoption requests: ${e}`);
     return [];
+  }
+}
+
+/**
+ * Approves a pending adoption request.
+ *
+ * @param request - The adoption request to approve.
+ */
+export async function approveRequest(request: AdoptionRequest): Promise<void> {
+  try {
+    // Update the animal's status
+    let animal = await getAnimalById(request.animalId);
+    if (!animal) {
+      error(`Animal with ID ${request.animalId} not found.`);
+      return;
+    }
+    animal.status = AnimalStatus.ADOPTED;
+    await updateAnimal(animal);
+
+    // Update the status of the approved request
+    request.status = RequestStatus.APPROVED;
+    request.adoptionTimestamp = Math.floor(Date.now() / 1000);
+    await updateAdoptionRequest(request);
+
+    // Retrieve all other adoption requests for the same animal
+    const otherPendingRequests = await getAdoptionRequestsByAnimalId(
+      request.animalId,
+    ).then((requests) =>
+      requests.filter(
+        (r) => r.id !== request.id && r.status === RequestStatus.PENDING,
+      ),
+    );
+
+    // Update status of the other requests
+    for (const other of otherPendingRequests) {
+      other.status = RequestStatus.REJECTED;
+      await updateAdoptionRequest(other);
+    }
+  } catch (e) {
+    error(`Error approving adoption request: ${e}`);
+  }
+}
+
+/**
+ * Rejects a pending adoption request.
+ *
+ * @param request - The adoption request to reject.
+ */
+export async function rejectRequest(request: AdoptionRequest): Promise<void> {
+  try {
+    // Update the status of the rejected request
+    request.status = RequestStatus.REJECTED;
+    await updateAdoptionRequest(request);
+
+    // Retrieve all other adoption requests for the same animal
+    const otherPendingRequests = await getAdoptionRequestsByAnimalId(
+      request.animalId,
+    ).then((requests) =>
+      requests.filter(
+        (r) => r.id !== request.id && r.status === RequestStatus.PENDING,
+      ),
+    );
+
+    // If there are no other pending requests, update the animal status back to AVAILABLE
+    if (otherPendingRequests.length === 0) {
+      let animal = await getAnimalById(request.animalId);
+      if (!animal) {
+        error(`Animal with ID ${request.animalId} not found.`);
+      } else {
+        animal.status = AnimalStatus.AVAILABLE;
+        await updateAnimal(animal);
+      }
+    }
+  } catch (e) {
+    error(`Error rejecting adoption request: ${e}`);
   }
 }
