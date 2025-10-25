@@ -46,16 +46,10 @@
 .controls-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 16px;
   margin-bottom: 32px;
   padding-bottom: 32px;
   border-bottom: 1px solid colors.$grey-border;
-}
-
-.left-controls {
-  display: flex;
-  align-items: center;
-  gap: 16px;
 }
 
 .animals-list {

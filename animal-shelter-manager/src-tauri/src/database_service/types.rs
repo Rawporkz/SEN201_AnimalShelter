@@ -74,6 +74,7 @@ impl FromSql for RequestStatus {
 
 /// Represents an animal in the shelter system
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Animal {
     /// Unique identifier for the animal
     pub id: String,
@@ -105,6 +106,7 @@ pub struct Animal {
 
 /// Simplified animal information for listing views
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AnimalSummary {
     /// Unique identifier for the animal
     pub id: String,
@@ -126,11 +128,14 @@ pub struct AnimalSummary {
 
 /// Represents an adoption request in the system
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AdoptionRequest {
     /// Unique identifier for the adoption request
     pub id: String,
     /// ID of the animal being requested for adoption
     pub animal_id: String,
+    /// Username of the user who made the request
+    pub username: String,
     /// Full name of the person requesting adoption
     pub name: String,
     /// Email address of the requester
@@ -160,6 +165,7 @@ pub struct AdoptionRequest {
 /// Represents the criteria available for filtering animals.
 /// This enum is designed to be sent from the TypeScript frontend.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Display, EnumString)]
+#[strum(serialize_all = "snake_case")]
 #[serde(rename_all = "snake_case")]
 pub enum FilterCriteria {
     Status,

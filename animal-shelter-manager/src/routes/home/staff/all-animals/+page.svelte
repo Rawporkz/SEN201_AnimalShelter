@@ -15,6 +15,7 @@ This page displays all animals in the shelter system for staff members.
   import AnimalInfoRow from "$lib/components/AnimalInfoRow/AnimalInfoRow.svelte";
   import FilterModal from "$lib/components/FilterModal/FilterModal.svelte";
   import ViewAnimalModal from "$lib/components/ViewAnimalPopup/ViewAnimalModal.svelte";
+  import ConfirmationModal from "$lib/components/ConfirmationModal/ConfirmationModal.svelte";
   import {
     FilterCriteria,
     type FilterSelections,
@@ -28,6 +29,7 @@ This page displays all animals in the shelter system for staff members.
   } from "$lib/utils/animal-utils";
   import { Plus, Eye, Pencil, ClipboardList, Funnel } from "@lucide/svelte";
   import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
+  import NothingToShowIcon from "$lib/components/NothingToShowIcon/NothingToShowIcon.svelte";
   import { navigationMap } from "../navigation-utils";
 
   // Props
@@ -55,7 +57,14 @@ This page displays all animals in the shelter system for staff members.
    * Handles user sign out process.
    * Logs out the user and redirects to the authentication page.
    */
-  async function handleSignOut(): Promise<void> {
+  function handleSignOut(): void {
+    isSignOutModalOpen = true;
+  }
+
+  /**
+   * Confirms and executes the sign-out process.
+   */
+  async function confirmSignOut(): Promise<void> {
     try {
       const logoutSuccess: boolean = await logoutUser();
       if (logoutSuccess) {
@@ -79,6 +88,8 @@ This page displays all animals in the shelter system for staff members.
   let selectedAnimal: Animal | null = $state(null);
   /** The adopter information associated with the selected animal, if applicable. */
   let selectedAdopter: AdoptionRequest | null = $state(null);
+  /** Controls the visibility of the sign-out confirmation modal. */
+  let isSignOutModalOpen = $state(false);
 
   /** List of filter criteria to display in the filter modal. */
   const filterCriteria = [
@@ -130,18 +141,21 @@ This page displays all animals in the shelter system for staff members.
    * @param animalId - The ID of the animal to edit.
    */
   function handleEditAnimal(animalId: string): void {
-    // Navigate to edit page or open edit modal
     info("Edit animal:" + animalId);
+    goto(`/edit-animal-form/${animalId}`);
   }
 
   /**
-   * Handles adoption request management.
+   * Handles handling adoption requests for an animal.
    *
    * @param animalId - The ID of the animal for which to manage requests.
    */
-  function handleManageRequest(animalId: string): void {
-    // Navigate to request management or open modal
+  function handleHandleRequest(animalId: string): void {
     info("Handle request for:" + animalId);
+    const params = new URLSearchParams({
+      animalId: animalId,
+    });
+    goto(`/home/staff/adoption-requests?${params.toString()}`);
   }
 
   /**
@@ -166,7 +180,7 @@ This page displays all animals in the shelter system for staff members.
 
   /** Derived store of animals filtered based on search query and filter selections. */
   let filteredAnimals = $derived(
-    (displayedAnimals || []).filter((animal) => {
+    displayedAnimals.filter((animal) => {
       if (!searchQuery) return true;
 
       const query = searchQuery.toLowerCase();
@@ -185,6 +199,7 @@ This page displays all animals in the shelter system for staff members.
     <SideBar
       username={data.currentUser?.username ?? "Staff User"}
       role="Staff"
+      navItems={Object.keys(navigationMap)}
       onNavigate={handleNavigation}
       onSignOut={handleSignOut}
     />
@@ -195,17 +210,18 @@ This page displays all animals in the shelter system for staff members.
       <h1 class="page-title">All Animals</h1>
     </div>
     <div class="controls-bar">
-      <SearchBar
-        bind:value={searchQuery}
-        placeholder="Search for names, IDs, breeds, and more..."
-      />
-      <ActionButton
-        label="Filter"
-        icon={Funnel}
-        width="110px"
-        onclick={handleFilterClick}
-      ></ActionButton>
-      <!-- TODO: Replace with the real ActionDropdownButton -->
+      <div class="left-controls">
+        <SearchBar
+          bind:value={searchQuery}
+          placeholder="Search for names, IDs, breeds, and more..."
+        />
+        <ActionButton
+          label="Filters"
+          icon={Funnel}
+          width="110px"
+          onclick={handleFilterClick}
+        ></ActionButton>
+      </div>
       <ActionButton
         label="Admit Animal"
         icon={Plus}
@@ -215,46 +231,50 @@ This page displays all animals in the shelter system for staff members.
     </div>
 
     <div class="animals-list">
-      {#each filteredAnimals as animal (animal.id)}
-        <AnimalInfoRow animalSummary={animal} showStatus={true}>
-          {#snippet actions()}
-            {#if animal.status === "available"}
-              <ActionButton
-                label="View"
-                icon={Eye}
-                width="155px"
-                onclick={() => handleViewAnimal(animal)}
-              />
-              <ActionButton
-                label="Edit"
-                icon={Pencil}
-                width="155px"
-                onclick={() => handleEditAnimal(animal.id)}
-              />
-            {:else if animal.status === "requested"}
-              <ActionButton
-                label="View"
-                icon={Eye}
-                width="155px"
-                onclick={() => handleViewAnimal(animal)}
-              />
-              <ActionButton
-                label="Handle Request"
-                icon={ClipboardList}
-                width="155px"
-                onclick={() => handleManageRequest(animal.id)}
-              />
-            {:else if animal.status === "adopted"}
-              <ActionButton
-                label="View"
-                icon={Eye}
-                width="155px"
-                onclick={() => handleViewAnimal(animal)}
-              />
-            {/if}
-          {/snippet}
-        </AnimalInfoRow>
-      {/each}
+      {#if filteredAnimals.length > 0}
+        {#each filteredAnimals as animal (animal.id)}
+          <AnimalInfoRow animalSummary={animal} showStatus={true}>
+            {#snippet actions()}
+              {#if animal.status === "available"}
+                <ActionButton
+                  label="View"
+                  icon={Eye}
+                  width="155px"
+                  onclick={() => handleViewAnimal(animal)}
+                />
+                <ActionButton
+                  label="Edit"
+                  icon={Pencil}
+                  width="155px"
+                  onclick={() => handleEditAnimal(animal.id)}
+                />
+              {:else if animal.status === "requested"}
+                <ActionButton
+                  label="View"
+                  icon={Eye}
+                  width="155px"
+                  onclick={() => handleViewAnimal(animal)}
+                />
+                <ActionButton
+                  label="Handle Request"
+                  icon={ClipboardList}
+                  width="155px"
+                  onclick={() => handleHandleRequest(animal.id)}
+                />
+              {:else if animal.status === "adopted"}
+                <ActionButton
+                  label="View"
+                  icon={Eye}
+                  width="155px"
+                  onclick={() => handleViewAnimal(animal)}
+                />
+              {/if}
+            {/snippet}
+          </AnimalInfoRow>
+        {/each}
+      {:else}
+        <NothingToShowIcon />
+      {/if}
     </div>
   </main>
 </div>
@@ -274,6 +294,16 @@ This page displays all animals in the shelter system for staff members.
     onClose={handleCloseViewModal}
   />
 {/if}
+
+<ConfirmationModal
+  bind:open={isSignOutModalOpen}
+  title="Confirm Sign Out"
+  message="Are you sure you want to sign out?"
+  confirmText="Sign Out"
+  cancelText="Cancel"
+  destructive={true}
+  onconfirm={confirmSignOut}
+/>
 
 <style lang="scss">
   @use "./style.scss";

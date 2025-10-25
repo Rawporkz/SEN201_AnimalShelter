@@ -14,6 +14,7 @@ import {
   AnimalStatus,
   getAdoptionRequestsByAnimalId,
   getAnimalById,
+  Animal,
 } from "$lib/utils/animal-utils";
 import { error } from "@tauri-apps/plugin-log";
 import { FilterSelections } from "$lib/utils/filter-utils";
@@ -35,7 +36,7 @@ export type AnimalAdoptionRequests = {
  * @returns A promise that resolves to an array of AnimalAdoptionReport objects.
  *          Returns an empty array if there's an error.
  */
-export async function get_adoption_requests(
+export async function getAdoptionRequests(
   filterSeclections: FilterSelections,
   animalId?: string | null,
 ): Promise<AnimalAdoptionRequests[]> {
@@ -44,8 +45,25 @@ export async function get_adoption_requests(
     let adoptedAnimals: AnimalSummary[];
     if (animalId) {
       // Fetch specific animal by ID
-      const animal = (await getAnimalById(animalId)) as AnimalSummary;
-      adoptedAnimals = [animal];
+      const animal: Animal | null = await getAnimalById(animalId);
+
+      // If animal not found, return empty array
+      if (!animal) {
+        return [];
+      }
+
+      // Construct AnimalSummary for the specific animal
+      const animalSummary: AnimalSummary = {
+        id: animal.id,
+        name: animal.name,
+        specie: animal.specie,
+        breed: animal.breed,
+        sex: animal.sex,
+        admissionTimestamp: animal.admissionTimestamp,
+        imagePath: animal.imagePath,
+        status: animal.status,
+      };
+      adoptedAnimals = [animalSummary];
     } else {
       // Fetch all adopted animals with status REQUESTED, applying filters if any
       adoptedAnimals = await getAnimals({
@@ -58,16 +76,16 @@ export async function get_adoption_requests(
     let animalAdoptionRequests: AnimalAdoptionRequests[] = [];
     for (const animal of adoptedAnimals) {
       // Get adoption requests for the animal
-      const adoptionRequest: AdoptionRequest[] | null =
+      const adoptionRequest: AdoptionRequest[] =
         await getAdoptionRequestsByAnimalId(animal.id);
 
       // Find the pending adoption request
-      const pendingRequests = adoptionRequest?.filter(
+      const pendingRequests = adoptionRequest.filter(
         (request) => request.status === RequestStatus.PENDING,
       );
 
       // Add each pending request to the result list
-      for (const request of pendingRequests || []) {
+      for (const request of pendingRequests) {
         animalAdoptionRequests.push({
           animal: animal,
           request: request,

@@ -49,8 +49,8 @@ This file defines a reusable AnimalInfo component.
   </div>
   <div class="animal-profile-left">
     <div class="animal-image">
-      {#if animal?.image_path}
-        <img src={convertFileSrc(animal.image_path)} alt="" />
+      {#if animal?.imagePath}
+        <img src={convertFileSrc(animal.imagePath)} alt="" />
       {:else}
         <div class="placeholder-image">
           <ImageOff size={48} />
@@ -73,8 +73,8 @@ This file defines a reusable AnimalInfo component.
       <div class="date-item">
         <div class="date-label">Admission Date</div>
         <div class="date-value">
-          {animal?.admission_timestamp
-            ? formatTimestamp(animal.admission_timestamp)
+          {animal?.admissionTimestamp
+            ? formatTimestamp(animal.admissionTimestamp)
             : "Unknown"}
         </div>
       </div>
@@ -100,8 +100,8 @@ This file defines a reusable AnimalInfo component.
         <div class="info-item">
           <div class="info-label">Birth Month/Year</div>
           <div class="info-value">
-            {animal && animal.birth_year != null && animal.birth_month != null
-              ? `${getBirthMonthYear(animal.birth_month, animal.birth_year)} (${calculateAge(animal.birth_year, animal.birth_month)})`
+            {animal && animal.birthYear != null && animal.birthMonth != null
+              ? `${getBirthMonthYear(animal.birthMonth, animal.birthYear)} (${calculateAge(animal.birthYear, animal.birthMonth)})`
               : "Unknown"}
           </div>
         </div>

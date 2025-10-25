@@ -12,8 +12,8 @@ import {
 import type { PageLoad } from "./$types";
 import { error } from "@tauri-apps/plugin-log";
 import {
-  AnimalAdoptionRequests,
-  get_adoption_requests,
+  type AnimalAdoptionRequests,
+  getAdoptionRequests,
 } from "./adoption-requests-utils";
 
 export const load: PageLoad = async ({ url }) => {
@@ -28,12 +28,12 @@ export const load: PageLoad = async ({ url }) => {
       return; // prevent returning data
     }
 
-    /** Get animal ID from URL parameters */
-    const animal_id = url.searchParams.get("animal_id");
+    // Get animal ID from URL parameters
+    const animalId = url.searchParams.get("animalId");
 
     // Fetch adoption requests without filters initially
     const adoptionRequests: AnimalAdoptionRequests[] =
-      await get_adoption_requests({}, animal_id);
+      await getAdoptionRequests({}, animalId);
 
     return {
       currentUser,

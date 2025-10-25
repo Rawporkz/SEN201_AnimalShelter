@@ -455,6 +455,41 @@ async fn get_adoption_requests_by_animal_id(
     }
 }
 
+/// Command to retrieve all adoption requests from the database for a specific user name
+///
+/// # Arguments
+/// * `username` - The user name to retrieve requests for
+///
+/// # Returns
+/// * `Ok(Vec<AdoptionRequest>)` - List of adoption requests if successful
+/// * `Err(String)` - An error message if the query fails
+#[tauri::command]
+async fn get_adoption_requests_by_username(
+    state: State<'_, Mutex<AppState>>,
+    app_handle: AppHandle,
+    username: String,
+) -> Result<Vec<AdoptionRequest>, String> {
+    // Lock the state for safe concurrent access
+    let mut state_guard = state.lock().await;
+
+    // Lazily initialize the database service
+    init_database_service_once(&mut state_guard, &app_handle).await?;
+
+    // Query adoption requests by user name
+    match state_guard
+        .database_service
+        .as_ref()
+        .unwrap()
+        .query_adoption_requests_by_username(&username)
+    {
+        Ok(requests) => Ok(requests),
+        Err(e) => Err(format!(
+            "Failed to retrieve adoption requests for user name {}: {}",
+            username, e
+        )),
+    }
+}
+
 // ==================== AUTHENTICATION COMMANDS ====================
 
 /// Command to register a new user account
@@ -661,6 +696,7 @@ pub fn run() {
             // Adoption request commands
             get_adoption_request_by_id,
             get_adoption_requests_by_animal_id,
+            get_adoption_requests_by_username,
             create_adoption_request,
             update_adoption_request,
             delete_adoption_request,

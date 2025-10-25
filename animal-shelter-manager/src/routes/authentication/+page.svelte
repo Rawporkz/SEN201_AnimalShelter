@@ -148,7 +148,7 @@ This file defines the authentication page of the application.
           password: credentials.password,
           role: credentials.role,
         });
-        await goto(`/authentication/create-account?${params.toString()}`);
+        goto(`/authentication/create-account?${params.toString()}`);
       } else if (result.invalidPassword) {
         // Password is wrong - show error on password field
         warn(`Invalid password, showing password error: ${result.message}`);

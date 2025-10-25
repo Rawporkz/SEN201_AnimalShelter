@@ -19,6 +19,8 @@ Reusable textarea component with configurable number of visible rows and width.
     rows?: number;
     /** Flag to indicate if the input is invalid */
     isInvalid?: boolean;
+    /** Optional callback for the input event */
+    oninput?: (event: Event) => void;
   }
 
   let {
@@ -28,6 +30,7 @@ Reusable textarea component with configurable number of visible rows and width.
     boxWidth = "350px",
     rows = 3,
     isInvalid = false,
+    oninput = () => {},
   }: Props = $props();
 
   /*
@@ -54,6 +57,7 @@ Reusable textarea component with configurable number of visible rows and width.
     {rows}
     bind:value
     onkeydown={handleKeyDown}
+    {oninput}
   ></textarea>
 </div>
 

@@ -32,7 +32,7 @@ information in a horizontal row layout.
   }: Props = $props();
 
   /** Flag to track if the animal has a valid image */
-  let hasValidImage: boolean = $state(!!animalSummary.image_path);
+  let hasValidImage: boolean = $state(!!animalSummary.imagePath);
 
   /**
    * Handles image load errors by showing the placeholder instead.
@@ -52,9 +52,9 @@ information in a horizontal row layout.
 <div class="animal-adoption-info-row">
   <div class="left-section">
     <div class="animal-image-container">
-      {#if animalSummary.image_path && hasValidImage}
+      {#if animalSummary.imagePath && hasValidImage}
         <img
-          src={convertFileSrc(animalSummary.image_path)}
+          src={convertFileSrc(animalSummary.imagePath)}
           alt="Photo of {animalSummary.name}"
           class="animal-image"
           onerror={handleImageError}
@@ -79,7 +79,7 @@ information in a horizontal row layout.
         <div class="info-item">
           <span class="info-label">Since:</span>
           <span class="info-value"
-            >{formatTimestamp(animalSummary.admission_timestamp)}</span
+            >{formatTimestamp(animalSummary.admissionTimestamp)}</span
           >
         </div>
       </div>
@@ -103,7 +103,7 @@ information in a horizontal row layout.
         <div class="info-item">
           <span class="info-label">On:</span>
           <span class="info-value"
-            >{formatTimestamp(adoptionRequest.adoption_timestamp)}</span
+            >{formatTimestamp(adoptionRequest.adoptionTimestamp)}</span
           >
         </div>
       </div>

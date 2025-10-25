@@ -14,6 +14,7 @@ This page displays all adoption reports for staff members to review.
   import AnimalAdoptionInfoRow from "$lib/components/AnimalAdoptionInfoRow/AnimalAdoptionInfoRow.svelte";
   import FilterModal from "$lib/components/FilterModal/FilterModal.svelte";
   import ViewAnimalModal from "$lib/components/ViewAnimalPopup/ViewAnimalModal.svelte";
+  import ConfirmationModal from "$lib/components/ConfirmationModal/ConfirmationModal.svelte";
   import {
     FilterCriteria,
     type FilterSelections,
@@ -23,14 +24,14 @@ This page displays all adoption reports for staff members to review.
     type Animal,
     type AdoptionRequest,
     getAnimalById,
-    getAdoptionRequestById,
   } from "$lib/utils/animal-utils";
   import {
     type AnimalAdoptionReport,
-    get_adoption_reports,
+    getAdoptionReports,
   } from "./adoption-reports-utils";
-  import { SlidersHorizontal, Eye } from "@lucide/svelte";
+  import { Funnel, Eye } from "@lucide/svelte";
   import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
+  import NothingToShowIcon from "$lib/components/NothingToShowIcon/NothingToShowIcon.svelte";
   import { navigationMap } from "../navigation-utils";
 
   interface Props {
@@ -52,6 +53,8 @@ This page displays all adoption reports for staff members to review.
   let selectedAnimal: Animal | null = $state(null);
   /** The adopter information associated with the selected animal, if applicable. */
   let selectedAdopter: AdoptionRequest | null = $state(null);
+  /** Controls the visibility of the sign-out confirmation modal. */
+  let isSignOutModalOpen = $state(false);
 
   /** Store of adoption requests to be displayed. */
   let displayedRequests: AnimalAdoptionReport[] = $state(
@@ -83,7 +86,14 @@ This page displays all adoption reports for staff members to review.
    * Handles user sign out process.
    * Logs out the user and redirects to the authentication page.
    */
-  async function handleSignOut(): Promise<void> {
+  function handleSignOut(): void {
+    isSignOutModalOpen = true;
+  }
+
+  /**
+   * Confirms and executes the sign-out process.
+   */
+  async function confirmSignOut(): Promise<void> {
     try {
       const logoutSuccess: boolean = await logoutUser();
       if (logoutSuccess) {
@@ -114,7 +124,7 @@ This page displays all adoption reports for staff members to review.
 
     // Fetch adoption reports without filters initially
     const adoptionRequests: AnimalAdoptionReport[] =
-      await get_adoption_reports(filterSelections);
+      await getAdoptionReports(filterSelections);
 
     displayedRequests = adoptionRequests;
   }
@@ -123,18 +133,19 @@ This page displays all adoption reports for staff members to review.
    * Handles viewing animal and adopter details.
    *
    * @param animalSummary - The summary of the animal.
-   * @param requestSummary - The summary of the adoption request.
+   * @param adoption - The summary of the adoption request.
    */
   async function handleViewRequest(
     animalSummary: AnimalSummary,
-    requestSummary: AdoptionRequest,
+    adoption: AdoptionRequest,
   ): Promise<void> {
-    const [animal, adopter] = await Promise.all([
-      getAnimalById(animalSummary.id),
-      getAdoptionRequestById(requestSummary.id),
-    ]);
+    const animal: Animal | null = await getAnimalById(animalSummary.id);
+    if (!animal) {
+      error(`Animal with ID ${animalSummary.id} not found.`);
+      return;
+    }
     selectedAnimal = animal;
-    selectedAdopter = adopter;
+    selectedAdopter = adoption;
     isViewModalOpen = true;
   }
 
@@ -149,7 +160,7 @@ This page displays all adoption reports for staff members to review.
 
   /** Derived store of adoption requests filtered based on search query. */
   let searchedRequests = $derived(
-    (displayedRequests || []).filter(({ animal, adoption }) => {
+    displayedRequests.filter(({ animal, adoption }) => {
       if (!searchQuery) return true;
 
       const query = searchQuery.toLowerCase();
@@ -171,6 +182,7 @@ This page displays all adoption reports for staff members to review.
     <SideBar
       username={data.currentUser?.username ?? "Staff User"}
       role="Staff"
+      navItems={Object.keys(navigationMap)}
       onNavigate={handleNavigation}
       onSignOut={handleSignOut}
     />
@@ -184,27 +196,33 @@ This page displays all adoption reports for staff members to review.
         bind:value={searchQuery}
         placeholder="Search for names, IDs, breeds, and more..."
       />
-      <button class="filter-button" onclick={handleFilterClick}>
-        <SlidersHorizontal size={16} />
-        <span>Filters</span>
-      </button>
+      <ActionButton
+        label="Filters"
+        icon={Funnel}
+        width="110px"
+        onclick={handleFilterClick}
+      />
     </div>
     <div class="report-list">
-      {#each searchedRequests as { animal, adoption } (animal.id)}
-        <AnimalAdoptionInfoRow
-          animalSummary={animal}
-          adoptionRequest={adoption}
-        >
-          {#snippet actions()}
-            <ActionButton
-              label="View"
-              icon={Eye}
-              width="155px"
-              onclick={() => handleViewRequest(animal, adoption)}
-            />
-          {/snippet}
-        </AnimalAdoptionInfoRow>
-      {/each}
+      {#if searchedRequests.length > 0}
+        {#each searchedRequests as { animal, adoption } (animal.id)}
+          <AnimalAdoptionInfoRow
+            animalSummary={animal}
+            adoptionRequest={adoption}
+          >
+            {#snippet actions()}
+              <ActionButton
+                label="View"
+                icon={Eye}
+                width="155px"
+                onclick={() => handleViewRequest(animal, adoption)}
+              />
+            {/snippet}
+          </AnimalAdoptionInfoRow>
+        {/each}
+      {:else}
+        <NothingToShowIcon />
+      {/if}
     </div>
   </main>
 </div>
@@ -222,6 +240,16 @@ This page displays all adoption reports for staff members to review.
     onClose={handleCloseViewModal}
   />
 {/if}
+
+<ConfirmationModal
+  bind:open={isSignOutModalOpen}
+  title="Confirm Sign Out"
+  message="Are you sure you want to sign out?"
+  confirmText="Sign Out"
+  cancelText="Cancel"
+  destructive={true}
+  onconfirm={confirmSignOut}
+/>
 
 <style lang="scss">
   @use "./style.scss";

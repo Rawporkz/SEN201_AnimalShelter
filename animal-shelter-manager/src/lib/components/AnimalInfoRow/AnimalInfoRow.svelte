@@ -32,7 +32,7 @@ showing animal image, name, ID, species/breed, sex, and admission date.
   }: Props = $props();
 
   /** Flag to track if the animal has a valid image */
-  let hasValidImage: boolean = $state(!!animalSummary.image_path);
+  let hasValidImage: boolean = $state(!!animalSummary.imagePath);
 
   /**
    * Handles image load errors by showing the placeholder instead.
@@ -51,9 +51,9 @@ showing animal image, name, ID, species/breed, sex, and admission date.
 
 <div class="animal-info-row">
   <div class="animal-image-container">
-    {#if animalSummary.image_path && hasValidImage}
+    {#if animalSummary.imagePath && hasValidImage}
       <img
-        src={convertFileSrc(animalSummary.image_path)}
+        src={convertFileSrc(animalSummary.imagePath)}
         alt="Photo of {animalSummary.name}"
         class="animal-image"
         onerror={handleImageError}
@@ -94,7 +94,7 @@ showing animal image, name, ID, species/breed, sex, and admission date.
       <div class="info-item">
         <span class="info-label">Since:</span>
         <span class="info-value"
-          >{formatTimestamp(animalSummary.admission_timestamp)}</span
+          >{formatTimestamp(animalSummary.admissionTimestamp)}</span
         >
       </div>
 

@@ -1,17 +1,18 @@
 <!-- 
-routes/home/staff/adoption-requests/+page.svelte
+routes/home/customer/available-animals/+page.svelte
 
-This page displays all adoption requests for staff members to review and manage.
+This page displays available animals to customers.
 -->
 
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { error, info } from "@tauri-apps/plugin-log";
+  import { error } from "@tauri-apps/plugin-log";
+  import { info } from "@tauri-apps/plugin-log";
   import SideBar from "$lib/components/SideBar/SideBar.svelte";
   import { logoutUser } from "$lib/utils/authentication-utils";
   import type { PageData } from "./$types";
   import SearchBar from "$lib/components/SearchBar/SearchBar.svelte";
-  import AnimalAdoptionInfoRow from "$lib/components/AnimalAdoptionInfoRow/AnimalAdoptionInfoRow.svelte";
+  import AnimalInfoRow from "$lib/components/AnimalInfoRow/AnimalInfoRow.svelte";
   import FilterModal from "$lib/components/FilterModal/FilterModal.svelte";
   import ViewAnimalModal from "$lib/components/ViewAnimalPopup/ViewAnimalModal.svelte";
   import ConfirmationModal from "$lib/components/ConfirmationModal/ConfirmationModal.svelte";
@@ -23,20 +24,17 @@ This page displays all adoption requests for staff members to review and manage.
     type AnimalSummary,
     type Animal,
     type AdoptionRequest,
-    getAnimalById,
+    getAnimals,
+    getAnimalWithAcceptedAdoption,
   } from "$lib/utils/animal-utils";
-  import { Funnel, Eye, FileCheck } from "@lucide/svelte";
+  import { Eye, Send, Funnel } from "@lucide/svelte";
   import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
-  import { navigationMap } from "../navigation-utils";
-  import {
-    type AnimalAdoptionRequests,
-    getAdoptionRequests,
-  } from "./adoption-requests-utils";
-  import ActionDropdownButton from "$lib/components/ActionDropdownButton/ActionDropdownButton.svelte";
   import NothingToShowIcon from "$lib/components/NothingToShowIcon/NothingToShowIcon.svelte";
+  import { navigationMap } from "../navigation-utils";
 
   // Props
   interface Props {
+    /** The data passed to the page from the load function. */
     data: PageData;
   }
 
@@ -44,8 +42,6 @@ This page displays all adoption requests for staff members to review and manage.
 
   /**
    * Handles navigation when a sidebar item is clicked.
-   * Navigates to the corresponding route based on the navigation mapping.
-   *
    * @param item - The navigation item that was clicked.
    */
   function handleNavigation(item: string): void {
@@ -56,8 +52,7 @@ This page displays all adoption requests for staff members to review and manage.
   }
 
   /**
-   * Handles user sign out process.
-   * Logs out the user and redirects to the authentication page.
+   * Opens the sign-out confirmation modal.
    */
   function handleSignOut(): void {
     isSignOutModalOpen = true;
@@ -77,27 +72,25 @@ This page displays all adoption requests for staff members to review and manage.
     }
   }
 
-  /** The current search query entered by the user. */
-  let searchQuery = $state("");
-  /** Controls the visibility of the filter modal. */
-  let isFilterModalOpen = $state(false);
-  /** Stores the current filter selections made by the user. */
+  /** The current search query. */
+  let searchQuery: string = $state("");
+  /** Whether the filter modal is open. */
+  let isFilterModalOpen: boolean = $state(false);
+  /** The current filter selections. */
   let filterSelections: FilterSelections | null = $state(null);
-
-  /** Controls the visibility of the animal view modal. */
-  let isViewModalOpen = $state(false);
-  /** The animal currently selected for viewing in the modal. */
+  /** Whether the view animal modal is open. */
+  let isViewModalOpen: boolean = $state(false);
+  /** The animal selected for viewing. */
   let selectedAnimal: Animal | null = $state(null);
-  /** The adopter information associated with the selected animal, if applicable. */
+  /** The adopter information for the selected animal. */
   let selectedAdopter: AdoptionRequest | null = $state(null);
-  /** Controls the visibility of the sign-out confirmation modal. */
+  /** Whether the sign-out confirmation modal is open. */
   let isSignOutModalOpen = $state(false);
 
-  /** List of filter criteria to display in the filter modal. */
+  /** The filter criteria to be displayed in the filter modal. */
   const filterCriteria = [
     FilterCriteria.SEX,
     FilterCriteria.SPECIES_AND_BREEDS,
-    FilterCriteria.ADMISSION_DATE,
   ];
 
   /**
@@ -107,48 +100,46 @@ This page displays all adoption requests for staff members to review and manage.
     isFilterModalOpen = true;
   }
 
-  /** Store of adoption requests to be displayed. */
-  let displayedRequests: AnimalAdoptionRequests[] = $state(
-    data.adoptionRequests || [],
-  );
-
   /**
-   * Handles filter modal close and updates selections.
-   * @param selections - The filter selections made by the user.
+   * Handles the closing of the filter modal and applies the selected filters.
+   * @param selections - The filter selections from the modal.
    */
   async function handleFilterClose(
     selections: FilterSelections,
   ): Promise<void> {
     filterSelections = selections;
-    info("Filter selections:" + filterSelections);
+    info("Filter selections:" + JSON.stringify(filterSelections));
     isFilterModalOpen = false;
-
-    // Fetch adoption reports with the new filters applied
-    displayedRequests = await getAdoptionRequests(filterSelections);
+    displayedAnimals = await getAnimals({
+      ...filterSelections,
+      status: ["available", "requested"],
+    });
   }
 
   /**
-   * Handles viewing animal and adopter details.
-   *
-   * @param animalSummary - The summary of the animal.
-   * @param request - The summary of the adoption request.
+   * Handles the viewing of an animal's details.
+   * @param animalSummary - The summary of the animal to view.
    */
-  async function handleViewRequest(
-    animalSummary: AnimalSummary,
-    request: AdoptionRequest,
-  ): Promise<void> {
-    const animal: Animal | null = await getAnimalById(animalSummary.id);
-    if (!animal) {
-      error(`Animal with ID ${animalSummary.id} not found.`);
-      return;
-    }
+  async function handleViewAnimal(animalSummary: AnimalSummary): Promise<void> {
+    const { animal, adopter } = await getAnimalWithAcceptedAdoption(
+      animalSummary.id,
+      animalSummary.status,
+    );
     selectedAnimal = animal;
-    selectedAdopter = request;
+    selectedAdopter = adopter;
     isViewModalOpen = true;
   }
 
   /**
-   * Closes the view modal.
+   * Navigates to the send adoption request form for the given animal.
+   * @param animalId - The ID of the animal to send a request for.
+   */
+  function handleSendRequest(animalId: string): void {
+    goto(`/send-adoption-request-form/${animalId}`);
+  }
+
+  /**
+   * Closes the view animal modal.
    */
   function handleCloseViewModal(): void {
     isViewModalOpen = false;
@@ -156,20 +147,19 @@ This page displays all adoption requests for staff members to review and manage.
     selectedAdopter = null;
   }
 
-  /** Derived store of adoption requests filtered based on search query. */
-  let filteredRequests = $derived(
-    displayedRequests.filter(({ animal, request }) => {
+  /** The list of animals to be displayed. */
+  let displayedAnimals: AnimalSummary[] = $state(data.animals || []);
+
+  /** The derived list of animals filtered by the search query. */
+  let filteredAnimals = $derived(
+    displayedAnimals.filter((animal) => {
       if (!searchQuery) return true;
-
       const query = searchQuery.toLowerCase();
-
       return (
         animal.name.toLowerCase().includes(query) ||
         animal.id.toLowerCase().includes(query) ||
         animal.breed.toLowerCase().includes(query) ||
-        animal.specie.toLowerCase().includes(query) ||
-        request.name.toLowerCase().includes(query) ||
-        request.email.toLowerCase().includes(query)
+        animal.specie.toLowerCase().includes(query)
       );
     }),
   );
@@ -178,16 +168,17 @@ This page displays all adoption requests for staff members to review and manage.
 <div class="staff-layout">
   <div class="sidebar-container">
     <SideBar
-      username={data.currentUser?.username ?? "Staff User"}
-      role="Staff"
+      username={data.currentUser?.username ?? "Customer User"}
+      role="Customer"
       navItems={Object.keys(navigationMap)}
       onNavigate={handleNavigation}
       onSignOut={handleSignOut}
     />
   </div>
+
   <main class="main-content">
     <div class="page-header">
-      <h1 class="page-title">Adoption Requests</h1>
+      <h1 class="page-title">Available Animals</h1>
     </div>
     <div class="controls-bar">
       <SearchBar
@@ -195,45 +186,32 @@ This page displays all adoption requests for staff members to review and manage.
         placeholder="Search for names, IDs, breeds, and more..."
       />
       <ActionButton
-        label="Filters"
+        label="Filter"
         icon={Funnel}
         width="110px"
         onclick={handleFilterClick}
-      />
+      ></ActionButton>
     </div>
-    <div class="requests-list">
-      {#if filteredRequests.length > 0}
-        {#each filteredRequests as { animal, request } (animal.id)}
-          <AnimalAdoptionInfoRow animalSummary={animal} adoptionRequest={request}>
+
+    <div class="animals-list">
+      {#if filteredAnimals.length > 0}
+        {#each filteredAnimals as animal (animal.id)}
+          <AnimalInfoRow animalSummary={animal} showStatus={false}>
             {#snippet actions()}
               <ActionButton
                 label="View"
                 icon={Eye}
                 width="155px"
-                onclick={() => handleViewRequest(animal, request)}
+                onclick={() => handleViewAnimal(animal)}
               />
-              <ActionDropdownButton
-                label="Handle Requests"
-                icon={FileCheck}
-                options={[
-                  {
-                    label: "Approve",
-                    icon: FileCheck,
-                    onclick: () => {
-                      //TODO: Implement approve functionality
-                    },
-                  },
-                  {
-                    label: "Reject",
-                    icon: FileCheck,
-                    onclick: () => {
-                      //TODO: Implement reject functionality
-                    },
-                  },
-                ]}
+              <ActionButton
+                label="Send Request"
+                icon={Send}
+                width="155px"
+                onclick={() => handleSendRequest(animal.id)}
               />
             {/snippet}
-          </AnimalAdoptionInfoRow>
+          </AnimalInfoRow>
         {/each}
       {:else}
         <NothingToShowIcon />
@@ -246,7 +224,7 @@ This page displays all adoption requests for staff members to review and manage.
   isVisible={isFilterModalOpen}
   criteriaList={filterCriteria}
   currentSelections={filterSelections}
-  onClose={handleFilterClose}
+  onClose={(selections) => handleFilterClose(selections)}
 />
 
 {#if selectedAnimal}

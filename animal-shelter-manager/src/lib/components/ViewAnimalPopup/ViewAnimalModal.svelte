@@ -81,7 +81,7 @@ about an animal and its adopter (if applicable).
         {:else}
           <AnimalInfo
             {animal}
-            adoption_timestamp={adopter?.adoption_timestamp ?? 0}
+            adoption_timestamp={adopter?.adoptionTimestamp ?? 0}
             onclose={closePopup}
           />
         {/if}

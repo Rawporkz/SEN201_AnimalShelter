@@ -10,34 +10,29 @@ or the customer's home page based on the user's authentication status and role.
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import { error } from "@tauri-apps/plugin-log";
-  import { getCurrentUser, UserRole } from "$lib/utils/authentication-utils";
+  import {
+    type CurrentUser,
+    getCurrentUser,
+  } from "$lib/utils/authentication-utils";
   import "./style.scss";
-  import SideBar from "$lib/components/SideBar/SideBar.svelte";
-
-  /** Current authenticated user object with role, null if not logged in */
-  let currentUser: { username: string; role: UserRole } | null = $state(null);
 
   onMount(async () => {
     try {
       // Check if user is authenticated
-      currentUser = (await getCurrentUser()) as {
-        username: string;
-        role: UserRole;
-      } | null;
+      const currentUser: CurrentUser | null = await getCurrentUser();
 
       if (currentUser === null) {
         // Redirect to authentication page if not logged in
         goto("/authentication");
-        currentUser = { username: "aaa", role: UserRole.STAFF };
       } else {
-        // Handle authenticated user - redirect to appropriate dashboard based on role
+        // Handle authenticated user - redirect to appropriate home based on role
         if (currentUser.role === "staff") {
           goto("/home/staff");
         } else if (currentUser.role === "customer") {
-          // TODO: Create customer home page
           goto("/home/customer");
         } else {
           // Unknown role, redirect to authentication
+          error(`Unknown user role: ${currentUser.role}`);
           goto("/authentication");
         }
       }
@@ -47,5 +42,3 @@ or the customer's home page based on the user's authentication status and role.
     }
   });
 </script>
-
-<SideBar username="Jira" role="Staff"></SideBar>

@@ -37,7 +37,7 @@ This file defines a reusable AdopterInfo component.
       </div>
       <div class="adopter-info-item">
         <div class="label">Annual Income</div>
-        <div class="value">{adopter?.annual_income ?? "Unknown"}</div>
+        <div class="value">{adopter?.annualIncome ?? "Unknown"}</div>
       </div>
     </div>
     <div class="adopter-info-row">
@@ -47,7 +47,7 @@ This file defines a reusable AdopterInfo component.
       </div>
       <div class="adopter-info-item">
         <div class="label">Telephone Number</div>
-        <div class="value">{adopter?.tel_number ?? "Unknown"}</div>
+        <div class="value">{adopter?.telNumber ?? "Unknown"}</div>
       </div>
     </div>
     <div class="divider"></div>
@@ -62,13 +62,13 @@ This file defines a reusable AdopterInfo component.
     <div class="divider"></div>
     <div class="adopter-info-item full-width">
       <div class="label">How many people do you have in your household?</div>
-      <div class="value">Answer: {adopter?.num_people ?? "Unknown"}</div>
+      <div class="value">Answer: {adopter?.numPeople ?? "Unknown"}</div>
     </div>
     <div class="adopter-info-item full-width">
       <div class="label">
         Of which, how many are children under 15 years old?
       </div>
-      <div class="value">Answer: {adopter?.num_children ?? "Unknown"}</div>
+      <div class="value">Answer: {adopter?.numChildren ?? "Unknown"}</div>
     </div>
   </div>
 </div>

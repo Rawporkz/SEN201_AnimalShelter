@@ -33,7 +33,7 @@ export type AnimalAdoptionReport = {
  * @returns A promise that resolves to an array of AnimalAdoptionReport objects.
  *          Returns an empty array if there's an error.
  */
-export async function get_adoption_reports(
+export async function getAdoptionReports(
   filterSeclections: FilterSelections,
 ): Promise<AnimalAdoptionReport[]> {
   try {
@@ -47,11 +47,11 @@ export async function get_adoption_reports(
     let animalAdoptionRequests: AnimalAdoptionReport[] = [];
     for (const animal of adoptedAnimals) {
       // Get adoption requests for the animal
-      const adoptionRequest: AdoptionRequest[] | null =
+      const adoptionRequest: AdoptionRequest[] =
         await getAdoptionRequestsByAnimalId(animal.id);
 
       // Find the approved adoption request
-      const approvedRequests = adoptionRequest?.find(
+      const approvedRequests = adoptionRequest.find(
         (request) => request.status === RequestStatus.APPROVED,
       );
 

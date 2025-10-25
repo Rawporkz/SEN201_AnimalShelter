@@ -16,11 +16,9 @@ This file defines the page for sending an adoption request for a specific animal
   import GenericButton from "$lib/components/GenericButton/GenericButton.svelte";
   import { calculateAge } from "$lib/utils/animal-utils";
   import type { AdoptionRequest } from "$lib/utils/animal-utils";
-  import {
-    createAdoptionRequest,
-    RequestStatus,
-  } from "$lib/utils/animal-utils";
+  import { createAdoptionRequest, RequestStatus } from "$lib/utils/animal-utils";
   import { COUNTRY_OPTIONS, INCOME_OPTIONS } from "./form-options-utils";
+  import { getCurrentUser } from "$lib/utils/authentication-utils";
 
   /** Props passed from the load function */
   const { data }: { data: PageData } = $props();
@@ -74,14 +72,21 @@ This file defines the page for sending an adoption request for a specific animal
   let errorMessage: string = $state("");
 
   onMount(() => {
-    if (animal.image_path) {
-      imageUrl = convertFileSrc(animal.image_path);
+    if (animal.imagePath) {
+      imageUrl = convertFileSrc(animal.imagePath);
     }
   });
 
   /** Clears the error message */
   function clearError(): void {
     errorMessage = "";
+  }
+
+  /**
+   * Handles input changes to clear the error message.
+   */
+  function handleInputChange(): void {
+    clearError();
   }
 
   /**
@@ -168,6 +173,9 @@ This file defines the page for sending an adoption request for a specific animal
   }
 
   /** Handles the save action */
+  /**
+   * Handles the save action, validates the form, and submits the adoption request.
+   */
   async function handleSave(): Promise<void> {
     clearError();
     hasAttemptedSave = true;
@@ -179,21 +187,31 @@ This file defines the page for sending an adoption request for a specific animal
     isSaving = true;
 
     try {
+      /** The currently logged-in user */
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        setError("You must be logged in to send an adoption request.");
+        isSaving = false;
+        return;
+      }
+
+      /** The adoption request object to be sent to the backend */
       const adoptionRequest: AdoptionRequest = {
         id: "", // Will be set by backend
-        animal_id: animal.id,
+        animalId: animal.id,
+        username: currentUser.username,
         name: applicantName.trim(),
         email: applicantEmail.trim(),
-        tel_number: applicantTelNumber.trim(),
+        telNumber: applicantTelNumber.trim(),
         address: applicantAddress.trim(),
         occupation: applicantOccupation.trim(),
-        annual_income: applicantAnnualIncome,
-        num_people: parseInt(numPeople) || 0,
-        num_children: parseInt(numChildren) || 0,
+        annualIncome: applicantAnnualIncome,
+        numPeople: parseInt(numPeople) || 0,
+        numChildren: parseInt(numChildren) || 0,
         country: applicantCountry,
         status: RequestStatus.PENDING,
-        request_timestamp: Math.floor(Date.now() / 1000),
-        adoption_timestamp: 0,
+        requestTimestamp: Math.floor(Date.now() / 1000),
+        adoptionTimestamp: 0,
       };
 
       info(`Creating adoption request: ${JSON.stringify(adoptionRequest)}`);
@@ -239,10 +257,10 @@ This file defines the page for sending an adoption request for a specific animal
           <div class="detail-item">
             <span class="label">Birth Month/Year</span>
             <span class="value">
-              {animal.birth_year && animal.birth_month
-                ? `${animal.birth_month}/${animal.birth_year} (${calculateAge(
-                    animal.birth_year,
-                    animal.birth_month,
+              {animal.birthYear && animal.birthMonth
+                ? `${animal.birthMonth}/${animal.birthYear} (${calculateAge(
+                    animal.birthYear,
+                    animal.birthMonth,
                   )})`
                 : "Unknown"}
             </span>
@@ -266,6 +284,7 @@ This file defines the page for sending an adoption request for a specific animal
             boxWidth="100%"
             rows={1}
             isInvalid={hasAttemptedSave && isApplicantNameInvalid}
+            oninput={handleInputChange}
           />
           <FormTextField
             label="Occupation"
@@ -274,15 +293,17 @@ This file defines the page for sending an adoption request for a specific animal
             boxWidth="100%"
             rows={1}
             isInvalid={hasAttemptedSave && isApplicantOccupationInvalid}
+            oninput={handleInputChange}
           />
           <FormDropdownButton
             label="Annual Income"
             placeholder="Pick a range"
             options={INCOME_OPTIONS}
-            onSelect={(v) => (applicantAnnualIncome = v)}
+            bind:value={applicantAnnualIncome}
             maxOptions={10}
             width="100%"
             isInvalid={hasAttemptedSave && isApplicantAnnualIncomeInvalid}
+            onchange={handleInputChange}
           />
         </div>
         <div class="form-row">
@@ -293,6 +314,7 @@ This file defines the page for sending an adoption request for a specific animal
             boxWidth="100%"
             rows={1}
             isInvalid={hasAttemptedSave && isApplicantEmailInvalid}
+            oninput={handleInputChange}
           />
           <FormTextField
             label="Telephone Number"
@@ -301,6 +323,7 @@ This file defines the page for sending an adoption request for a specific animal
             boxWidth="100%"
             rows={1}
             isInvalid={hasAttemptedSave && isApplicantTelNumberInvalid}
+            oninput={handleInputChange}
           />
         </div>
 
@@ -314,6 +337,7 @@ This file defines the page for sending an adoption request for a specific animal
             boxWidth="100%"
             rows={4}
             isInvalid={hasAttemptedSave && isApplicantAddressInvalid}
+            oninput={handleInputChange}
           />
         </div>
         <div class="form-row">
@@ -321,9 +345,10 @@ This file defines the page for sending an adoption request for a specific animal
             label="Country"
             placeholder="Pick a country"
             options={COUNTRY_OPTIONS}
-            onSelect={(v) => (applicantCountry = v)}
+            bind:value={applicantCountry}
             width="100%"
             isInvalid={hasAttemptedSave && isApplicantCountryInvalid}
+            onchange={handleInputChange}
           />
           <FormTextField
             label="State/Province"
@@ -332,6 +357,7 @@ This file defines the page for sending an adoption request for a specific animal
             boxWidth="100%"
             rows={1}
             isInvalid={hasAttemptedSave && isApplicantStateInvalid}
+            oninput={handleInputChange}
           />
         </div>
 
@@ -345,6 +371,7 @@ This file defines the page for sending an adoption request for a specific animal
             boxWidth="100%"
             rows={1}
             isInvalid={hasAttemptedSave && isNumPeopleInvalid}
+            oninput={handleInputChange}
           />
           <FormTextField
             label="Of which, how many are children under 15 years old?"
@@ -353,6 +380,7 @@ This file defines the page for sending an adoption request for a specific animal
             boxWidth="100%"
             rows={1}
             isInvalid={hasAttemptedSave && isNumChildrenInvalid}
+            oninput={handleInputChange}
           />
         </div>
       </div>

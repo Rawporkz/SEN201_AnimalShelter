@@ -77,6 +77,7 @@ mod database_service_tests {
     fn sample_request(id: &str, animal_id: &str) -> AdoptionRequest {
         AdoptionRequest {
             id: id.to_string(),
+            username: "JiraPit".to_string(),
             animal_id: animal_id.to_string(),
             name: "Jira Pit".to_string(),
             email: "jira.pit@gmail.com".to_string(),
@@ -225,7 +226,7 @@ mod database_service_tests {
         animal2.breed = "Siamese".to_string();
         animal2.sex = "Female".to_string();
         animal2.status = AnimalStatus::Available;
-        animal2.admission_timestamp = Utc::now().timestamp() - 86400 * 5; // 5 days ago
+        animal2.admission_timestamp = Utc::now().timestamp() - 86400; // 1 day ago
 
         let mut animal3 = sample_animal("a3");
         animal3.name = "Rocky".to_string();
@@ -324,28 +325,23 @@ mod database_service_tests {
 
         // Test filter by admission date
         filters.clear();
-        let start_date = (Utc::now().timestamp() - 86400 * 7).to_string(); // 7 days ago
-        let end_date = Utc::now().timestamp().to_string();
         filters.insert(
             FilterCriteria::AdmissionDate,
-            Some(FilterValue::ChooseMany(vec![
-                start_date.clone(),
-                end_date.clone(),
-            ])),
+            Some(FilterValue::ChooseOne("this_week".to_string())),
         );
         let animals = db.query_animals(Some(filters.clone())).unwrap();
         assert_eq!(animals.len(), 1);
-        assert_eq!(animals[0].id, "a2");
+        assert!(animals.iter().any(|a| a.id == "a2"));
 
         // Test filter by adoption date
         filters.clear();
         filters.insert(
             FilterCriteria::AdoptionDate,
-            Some(FilterValue::ChooseMany(vec![start_date, end_date])),
+            Some(FilterValue::ChooseOne("this_week".to_string())),
         );
         let animals = db.query_animals(Some(filters)).unwrap();
         assert_eq!(animals.len(), 1);
-        assert_eq!(animals[0].id, "a4");
+        assert!(animals.iter().any(|a| a.id == "a4"));
     }
 
     // ==================== ADOPTION REQUESTS TESTS ====================

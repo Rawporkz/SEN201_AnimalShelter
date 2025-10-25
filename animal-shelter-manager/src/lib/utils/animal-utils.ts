@@ -47,17 +47,17 @@ export interface Animal {
   /** Sex of the animal (e.g., "Male", "Female") */
   sex: string;
   /** Birth month of the animal (1-12) */
-  birth_month: number | null;
+  birthMonth: number | null;
   /** Birth year of the animal */
-  birth_year: number | null;
+  birthYear: number | null;
   /** Whether the animal has been neutered */
   neutered: boolean;
   /** Timestamp when the animal was admitted to the shelter */
-  admission_timestamp: number;
+  admissionTimestamp: number;
   /** Current status of the animal */
   status: AnimalStatus;
   /** Path to the animal's image file */
-  image_path?: string;
+  imagePath?: string;
   /** Appearance description of the animal */
   appearance: string;
   /** Bio & Characteristics of the animal */
@@ -77,9 +77,9 @@ export interface AnimalSummary {
   /** Sex of the animal */
   sex: string;
   /** Timestamp when the animal was admitted to the shelter */
-  admission_timestamp: number;
+  admissionTimestamp: number;
   /** Path to the animal's image file */
-  image_path?: string;
+  imagePath?: string;
   /** Current status of the animal */
   status: AnimalStatus;
 }
@@ -89,27 +89,29 @@ export interface AdoptionRequest {
   /** Unique identifier for the adoption request */
   id: string;
   /** ID of the animal being requested for adoption */
-  animal_id: string;
+  animalId: string;
+  /** Username of the user who made the request */
+  username: string;
   /** Full name of the person requesting adoption */
   name: string;
   /** Email address of the requester */
   email: string;
   /** Telephone number of the requester */
-  tel_number: string;
+  telNumber: string;
   /** Address of the requester */
   address: string;
   /** Occupation of the requester */
   occupation: string;
   /** Annual income of the requester */
-  annual_income: string;
+  annualIncome: string;
   /** Number of people in the household */
-  num_people: number;
+  numPeople: number;
   /** Number of children in the household */
-  num_children: number;
+  numChildren: number;
   /** Timestamp when the request was submitted */
-  request_timestamp: number;
+  requestTimestamp: number;
   /** Timestamp when the adoption was completed (0 if not completed) */
-  adoption_timestamp: number;
+  adoptionTimestamp: number;
   /** Current status of the request */
   status: RequestStatus;
   /** Country of the requester */
@@ -271,6 +273,26 @@ export async function getAdoptionRequestsByAnimalId(
     );
   } catch (e) {
     error(`Failed to get adoption requests for animal ID ${animalId}: ${e}`);
+    return [];
+  }
+}
+
+/**
+ * Retrieves all adoption requests for a specific username.
+ *
+ * @param username - The username to retrieve requests for
+ * @returns Promise<AdoptionRequest[]> - List of adoption requests. Returns an empty array if the operation fails.
+ */
+export async function getAdoptionRequestsByUsername(
+  username: string,
+): Promise<AdoptionRequest[]> {
+  try {
+    return await invoke<AdoptionRequest[]>(
+      "get_adoption_requests_by_username",
+      { username },
+    );
+  } catch (e) {
+    error(`Failed to get adoption requests for username ${username}: ${e}`);
     return [];
   }
 }

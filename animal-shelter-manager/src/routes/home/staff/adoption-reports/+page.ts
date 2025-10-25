@@ -13,7 +13,7 @@ import type { PageLoad } from "./$types";
 import { error } from "@tauri-apps/plugin-log";
 import {
   type AnimalAdoptionReport,
-  get_adoption_reports,
+  getAdoptionReports,
 } from "./adoption-reports-utils";
 
 export const load: PageLoad = async () => {
@@ -29,7 +29,7 @@ export const load: PageLoad = async () => {
     }
 
     // Fetch adoption reports without filters initially
-    const adoptionRequests: AnimalAdoptionReport[] = await get_adoption_reports(
+    const adoptionRequests: AnimalAdoptionReport[] = await getAdoptionReports(
       {},
     );
 

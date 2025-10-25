@@ -1,18 +1,20 @@
 <!-- 
-routes/admit-animal-form/+page.svelte
+routes/edit-animal-form/[id]/+page.svelte
 
-This file defines the admit animal form page of the application.
-Allows staff to admit new animals to the shelter system.
+This file defines the edit animal form page of the application.
+Allows staff to edit existing animals in the shelter system.
 -->
 
 <script lang="ts">
-  import { X, ImagePlus, Save } from "@lucide/svelte";
+  import { onMount } from "svelte";
+  import { X, ImagePlus, Save, Trash2 } from "@lucide/svelte";
   import { goto } from "$app/navigation";
   import { convertFileSrc } from "@tauri-apps/api/core";
-  import { MONTH_OPTIONS } from "./form-optons-utils";
+  import type { PageData } from "./$types";
   import FormTextField from "$lib/components/FormTextField/FormTextField.svelte";
   import FormDropdownButton from "$lib/components/FormDropdownButton/FormDropdownButton.svelte";
   import GenericButton from "$lib/components/GenericButton/GenericButton.svelte";
+  import ConfirmationModal from "$lib/components/ConfirmationModal/ConfirmationModal.svelte";
   import {
     ANIMAL_SPECIES_OPTIONS,
     ANIMAL_SEX_OPTIONS,
@@ -21,11 +23,15 @@ Allows staff to admit new animals to the shelter system.
   } from "$lib/config/animal-options";
   import {
     uploadAnimalImage,
-    createAnimal,
+    updateAnimal,
+    deleteAnimal,
     type Animal,
     AnimalStatus,
   } from "$lib/utils/animal-utils";
   import { info, error } from "@tauri-apps/plugin-log";
+
+  const { data }: { data: PageData } = $props();
+  const animal = data.animal;
 
   /** Animal name entered by user */
   let animalName: string = $state("");
@@ -84,6 +90,41 @@ Allows staff to admit new animals to the shelter system.
 
   /** Error message to display */
   let errorMessage: string = $state("");
+
+  /** Whether the delete confirmation modal is open. */
+  let isDeleteModalOpen: boolean = $state(false);
+
+  onMount(() => {
+    if (animal) {
+      animalName = animal.name;
+      selectedMonth = monthOptions[animal.birthMonth || 0];
+      selectedYear = animal.birthYear?.toString() || "Unknown";
+      selectedSpecies = animal.specie;
+      selectedBreed = animal.breed;
+      selectedSex = animal.sex;
+      selectedNeuteredStatus = animal.neutered ? "Yes" : "No";
+      animalAppearance = animal.appearance;
+      animalBio = animal.bio;
+      imagePath = animal.imagePath || null;
+    }
+  });
+
+  /** Generate month options (1-12) */
+  const monthOptions: string[] = [
+    "Unknown",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
   /** Generate year options (current year back to 1990) */
   const yearOptions: string[] = (() => {
@@ -243,6 +284,32 @@ Allows staff to admit new animals to the shelter system.
     goto("/");
   }
 
+  let deleteReason: string = $state("passed-away");
+  let otherReasonText: string = $state("");
+
+  /**
+   * Opens the delete confirmation modal.
+   */
+  function handleDelete(): void {
+    isDeleteModalOpen = true;
+  }
+
+  /**
+   * Confirms and executes the delete or update operation based on the selected reason.
+   */
+  async function confirmDelete(): Promise<void> {
+    if (deleteReason === "passed-away") {
+      const updatedAnimal: Animal = {
+        ...animal,
+        status: AnimalStatus.PASSED_AWAY,
+      };
+      await updateAnimal(updatedAnimal);
+    } else {
+      await deleteAnimal(animal.id);
+    }
+    goto("/");
+  }
+
   /**
    * Handles the save action.
    */
@@ -276,13 +343,12 @@ Allows staff to admit new animals to the shelter system.
       const monthNumber =
         selectedMonth === "Unknown"
           ? null
-          : MONTH_OPTIONS.indexOf(selectedMonth);
+          : monthOptions.indexOf(selectedMonth);
       const yearNumber =
         selectedYear === "Unknown" ? null : parseInt(selectedYear);
 
-      // Create animal object
-      const animal: Animal = {
-        id: "", // Will be set by backend
+      const animalToUpdate: Animal = {
+        ...animal,
         name: animalName.trim(),
         specie: speciesValue,
         breed: selectedBreed,
@@ -290,14 +356,12 @@ Allows staff to admit new animals to the shelter system.
         birthMonth: monthNumber,
         birthYear: yearNumber,
         neutered: neuteredValue === "yes",
-        admissionTimestamp: Math.floor(Date.now() / 1000),
-        status: AnimalStatus.AVAILABLE,
         imagePath: imagePath!,
         appearance: animalAppearance.trim(),
         bio: animalBio.trim(),
       };
-      info(`Creating animal: ${JSON.stringify(animal)}`);
-      await createAnimal(animal);
+      info(`Updating animal: ${JSON.stringify(animalToUpdate)}`);
+      await updateAnimal(animalToUpdate);
       goto("/");
     } catch (e) {
       error(`Failed to admit animal: ${e}`);
@@ -309,7 +373,7 @@ Allows staff to admit new animals to the shelter system.
 </script>
 
 <div class="container">
-  <h1 class="page-title">Admit Animal</h1>
+  <h1 class="page-title">Edit Animal</h1>
 
   <div class="form-content">
     <div class="left-section">
@@ -352,7 +416,7 @@ Allows staff to admit new animals to the shelter system.
           <div class="form-field-right">
             <div class="birthdate-fields">
               <FormDropdownButton
-                options={MONTH_OPTIONS}
+                options={monthOptions}
                 placeholder="Month"
                 width="100%"
                 label="Birthdate"
@@ -456,30 +520,44 @@ Allows staff to admit new animals to the shelter system.
     </div>
   </div>
 
-  <!-- Action Buttons -->
   <div class="action-buttons">
-    <GenericButton
-      color="#003a62"
-      textColor="white"
-      text="Cancel"
-      icon={X}
-      showIcon={true}
-      iconPosition="left"
-      width="120px"
-      disabled={isSaving}
-      onclick={handleCancel}
-    />
-    <GenericButton
-      color="#00b047"
-      textColor="white"
-      text="Save"
-      icon={Save}
-      showIcon={true}
-      iconPosition="left"
-      width="120px"
-      disabled={isSaving}
-      onclick={handleSave}
-    />
+    <div>
+      <GenericButton
+        color="#003a62"
+        textColor="white"
+        text="Cancel"
+        icon={X}
+        showIcon={true}
+        iconPosition="left"
+        width="120px"
+        disabled={isSaving}
+        onclick={handleCancel}
+      />
+    </div>
+    <div class="save-cancel-buttons">
+      <GenericButton
+        color="#ea4444"
+        textColor="white"
+        text="Delete"
+        icon={Trash2}
+        showIcon={true}
+        iconPosition="left"
+        width="120px"
+        disabled={isSaving}
+        onclick={handleDelete}
+      />
+      <GenericButton
+        color="#00b047"
+        textColor="white"
+        text="Save"
+        icon={Save}
+        showIcon={true}
+        iconPosition="left"
+        width="120px"
+        disabled={isSaving}
+        onclick={handleSave}
+      />
+    </div>
   </div>
 
   <!-- Error Message -->
@@ -488,6 +566,44 @@ Allows staff to admit new animals to the shelter system.
       {errorMessage}
     </div>
   {/if}
+
+  <ConfirmationModal
+    bind:open={isDeleteModalOpen}
+    title="Deleting an Animal"
+    message={`Please provide a reason for the deletion of ${animal.name}.`}
+    width="500px"
+    contentWidth="400px"
+    confirmText={deleteReason === "passed-away" ? "Change Status" : "Confirm"}
+    cancelText="Cancel"
+    destructive={deleteReason !== "passed-away"}
+    confirmColor={deleteReason === "passed-away" ? "black" : "#ea4444"}
+    onconfirm={confirmDelete}
+  >
+    {#snippet extra()}
+      <div class="delete-reason-options">
+        <label>
+          <input type="radio" bind:group={deleteReason} value="passed-away" />
+          The animal has passed away
+        </label>
+        <label>
+          <input type="radio" bind:group={deleteReason} value="mistake" />
+          The animal was added by mistake
+        </label>
+        <label>
+          <input type="radio" bind:group={deleteReason} value="other" />
+          Other
+        </label>
+        {#if deleteReason === "other"}
+          <FormTextField
+            label=""
+            placeholder="Type Here..."
+            bind:value={otherReasonText}
+            boxWidth="100%"
+          />
+        {/if}
+      </div>
+    {/snippet}
+  </ConfirmationModal>
 </div>
 
 <style lang="scss">
