@@ -8,9 +8,6 @@
 import { goto } from "$app/navigation";
 import type { PageLoad } from "./$types";
 
-/**
- * Redirects the user to the available animals page when they navigate to /home/customer.
- */
 export const load: PageLoad = () => {
   goto("/home/customer/available-animals", { replaceState: true });
 };

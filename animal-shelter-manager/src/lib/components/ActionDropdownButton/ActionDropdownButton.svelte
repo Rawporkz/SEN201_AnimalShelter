@@ -15,6 +15,8 @@
     label: string;
     /** Icon component to display on the button */
     icon?: Component<any>;
+    /** Width of the dropdown button (default: '155px') */
+    width?: string;
     /** Array of dropdown menu options with labels, icons, and click handlers */
     options: Array<{
       label: string;
@@ -23,7 +25,7 @@
     }>;
   }
 
-  const { label, options, icon }: Props = $props();
+  const { label, options, icon, width = "155px" }: Props = $props();
 
   /** State to track whether the dropdown menu is currently open */
   let isOpen: boolean = $state(false);
@@ -66,6 +68,7 @@
 <div class="dropdown-button-container">
   <button
     class="dropdown-button"
+    style="--width: {width}"
     class:open={isOpen}
     onclick={toggleDropdown}
     type="button"

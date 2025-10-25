@@ -173,7 +173,7 @@ This page displays the user's adoption requests.
     <div class="animals-list">
       {#if filteredRequests.length > 0}
         {#each filteredRequests as { animal, request } (request.id)}
-          <AnimalInfoRow animalSummary={animal} showStatus={true}>
+          <AnimalInfoRow animalSummary={animal} showStatus={false}>
             {#snippet actions()}
               <ActionButton
                 label="View"

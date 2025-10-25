@@ -29,7 +29,7 @@ with customizable styling, placeholder text, and width for form interfaces.
     resetOn?: unknown;
     /** Flag to indicate if the input is invalid */
     isInvalid?: boolean;
-    /** Callback function called when the value changes */
+    /** Optional callback function called when the value changes */
     onchange?: () => void;
   }
 

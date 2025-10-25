@@ -256,7 +256,7 @@ This page displays all animals in the shelter system for staff members.
                   onclick={() => handleViewAnimal(animal)}
                 />
                 <ActionButton
-                  label="Handle Request"
+                  label="Handle"
                   icon={ClipboardList}
                   width="155px"
                   onclick={() => handleHandleRequest(animal.id)}

@@ -25,7 +25,7 @@ This page displays all adoption requests for staff members to review and manage.
     type AdoptionRequest,
     getAnimalById,
   } from "$lib/utils/animal-utils";
-  import { Funnel, Eye, FileCheck } from "@lucide/svelte";
+  import { Funnel, Eye, FileCheck, CheckIcon, X } from "@lucide/svelte";
   import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
   import { navigationMap } from "../navigation-utils";
   import {
@@ -204,7 +204,10 @@ This page displays all adoption requests for staff members to review and manage.
     <div class="requests-list">
       {#if filteredRequests.length > 0}
         {#each filteredRequests as { animal, request } (animal.id)}
-          <AnimalAdoptionInfoRow animalSummary={animal} adoptionRequest={request}>
+          <AnimalAdoptionInfoRow
+            animalSummary={animal}
+            adoptionRequest={request}
+          >
             {#snippet actions()}
               <ActionButton
                 label="View"
@@ -213,19 +216,20 @@ This page displays all adoption requests for staff members to review and manage.
                 onclick={() => handleViewRequest(animal, request)}
               />
               <ActionDropdownButton
-                label="Handle Requests"
+                label="Handle"
+                width="155px"
                 icon={FileCheck}
                 options={[
                   {
                     label: "Approve",
-                    icon: FileCheck,
+                    icon: CheckIcon,
                     onclick: () => {
                       //TODO: Implement approve functionality
                     },
                   },
                   {
                     label: "Reject",
-                    icon: FileCheck,
+                    icon: X,
                     onclick: () => {
                       //TODO: Implement reject functionality
                     },
