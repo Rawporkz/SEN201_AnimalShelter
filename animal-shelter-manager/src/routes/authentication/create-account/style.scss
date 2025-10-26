@@ -7,9 +7,6 @@
 @use "../../../lib/styles/colors.scss" as colors;
 @use "sass:color";
 
-// Height for input fields and buttons
-$field-height: 56px;
-
 .container {
   min-height: 100vh;
   background: colors.$blue-main;
@@ -59,7 +56,7 @@ $field-height: 56px;
 }
 
 .create-account-form-field-input {
-  height: $field-height;
+  height: 56px;
   padding: 0 16px;
   border: 1px solid colors.$grey-border;
   border-radius: 20px;

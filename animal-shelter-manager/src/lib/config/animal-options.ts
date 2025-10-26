@@ -10,7 +10,7 @@ export type AnimalStatus =
   | "available"
   | "requested"
   | "adopted"
-  | "passed away";
+  | "passed-away";
 
 /** Animal sex options for biological classification */
 export type AnimalSex = "male" | "female";
@@ -41,7 +41,7 @@ export const ANIMAL_STATUS_OPTIONS: Array<{
   { value: "available", label: "Available" },
   { value: "requested", label: "Requested" },
   { value: "adopted", label: "Adopted" },
-  { value: "passed away", label: "Passed Away" },
+  { value: "passed-away", label: "Passed Away" },
 ];
 
 /** Available animal sex options with display labels */

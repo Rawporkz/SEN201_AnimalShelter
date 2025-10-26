@@ -75,3 +75,10 @@
     background-color: colors.$grey-border;
   }
 }
+
+.close-button-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+}

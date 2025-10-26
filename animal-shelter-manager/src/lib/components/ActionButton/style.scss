@@ -8,8 +8,10 @@
 @use "sass:color";
 
 .action-button {
+  height: 33px;
   display: inline-flex;
   align-items: center;
+  justify-content: flex-start;
   gap: 8px;
   padding: 10px 16px;
   background-color: colors.$blue-main;
@@ -55,6 +57,6 @@
   .button-text {
     flex: 1;
     white-space: nowrap;
+    text-align: left;
   }
 }
-

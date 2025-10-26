@@ -19,8 +19,8 @@ with customizable styling, placeholder text, and width for form interfaces.
     width: string;
     /** Label text displayed above the dropdown */
     label: string;
-    /** Callback function called when an option is selected */
-    onSelect?: (selectedValue: string) => void;
+    /** Two-way bindable value of the dropdown */
+    value?: string;
     /** Maximum number of options to show before enabling scroll */
     maxOptions?: number;
     /** Disable the dropdown (non-interactive, muted styles) */
@@ -29,22 +29,22 @@ with customizable styling, placeholder text, and width for form interfaces.
     resetOn?: unknown;
     /** Flag to indicate if the input is invalid */
     isInvalid?: boolean;
+    /** Optional callback function called when the value changes */
+    onchange?: () => void;
   }
 
-  const {
+  let {
     options,
     placeholder,
     width,
     label,
-    onSelect,
+    value = $bindable(""),
     maxOptions = 5,
     disabled = false,
     resetOn,
     isInvalid = false,
+    onchange = () => {},
   }: Props = $props();
-
-  /** Currently selected option, defaults to placeholder */
-  let text: string = $state(placeholder);
 
   /** State to track whether the dropdown menu is currently open */
   let isOpen: boolean = $state(false);
@@ -69,7 +69,7 @@ with customizable styling, placeholder text, and width for form interfaces.
   $effect(() => {
     if (resetOn !== lastResetToken) {
       lastResetToken = resetOn;
-      text = placeholder;
+      value = "";
       isOpen = false;
     }
   });
@@ -88,11 +88,9 @@ with customizable styling, placeholder text, and width for form interfaces.
    */
   function selectOption(option: string): void {
     if (disabled) return;
-    text = option;
+    value = option;
     isOpen = false;
-    if (onSelect) {
-      onSelect(option);
-    }
+    onchange();
   }
 
   /**
@@ -100,7 +98,7 @@ with customizable styling, placeholder text, and width for form interfaces.
    * @returns boolean - True if an option other than placeholder is selected
    */
   function optionChosen(): boolean {
-    return text !== placeholder;
+    return !!value && value !== placeholder;
   }
 
   /**
@@ -167,7 +165,7 @@ with customizable styling, placeholder text, and width for form interfaces.
       type="button"
       {disabled}
     >
-      <span class="button-text">{text}</span>
+      <span class="button-text">{value || placeholder}</span>
       <div class="chevron" class:rotated={isOpen}>
         <ChevronDown size={16} />
       </div>

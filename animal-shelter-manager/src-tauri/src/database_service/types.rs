@@ -7,6 +7,7 @@
 
 use rusqlite::{types::FromSql, ToSql};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use strum::{Display, EnumString};
 
 /// Status of an animal in the shelter system
@@ -73,6 +74,7 @@ impl FromSql for RequestStatus {
 
 /// Represents an animal in the shelter system
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Animal {
     /// Unique identifier for the animal
     pub id: String,
@@ -104,6 +106,7 @@ pub struct Animal {
 
 /// Simplified animal information for listing views
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AnimalSummary {
     /// Unique identifier for the animal
     pub id: String,
@@ -117,17 +120,22 @@ pub struct AnimalSummary {
     pub sex: String,
     /// Timestamp when the animal was admitted to the shelter
     pub admission_timestamp: i64,
+    /// Current status of the animal
+    pub status: AnimalStatus,
     /// Path to the animal's image file
     pub image_path: Option<String>,
 }
 
 /// Represents an adoption request in the system
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct AdoptionRequest {
     /// Unique identifier for the adoption request
     pub id: String,
     /// ID of the animal being requested for adoption
     pub animal_id: String,
+    /// Username of the user who made the request
+    pub username: String,
     /// Full name of the person requesting adoption
     pub name: String,
     /// Email address of the requester
@@ -154,17 +162,24 @@ pub struct AdoptionRequest {
     pub country: String,
 }
 
-/// Simplified adoption request information for listing views
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct AdoptionRequestSummary {
-    /// Unique identifier for the adoption request
-    pub id: String,
-    /// ID of the animal being requested for adoption
-    pub animal_id: String,
-    /// Full name of the person requesting adoption
-    pub name: String,
-    /// Email address of the requester
-    pub email: String,
-    /// Timestamp when the request was submitted
-    pub request_timestamp: i64,
+/// Represents the criteria available for filtering animals.
+/// This enum is designed to be sent from the TypeScript frontend.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Display, EnumString)]
+#[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
+pub enum FilterCriteria {
+    Status,
+    Sex,
+    SpeciesAndBreeds,
+    AdmissionDate,
+    AdoptionDate,
+}
+
+/// Represents the different types of values that can be associated with a filter criterion.
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum FilterValue {
+    ChooseOne(String),
+    ChooseMany(Vec<String>),
+    NestedChooseMany(HashMap<String, Vec<String>>),
 }

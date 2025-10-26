@@ -9,9 +9,7 @@ about an animal and its adopter (if applicable).
   import { User, Dog } from "@lucide/svelte";
   import AdopterInfo from "./AdopterInfo/AdopterInfo.svelte";
   import AnimalInfo from "./AnimalInfo/AnimalInfo.svelte";
-  import ClosePopupButton from "../ClosePopupButton/ClosePopupButton.svelte";
-  import type { Animal } from "../../utils/animal-utils";
-  import type { AdoptionRequest } from "../../utils/animal-utils";
+  import { type Animal, type AdoptionRequest } from "$lib/utils/data-utils";
 
   /** Type definition for tab selection in the adoption info popup */
   type Tab = "animal" | "adopter";
@@ -76,16 +74,14 @@ about an animal and its adopter (if applicable).
         if (e.key === "Escape") closePopup();
       }}
     >
-      <div class="close-button-wrapper">
-        <ClosePopupButton onclick={closePopup} />
-      </div>
       <div class="tab-content">
         {#if adopter && activeTab === "adopter"}
-          <AdopterInfo {adopter} />
+          <AdopterInfo {adopter} onclose={closePopup} />
         {:else}
           <AnimalInfo
             {animal}
-            adoption_timestamp={adopter?.adoption_timestamp ?? 0}
+            adoption_timestamp={adopter?.adoptionTimestamp ?? 0}
+            onclose={closePopup}
           />
         {/if}
       </div>

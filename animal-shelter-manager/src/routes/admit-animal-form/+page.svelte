@@ -9,7 +9,7 @@ Allows staff to admit new animals to the shelter system.
   import { X, ImagePlus, Save } from "@lucide/svelte";
   import { goto } from "$app/navigation";
   import { convertFileSrc } from "@tauri-apps/api/core";
-
+  import { MONTH_OPTIONS } from "./form-optons-utils";
   import FormTextField from "$lib/components/FormTextField/FormTextField.svelte";
   import FormDropdownButton from "$lib/components/FormDropdownButton/FormDropdownButton.svelte";
   import GenericButton from "$lib/components/GenericButton/GenericButton.svelte";
@@ -24,7 +24,7 @@ Allows staff to admit new animals to the shelter system.
     createAnimal,
     type Animal,
     AnimalStatus,
-  } from "$lib/utils/animal-utils";
+  } from "$lib/utils/data-utils";
   import { info, error } from "@tauri-apps/plugin-log";
 
   /** Animal name entered by user */
@@ -85,23 +85,6 @@ Allows staff to admit new animals to the shelter system.
   /** Error message to display */
   let errorMessage: string = $state("");
 
-  /** Generate month options (1-12) */
-  const monthOptions: string[] = [
-    "Unknown",
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
   /** Generate year options (current year back to 1990) */
   const yearOptions: string[] = (() => {
     const currentYear = new Date().getFullYear();
@@ -139,71 +122,17 @@ Allows staff to admit new animals to the shelter system.
   }
 
   /**
-   * Handles species selection and resets breed selection.
-   *
-   * @param species - The selected species label
-   */
-  function handleSpeciesSelect(species: string): void {
-    selectedSpecies = species;
-    selectedBreed = ""; // Reset breed when species changes
-    clearError();
-  }
-
-  /**
-   * Handles breed selection.
-   *
-   * @param breed - The selected breed
-   */
-  function handleBreedSelect(breed: string): void {
-    selectedBreed = breed;
-    clearError();
-  }
-
-  /**
-   * Handles sex selection.
-   *
-   * @param sex - The selected sex label
-   */
-  function handleSexSelect(sex: string): void {
-    selectedSex = sex;
-    clearError();
-  }
-
-  /**
-   * Handles neutered status selection.
-   *
-   * @param status - The selected neutered status label
-   */
-  function handleNeuteredStatusSelect(status: string): void {
-    selectedNeuteredStatus = status;
-    clearError();
-  }
-
-  /**
-   * Handles month selection.
-   *
-   * @param month - The selected month name
-   */
-  function handleMonthSelect(month: string): void {
-    selectedMonth = month;
-    clearError();
-  }
-
-  /**
-   * Handles year selection.
-   *
-   * @param year - The selected year
-   */
-  function handleYearSelect(year: string): void {
-    selectedYear = year;
-    clearError();
-  }
-
-  /**
    * Clears the error message.
    */
   function clearError(): void {
     errorMessage = "";
+  }
+
+  /**
+   * Handles input changes to clear the error message.
+   */
+  function handleInputChange(): void {
+    clearError();
   }
 
   /**
@@ -347,7 +276,7 @@ Allows staff to admit new animals to the shelter system.
       const monthNumber =
         selectedMonth === "Unknown"
           ? null
-          : monthOptions.indexOf(selectedMonth);
+          : MONTH_OPTIONS.indexOf(selectedMonth);
       const yearNumber =
         selectedYear === "Unknown" ? null : parseInt(selectedYear);
 
@@ -358,12 +287,12 @@ Allows staff to admit new animals to the shelter system.
         specie: speciesValue,
         breed: selectedBreed,
         sex: sexValue,
-        birth_month: monthNumber,
-        birth_year: yearNumber,
+        birthMonth: monthNumber,
+        birthYear: yearNumber,
         neutered: neuteredValue === "yes",
-        admission_timestamp: Math.floor(Date.now() / 1000),
+        admissionTimestamp: Math.floor(Date.now() / 1000),
         status: AnimalStatus.AVAILABLE,
-        image_path: imagePath!,
+        imagePath: imagePath!,
         appearance: animalAppearance.trim(),
         bio: animalBio.trim(),
       };
@@ -417,25 +346,28 @@ Allows staff to admit new animals to the shelter system.
               boxWidth="100%"
               rows={1}
               isInvalid={hasAttemptedSave && isAnimalNameInvalid}
+              oninput={handleInputChange}
             />
           </div>
           <div class="form-field-right">
             <div class="birthdate-fields">
               <FormDropdownButton
-                options={monthOptions}
+                options={MONTH_OPTIONS}
                 placeholder="Month"
                 width="100%"
                 label="Birthdate"
-                onSelect={handleMonthSelect}
+                bind:value={selectedMonth}
                 isInvalid={hasAttemptedSave && isSelectedMonthInvalid}
+                onchange={handleInputChange}
               />
               <FormDropdownButton
                 options={yearOptions}
                 placeholder="Year"
                 width="100%"
                 label="‎"
-                onSelect={handleYearSelect}
+                bind:value={selectedYear}
                 isInvalid={hasAttemptedSave && isSelectedYearInvalid}
+                onchange={handleInputChange}
               />
             </div>
           </div>
@@ -449,8 +381,9 @@ Allows staff to admit new animals to the shelter system.
               placeholder="Pick a species"
               width="100%"
               label="Species"
-              onSelect={handleSpeciesSelect}
+              bind:value={selectedSpecies}
               isInvalid={hasAttemptedSave && isSelectedSpeciesInvalid}
+              onchange={handleInputChange}
             />
           </div>
           <div class="form-field-right">
@@ -459,10 +392,11 @@ Allows staff to admit new animals to the shelter system.
               placeholder="Pick breeds"
               width="100%"
               label="Breed"
-              onSelect={handleBreedSelect}
+              bind:value={selectedBreed}
               disabled={!selectedSpecies}
               resetOn={selectedSpecies}
               isInvalid={hasAttemptedSave && isSelectedBreedInvalid}
+              onchange={handleInputChange}
             />
           </div>
         </div>
@@ -475,8 +409,9 @@ Allows staff to admit new animals to the shelter system.
               placeholder="Pick a sex"
               width="100%"
               label="Sex"
-              onSelect={handleSexSelect}
+              bind:value={selectedSex}
               isInvalid={hasAttemptedSave && isSelectedSexInvalid}
+              onchange={handleInputChange}
             />
           </div>
           <div class="form-field-right">
@@ -485,8 +420,9 @@ Allows staff to admit new animals to the shelter system.
               placeholder="Pick a neutured status"
               width="100%"
               label="Neutured Status"
-              onSelect={handleNeuteredStatusSelect}
+              bind:value={selectedNeuteredStatus}
               isInvalid={hasAttemptedSave && isSelectedNeuteredStatusInvalid}
+              onchange={handleInputChange}
             />
           </div>
         </div>
@@ -500,6 +436,7 @@ Allows staff to admit new animals to the shelter system.
             boxWidth="100%"
             rows={4}
             isInvalid={hasAttemptedSave && isAnimalAppearanceInvalid}
+            oninput={handleInputChange}
           />
         </div>
 
@@ -512,6 +449,7 @@ Allows staff to admit new animals to the shelter system.
             boxWidth="100%"
             rows={4}
             isInvalid={hasAttemptedSave && isAnimalBioInvalid}
+            oninput={handleInputChange}
           />
         </div>
       </div>

@@ -4,13 +4,15 @@ ViewAnimalModal/AnimalInfo.svelte
 This file defines a reusable AnimalInfo component.
 -->
 <script lang="ts">
-  import type { Animal } from "../../../utils/animal-utils";
   import {
+    type Animal,
     formatTimestamp,
     calculateAge,
     getStatusDisplayText,
-  } from "../../../utils/animal-utils";
+  } from "$lib/utils/data-utils";
   import { ImageOff } from "@lucide/svelte";
+  import { convertFileSrc } from "@tauri-apps/api/core";
+  import ClosePopupButton from "$lib/components/ClosePopupButton/ClosePopupButton.svelte";
 
   // Props
   interface Props {
@@ -18,10 +20,12 @@ This file defines a reusable AnimalInfo component.
     animal: Animal;
     /** The adopter information (optional) */
     adoption_timestamp: number;
+    /** Callback function to close the popup */
+    onclose?: () => void;
   }
 
   /** Component props with default values */
-  const { animal, adoption_timestamp }: Props = $props();
+  const { animal, adoption_timestamp, onclose }: Props = $props();
 
   /** Helper to display neutered status as Yes/No */
   const getNeuteredText = (neutered: boolean) => (neutered ? "Yes" : "No");
@@ -40,10 +44,13 @@ This file defines a reusable AnimalInfo component.
 </script>
 
 <div class="animal-info-modal">
+  <div class="close-button-wrapper">
+    <ClosePopupButton onclick={onclose} />
+  </div>
   <div class="animal-profile-left">
     <div class="animal-image">
-      {#if animal?.image_path}
-        <img src={animal.image_path} alt="" />
+      {#if animal?.imagePath}
+        <img src={convertFileSrc(animal.imagePath)} alt="" />
       {:else}
         <div class="placeholder-image">
           <ImageOff size={48} />
@@ -66,8 +73,8 @@ This file defines a reusable AnimalInfo component.
       <div class="date-item">
         <div class="date-label">Admission Date</div>
         <div class="date-value">
-          {animal?.admission_timestamp
-            ? formatTimestamp(animal.admission_timestamp)
+          {animal?.admissionTimestamp
+            ? formatTimestamp(animal.admissionTimestamp)
             : "Unknown"}
         </div>
       </div>
@@ -93,8 +100,8 @@ This file defines a reusable AnimalInfo component.
         <div class="info-item">
           <div class="info-label">Birth Month/Year</div>
           <div class="info-value">
-            {animal
-              ? `${getBirthMonthYear(animal.birth_month, animal.birth_year)} (${calculateAge(animal.birth_year, animal.birth_month)})`
+            {animal && animal.birthYear != null && animal.birthMonth != null
+              ? `${getBirthMonthYear(animal.birthMonth, animal.birthYear)} (${calculateAge(animal.birthYear, animal.birthMonth)})`
               : "Unknown"}
           </div>
         </div>

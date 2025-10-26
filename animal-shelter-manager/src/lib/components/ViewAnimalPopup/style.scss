@@ -18,7 +18,7 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
 }
 
 .popup-content {
@@ -31,12 +31,7 @@
   flex-direction: column;
   position: relative;
 
-  .close-button-wrapper {
-    position: absolute;
-    top: 0px;
-    right: 0px;
-    z-index: 10;
-  }
+
 }
 
 .tab-container {

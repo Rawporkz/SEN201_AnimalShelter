@@ -15,10 +15,11 @@ use authentication_service::{
     AuthenticationService, CurrentUser,
 };
 use database_service::{
-    types::{AdoptionRequest, AdoptionRequestSummary, Animal, AnimalSummary},
+    types::{AdoptionRequest, Animal, AnimalSummary, FilterCriteria, FilterValue},
     DatabaseService,
 };
 use file_service::FileService;
+use std::collections::HashMap;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, State};
 use tokio::sync::Mutex;
@@ -115,15 +116,19 @@ async fn init_authentication_service_once(
 
 // ==================== ANIMAL TABLE COMMANDS ====================
 
-/// Command to retrieve all animals from the database
+/// Command to retrieve animals from the database, with optional filtering
+///
+/// # Arguments
+/// * `filters` - Optional map of filter criteria and values
 ///
 /// # Returns
 /// * `Ok(Vec<AnimalSummary>)` - List of animal summaries if successful
 /// * `Err(String)` - An error message if the query fails
 #[tauri::command]
-async fn get_all_animals(
+async fn get_animals(
     state: State<'_, Mutex<AppState>>,
     app_handle: AppHandle,
+    filters: Option<HashMap<FilterCriteria, Option<FilterValue>>>,
 ) -> Result<Vec<AnimalSummary>, String> {
     // Lock the state for safe concurrent access
     let mut state_guard = state.lock().await;
@@ -131,12 +136,12 @@ async fn get_all_animals(
     // Lazily initialize the database service
     init_database_service_once(&mut state_guard, &app_handle).await?;
 
-    // Query all animals
+    // Query animals with filters
     match state_guard
         .database_service
         .as_ref()
         .unwrap()
-        .query_all_animals()
+        .query_animals(filters)
     {
         Ok(animals) => Ok(animals),
         Err(e) => Err(format!("Failed to retrieve animals: {}", e)),
@@ -280,34 +285,6 @@ async fn delete_animal(
 
 // ==================== ADOPTION REQUEST TABLE COMMANDS ====================
 
-/// Command to retrieve all adoption requests from the database
-///
-/// # Returns
-/// * `Ok(Vec<AdoptionRequestSummary>)` - List of adoption request summaries if successful
-/// * `Err(String)` - An error message if the query fails
-#[tauri::command]
-async fn get_all_adoption_requests(
-    state: State<'_, Mutex<AppState>>,
-    app_handle: AppHandle,
-) -> Result<Vec<AdoptionRequestSummary>, String> {
-    // Lock the state for safe concurrent access
-    let mut state_guard = state.lock().await;
-
-    // Lazily initialize the database service
-    init_database_service_once(&mut state_guard, &app_handle).await?;
-
-    // Query all adoption requests
-    match state_guard
-        .database_service
-        .as_ref()
-        .unwrap()
-        .query_all_adoption_requests()
-    {
-        Ok(requests) => Ok(requests),
-        Err(e) => Err(format!("Failed to retrieve adoption requests: {}", e)),
-    }
-}
-
 /// Command to retrieve a specific adoption request by ID
 ///
 /// # Arguments
@@ -439,6 +416,76 @@ async fn delete_adoption_request(
         Err(e) => Err(format!(
             "Failed to delete adoption request with ID {}: {}",
             request_id, e
+        )),
+    }
+}
+
+/// Command to retrieve all adoption requests from the database for a specific animal ID
+///
+/// # Arguments
+/// * `animal_id` - The ID of the animal to retrieve requests for
+///
+/// # Returns
+/// * `Ok(Vec<AdoptionRequest>)` - List of adoption requests if successful
+/// * `Err(String)` - An error message if the query fails
+#[tauri::command]
+async fn get_adoption_requests_by_animal_id(
+    state: State<'_, Mutex<AppState>>,
+    app_handle: AppHandle,
+    animal_id: String,
+) -> Result<Vec<AdoptionRequest>, String> {
+    // Lock the state for safe concurrent access
+    let mut state_guard = state.lock().await;
+
+    // Lazily initialize the database service
+    init_database_service_once(&mut state_guard, &app_handle).await?;
+
+    // Query adoption requests by animal ID
+    match state_guard
+        .database_service
+        .as_ref()
+        .unwrap()
+        .query_adoption_requests_by_animal_id(&animal_id)
+    {
+        Ok(requests) => Ok(requests),
+        Err(e) => Err(format!(
+            "Failed to retrieve adoption requests for animal ID {}: {}",
+            animal_id, e
+        )),
+    }
+}
+
+/// Command to retrieve all adoption requests from the database for a specific user name
+///
+/// # Arguments
+/// * `username` - The user name to retrieve requests for
+///
+/// # Returns
+/// * `Ok(Vec<AdoptionRequest>)` - List of adoption requests if successful
+/// * `Err(String)` - An error message if the query fails
+#[tauri::command]
+async fn get_adoption_requests_by_username(
+    state: State<'_, Mutex<AppState>>,
+    app_handle: AppHandle,
+    username: String,
+) -> Result<Vec<AdoptionRequest>, String> {
+    // Lock the state for safe concurrent access
+    let mut state_guard = state.lock().await;
+
+    // Lazily initialize the database service
+    init_database_service_once(&mut state_guard, &app_handle).await?;
+
+    // Query adoption requests by user name
+    match state_guard
+        .database_service
+        .as_ref()
+        .unwrap()
+        .query_adoption_requests_by_username(&username)
+    {
+        Ok(requests) => Ok(requests),
+        Err(e) => Err(format!(
+            "Failed to retrieve adoption requests for user name {}: {}",
+            username, e
         )),
     }
 }
@@ -641,14 +688,15 @@ pub fn run() {
             get_current_user,
             log_out,
             // Animal commands
-            get_all_animals,
+            get_animals,
             get_animal_by_id,
             create_animal,
             update_animal,
             delete_animal,
             // Adoption request commands
-            get_all_adoption_requests,
             get_adoption_request_by_id,
+            get_adoption_requests_by_animal_id,
+            get_adoption_requests_by_username,
             create_adoption_request,
             update_adoption_request,
             delete_adoption_request,
