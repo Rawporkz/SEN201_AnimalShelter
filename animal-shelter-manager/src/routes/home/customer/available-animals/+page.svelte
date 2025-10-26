@@ -196,7 +196,7 @@ This page displays available animals to customers.
     <div class="animals-list">
       {#if filteredAnimals.length > 0}
         {#each filteredAnimals as animal (animal.id)}
-          <AnimalInfoRow animalSummary={animal} showStatus={false}>
+          <AnimalInfoRow animalSummary={animal}>
             {#snippet actions()}
               <ActionButton
                 label="View"

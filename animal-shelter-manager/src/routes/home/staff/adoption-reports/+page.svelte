@@ -6,7 +6,7 @@ This page displays all adoption reports for staff members to review.
 
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { info, error } from "@tauri-apps/plugin-log";
+  import { error } from "@tauri-apps/plugin-log";
   import SideBar from "$lib/components/SideBar/SideBar.svelte";
   import { logoutUser } from "$lib/utils/authentication-utils";
   import type { PageData } from "./$types";
@@ -118,7 +118,6 @@ This page displays all adoption reports for staff members to review.
   async function handleFilterClose(
     filterSelections: FilterSelections,
   ): Promise<void> {
-    info("Filter selections:" + filterSelections);
     filterSelections = filterSelections;
     isFilterModalOpen = false;
 

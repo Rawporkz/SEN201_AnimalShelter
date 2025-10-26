@@ -26,6 +26,9 @@ This page displays the user's adoption requests.
   import NothingToShowIcon from "$lib/components/NothingToShowIcon/NothingToShowIcon.svelte";
   import { navigationMap } from "../navigation-utils";
   import { type MyAdoptionRequest } from "./my-adoption-request-utils";
+  import ExpandableStatus from "$lib/components/ExpandableStatus/ExpandableStatus.svelte";
+  import { getRequestStatusDisplayText } from "$lib/utils/data-utils";
+  import { getRequestStatusColor } from "./status-utils";
 
   // Props
   interface Props {
@@ -173,7 +176,13 @@ This page displays the user's adoption requests.
     <div class="animals-list">
       {#if filteredRequests.length > 0}
         {#each filteredRequests as { animal, request } (request.id)}
-          <AnimalInfoRow animalSummary={animal} showStatus={false}>
+          <AnimalInfoRow animalSummary={animal}>
+            {#snippet status()}
+              <ExpandableStatus
+                text={getRequestStatusDisplayText(request.status)}
+                color={getRequestStatusColor(request.status)}
+              />
+            {/snippet}
             {#snippet actions()}
               <ActionButton
                 label="View"
@@ -181,12 +190,14 @@ This page displays the user's adoption requests.
                 width="155px"
                 onclick={() => handleViewAnimal(animal)}
               />
-              <ActionButton
-                label="Revoke"
-                icon={X}
-                width="155px"
-                onclick={() => handleRevokeRequest(request)}
-              />
+              {#if request.status === "pending"}
+                <ActionButton
+                  label="Revoke"
+                  icon={X}
+                  width="155px"
+                  onclick={() => handleRevokeRequest(request)}
+                />
+              {/if}
             {/snippet}
           </AnimalInfoRow>
         {/each}

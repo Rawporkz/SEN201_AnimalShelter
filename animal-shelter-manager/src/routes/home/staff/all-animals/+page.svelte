@@ -21,6 +21,7 @@ This page displays all animals in the shelter system for staff members.
     type FilterSelections,
   } from "$lib/utils/filter-utils";
   import {
+    getStatusDisplayText,
     type AnimalSummary,
     type Animal,
     type AdoptionRequest,
@@ -31,6 +32,8 @@ This page displays all animals in the shelter system for staff members.
   import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
   import NothingToShowIcon from "$lib/components/NothingToShowIcon/NothingToShowIcon.svelte";
   import { navigationMap } from "../navigation-utils";
+  import ExpandableStatus from "$lib/components/ExpandableStatus/ExpandableStatus.svelte";
+  import { getStatusColor } from "./status-utils";
 
   // Props
   interface Props {
@@ -115,7 +118,7 @@ This page displays all animals in the shelter system for staff members.
     selections: FilterSelections,
   ): Promise<void> {
     filterSelections = selections;
-    info("Filter selections:" + filterSelections);
+    info(`Applied filters: ${JSON.stringify(selections)}`);
     isFilterModalOpen = false;
     displayedAnimals = await getAnimals(filterSelections);
   }
@@ -233,15 +236,21 @@ This page displays all animals in the shelter system for staff members.
     <div class="animals-list">
       {#if filteredAnimals.length > 0}
         {#each filteredAnimals as animal (animal.id)}
-          <AnimalInfoRow animalSummary={animal} showStatus={true}>
+          <AnimalInfoRow animalSummary={animal}>
+            {#snippet status()}
+              <ExpandableStatus
+                text={getStatusDisplayText(animal.status)}
+                color={getStatusColor(animal.status)}
+              />
+            {/snippet}
             {#snippet actions()}
+              <ActionButton
+                label="View"
+                icon={Eye}
+                width="155px"
+                onclick={() => handleViewAnimal(animal)}
+              />
               {#if animal.status === "available"}
-                <ActionButton
-                  label="View"
-                  icon={Eye}
-                  width="155px"
-                  onclick={() => handleViewAnimal(animal)}
-                />
                 <ActionButton
                   label="Edit"
                   icon={Pencil}
@@ -250,23 +259,10 @@ This page displays all animals in the shelter system for staff members.
                 />
               {:else if animal.status === "requested"}
                 <ActionButton
-                  label="View"
-                  icon={Eye}
-                  width="155px"
-                  onclick={() => handleViewAnimal(animal)}
-                />
-                <ActionButton
                   label="Handle"
                   icon={ClipboardList}
                   width="155px"
                   onclick={() => handleHandleRequest(animal.id)}
-                />
-              {:else if animal.status === "adopted"}
-                <ActionButton
-                  label="View"
-                  icon={Eye}
-                  width="155px"
-                  onclick={() => handleViewAnimal(animal)}
                 />
               {/if}
             {/snippet}

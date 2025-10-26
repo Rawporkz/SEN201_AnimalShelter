@@ -461,3 +461,22 @@ export function getStatusDisplayText(status: AnimalStatus): string {
       return "Unknown";
   }
 }
+
+/**
+ * Gets the display text for a request status.
+ *
+ * @param status - The request status
+ * @returns string - Human-readable status text
+ */
+export function getRequestStatusDisplayText(status: RequestStatus): string {
+  switch (status) {
+    case RequestStatus.PENDING:
+      return "Pending";
+    case RequestStatus.REJECTED:
+      return "Rejected";
+    case RequestStatus.APPROVED:
+      return "Approved";
+    default:
+      return "Unknown";
+  }
+}
