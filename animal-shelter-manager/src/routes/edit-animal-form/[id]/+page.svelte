@@ -27,6 +27,9 @@ Allows staff to edit existing animals in the shelter system.
     deleteAnimal,
     type Animal,
     AnimalStatus,
+    getAdoptionRequestsByAnimalId,
+    RequestStatus,
+    updateAdoptionRequest,
   } from "$lib/utils/data-utils";
   import { info, error } from "@tauri-apps/plugin-log";
 
@@ -299,14 +302,22 @@ Allows staff to edit existing animals in the shelter system.
    */
   async function confirmDelete(): Promise<void> {
     if (deleteReason === "passed-away") {
-      const updatedAnimal: Animal = {
-        ...animal,
-        status: AnimalStatus.PASSED_AWAY,
-      };
-      await updateAnimal(updatedAnimal);
+      // Update the animal status to PASSED_AWAY
+      animal.status = AnimalStatus.PASSED_AWAY;
+      await updateAnimal(animal);
     } else {
-      await deleteAnimal(animal.id);
+      // Delete the animal record
+      await deleteAnimal(animal);
     }
+
+    // Reject all requests associated with the animal
+    let requests = await getAdoptionRequestsByAnimalId(animal.id);
+    for (const request of requests) {
+      request.status = RequestStatus.REJECTED;
+      await updateAdoptionRequest(request);
+    }
+
+    // Navigate back
     goto("/");
   }
 

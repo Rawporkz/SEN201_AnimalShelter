@@ -9,16 +9,16 @@
 export enum FilterCriteria {
   STATUS = "status",
   SEX = "sex",
-  SPECIES_AND_BREEDS = "species_and_breeds",
-  ADMISSION_DATE = "admission_date",
-  ADOPTION_DATE = "adoption_date",
+  SPECIES_AND_BREEDS = "species-and-breeds",
+  ADMISSION_DATE = "admission-date",
+  ADOPTION_DATE = "adoption-date",
 }
 
 /** Types of filter components available */
 export enum FilterType {
-  CHOOSE_ONE = "choose_one",
-  CHOOSE_MANY = "choose_many",
-  NESTED_CHOOSE_MANY = "nested_choose_many",
+  CHOOSE_ONE = "choose-one",
+  CHOOSE_MANY = "choose-many",
+  NESTED_CHOOSE_MANY = "nested-choose-many",
 }
 
 /** Configuration for each filter criteria */

@@ -25,7 +25,14 @@ This page displays all adoption requests for staff members to review and manage.
     type AdoptionRequest,
     getAnimalById,
   } from "$lib/utils/data-utils";
-  import { Funnel, Eye, FileCheck, CheckIcon, X } from "@lucide/svelte";
+  import {
+    Funnel,
+    Eye,
+    FileCheck,
+    CheckIcon,
+    X,
+    TriangleAlert,
+  } from "@lucide/svelte";
   import ActionButton from "$lib/components/ActionButton/ActionButton.svelte";
   import { navigationMap } from "../navigation-utils";
   import {
@@ -94,6 +101,12 @@ This page displays all adoption requests for staff members to review and manage.
   let selectedAdopter: AdoptionRequest | null = $state(null);
   /** Controls the visibility of the sign-out confirmation modal. */
   let isSignOutModalOpen = $state(false);
+  /** Controls the visibility of the approve confirmation modal. */
+  let isApproveModalOpen = $state(false);
+  /** Controls the visibility of the reject confirmation modal. */
+  let isRejectModalOpen = $state(false);
+  /** The adoption request to be handled (approved or rejected). */
+  let requestToHandle: AdoptionRequest | null = $state(null);
 
   /** List of filter criteria to display in the filter modal. */
   const filterCriteria = [
@@ -156,6 +169,68 @@ This page displays all adoption requests for staff members to review and manage.
     isViewModalOpen = false;
     selectedAnimal = null;
     selectedAdopter = null;
+  }
+
+  /**
+   * Opens the approve confirmation modal for the given request.
+   * @param request - The adoption request to approve.
+   */
+  function handleApproveRequest(request: AdoptionRequest): void {
+    requestToHandle = request;
+    isApproveModalOpen = true;
+  }
+
+  /**
+   * Opens the reject confirmation modal for the given request.
+   * @param request - The adoption request to reject.
+   */
+  function handleRejectRequest(request: AdoptionRequest): void {
+    requestToHandle = request;
+    isRejectModalOpen = true;
+  }
+
+  /**
+   * Confirms and executes the approval of an adoption request.
+   */
+  async function confirmApproveRequest(): Promise<void> {
+    if (!requestToHandle) return;
+    const animalId = requestToHandle.animalId;
+    try {
+      info(`Approving request ID: ${requestToHandle.id}`);
+      await approveRequest(requestToHandle);
+
+      // Remove the approved request and all other requests for the same animal from the displayed list
+      displayedRequests = displayedRequests.filter(
+        (r) => r.animal.id !== animalId,
+      );
+    } catch (e) {
+      error(`Failed to approve request: ${e}`);
+    } finally {
+      requestToHandle = null;
+      isApproveModalOpen = false;
+    }
+  }
+
+  /**
+   * Confirms and executes the rejection of an adoption request.
+   */
+  async function confirmRejectRequest(): Promise<void> {
+    if (!requestToHandle) return;
+    const requestId = requestToHandle.id;
+    try {
+      info(`Rejecting request ID: ${requestToHandle.id}`);
+      await rejectRequest(requestToHandle);
+
+      // Remove the rejected request from the displayed list
+      displayedRequests = displayedRequests.filter(
+        (r) => r.request.id !== requestId,
+      );
+    } catch (e) {
+      error(`Failed to reject request: ${e}`);
+    } finally {
+      requestToHandle = null;
+      isRejectModalOpen = false;
+    }
   }
 
   /** Derived store of adoption requests filtered based on search query. */
@@ -225,18 +300,12 @@ This page displays all adoption requests for staff members to review and manage.
                   {
                     label: "Approve",
                     icon: CheckIcon,
-                    onclick: async () => {
-                      info(`Approving request ID: ${request.id}`);
-                      await approveRequest(request);
-                    },
+                    onclick: () => handleApproveRequest(request),
                   },
                   {
                     label: "Reject",
                     icon: X,
-                    onclick: async () => {
-                      info(`Rejecting request ID: ${request.id}`);
-                      await rejectRequest(request);
-                    },
+                    onclick: () => handleRejectRequest(request),
                   },
                 ]}
               />
@@ -274,6 +343,32 @@ This page displays all adoption requests for staff members to review and manage.
   cancelText="Cancel"
   destructive={true}
   onconfirm={confirmSignOut}
+/>
+
+<ConfirmationModal
+  bind:open={isApproveModalOpen}
+  title="Approving a Request"
+  message={`Are you sure you want to approve this adoption request by ${requestToHandle?.name}?`}
+  confirmText="Approve"
+  cancelText="Cancel"
+  onconfirm={confirmApproveRequest}
+>
+  {#snippet extra()}
+    <div class="warning-box">
+      <TriangleAlert size={50} />
+      <span>This will reject all other requests for this animal.</span>
+    </div>
+  {/snippet}
+</ConfirmationModal>
+
+<ConfirmationModal
+  bind:open={isRejectModalOpen}
+  title="Confirm Rejection"
+  message="Are you sure you want to reject this adoption request?"
+  confirmText="Reject"
+  cancelText="Cancel"
+  destructive={true}
+  onconfirm={confirmRejectRequest}
 />
 
 <style lang="scss">

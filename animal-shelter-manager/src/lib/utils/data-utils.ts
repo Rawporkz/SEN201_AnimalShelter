@@ -224,14 +224,27 @@ export async function updateAnimal(animal: Animal): Promise<boolean> {
 /**
  * Deletes an animal from the database.
  *
- * @param animalId - The ID of the animal to delete
+ * @param animal - The animal data to delete
  * @returns Promise<boolean> - True if animal was found and deleted, false if not found. Returns false if the operation fails.
  */
-export async function deleteAnimal(animalId: string): Promise<boolean> {
+export async function deleteAnimal(
+  animal: AnimalSummary | Animal,
+): Promise<boolean> {
   try {
-    return await invoke<boolean>("delete_animal", { animalId });
+    const animalId = animal.id;
+
+    // Delete animal from database
+    const deleteStatus = await invoke<boolean>("delete_animal", { animalId });
+
+    // Remove file associated with the animal if the deletion was successful
+    if (deleteStatus) {
+      await invoke<boolean>("delete_animal", { animalId });
+      return true;
+    }
+
+    return false;
   } catch (e) {
-    error(`Failed to delete animal with ID ${animalId}: ${e}`);
+    error(`Failed to delete animal with ID ${animal.id}: ${e}`);
     return false;
   }
 }

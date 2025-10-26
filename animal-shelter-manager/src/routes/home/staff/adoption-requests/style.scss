@@ -52,11 +52,20 @@
   border-bottom: 1px solid colors.$grey-border;
 }
 
-
-
 .requests-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
+.warning-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: color.adjust(colors.$yellow-vibrant, $lightness: +50%);
+  color: black;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  border: 1px solid colors.$yellow-vibrant;
+}

@@ -165,8 +165,8 @@ pub struct AdoptionRequest {
 /// Represents the criteria available for filtering animals.
 /// This enum is designed to be sent from the TypeScript frontend.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize, Display, EnumString)]
-#[strum(serialize_all = "snake_case")]
-#[serde(rename_all = "snake_case")]
+#[strum(serialize_all = "kebab-case")]
+#[serde(rename_all = "kebab-case")]
 pub enum FilterCriteria {
     Status,
     Sex,

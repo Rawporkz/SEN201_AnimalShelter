@@ -11,7 +11,11 @@ import {
 } from "$lib/utils/authentication-utils";
 import type { PageLoad } from "./$types";
 import { error } from "@tauri-apps/plugin-log";
-import { getAnimals, AnimalStatus } from "$lib/utils/data-utils";
+import {
+  getAnimals,
+  AnimalStatus,
+  getAdoptionRequestsByUsername,
+} from "$lib/utils/data-utils";
 
 /**
  * Loads the necessary data for the available animals page.
@@ -29,12 +33,20 @@ export const load: PageLoad = async () => {
       return;
     }
 
+    // Fetch animals that are either AVAILABLE or REQUESTED
+    let animals = await getAnimals({
+      status: [AnimalStatus.AVAILABLE, AnimalStatus.REQUESTED],
+    });
+
+    // Fetch animals already requested by the current user to filter them out
+    const requestedAnimals = await getAdoptionRequestsByUsername(
+      currentUser.username,
+    ).then((requests) => requests.map((req) => req.animalId));
+    animals = animals.filter((animal) => !requestedAnimals.includes(animal.id));
+
     return {
       currentUser,
-      /** The list of available and requested animals. */
-      animals: await getAnimals({
-        status: [AnimalStatus.AVAILABLE, AnimalStatus.REQUESTED],
-      }),
+      animals,
     };
   } catch (e) {
     // Authentication check failed, redirect to authentication

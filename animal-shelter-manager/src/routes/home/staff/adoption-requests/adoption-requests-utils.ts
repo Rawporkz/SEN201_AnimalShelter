@@ -16,7 +16,7 @@ import {
   Animal,
   updateAnimal,
 } from "$lib/utils/data-utils";
-import { error } from "@tauri-apps/plugin-log";
+import { info, error } from "@tauri-apps/plugin-log";
 import { FilterSelections } from "$lib/utils/filter-utils";
 
 /** Structure for adoption requests, combining animal summary and the pending adoption requests. */
@@ -93,6 +93,7 @@ export async function getAdoptionRequests(
       }
     }
 
+    info(`${JSON.stringify(animalAdoptionRequests)}`);
     return animalAdoptionRequests;
   } catch (e) {
     error(`Error fetching adoption requests: ${e}`);
