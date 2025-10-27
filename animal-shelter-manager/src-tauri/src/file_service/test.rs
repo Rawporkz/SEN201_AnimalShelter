@@ -99,4 +99,3 @@ mod file_service_tests {
         fs::remove_dir(&outside_dir).expect("Failed to clean up outside directory");
     }
 }
-

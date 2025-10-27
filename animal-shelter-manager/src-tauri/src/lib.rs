@@ -50,7 +50,7 @@ async fn init_file_service_once(
         // Initialize FileService with application app data directory
         let app_data_dir = app_handle
             .path()
-            .app_local_data_dir()
+            .app_data_dir()
             .map_err(|e| e.to_string())?;
         match FileService::new(app_data_dir) {
             Ok(service) => state.file_service = Some(service),
@@ -75,7 +75,7 @@ async fn init_database_service_once(
         // Initialize DatabaseService with application app data directory
         let app_data_dir = app_handle
             .path()
-            .app_local_data_dir()
+            .app_data_dir()
             .map_err(|e| e.to_string())?;
         let db_path = app_data_dir.join("animal_shelter.db");
 
@@ -102,7 +102,7 @@ async fn init_authentication_service_once(
         // Initialize AuthenticationService with its own database in app data directory
         let app_data_dir = app_handle
             .path()
-            .app_local_data_dir()
+            .app_data_dir()
             .map_err(|e| e.to_string())?;
         let auth_db_path = app_data_dir.join("authentication.db");
 
@@ -677,6 +677,7 @@ async fn delete_file(
 /// Runs the Tauri application
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_log::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
