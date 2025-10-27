@@ -13,22 +13,22 @@ export type AnimalStatus =
   | "passed-away";
 
 /** Animal sex options for biological classification */
-export type AnimalSex = "male" | "female";
+export type AnimalSex = "Male" | "Female";
 
 /** Animal species supported by the shelter system */
 export type AnimalSpecies =
-  | "dog"
-  | "cat"
-  | "rabbit"
-  | "bird"
-  | "hamster"
-  | "guinea pig"
-  | "ferret"
-  | "reptile"
-  | "fish"
-  | "horse"
-  | "goat"
-  | "pig";
+  | "Dog"
+  | "Cat"
+  | "Rabbit"
+  | "Bird"
+  | "Hamster"
+  | "Guinea pig"
+  | "Ferret"
+  | "Reptile"
+  | "Fish"
+  | "Horse"
+  | "Goat"
+  | "Pig";
 
 /** Neutered status options for spay/neuter tracking */
 export type NeuteredStatus = "yes" | "no";
@@ -49,8 +49,8 @@ export const ANIMAL_SEX_OPTIONS: Array<{
   value: AnimalSex;
   label: string;
 }> = [
-  { value: "male", label: "Male" },
-  { value: "female", label: "Female" },
+  { value: "Male", label: "Male" },
+  { value: "Female", label: "Female" },
 ];
 
 /** Available animal species options with display labels */
@@ -58,18 +58,18 @@ export const ANIMAL_SPECIES_OPTIONS: Array<{
   value: AnimalSpecies;
   label: string;
 }> = [
-  { value: "dog", label: "Dog" },
-  { value: "cat", label: "Cat" },
-  { value: "rabbit", label: "Rabbit" },
-  { value: "bird", label: "Bird" },
-  { value: "hamster", label: "Hamster" },
-  { value: "guinea pig", label: "Guinea Pig" },
-  { value: "ferret", label: "Ferret" },
-  { value: "reptile", label: "Reptile" },
-  { value: "fish", label: "Fish" },
-  { value: "horse", label: "Horse" },
-  { value: "goat", label: "Goat" },
-  { value: "pig", label: "Pig" },
+  { value: "Dog", label: "Dog" },
+  { value: "Cat", label: "Cat" },
+  { value: "Rabbit", label: "Rabbit" },
+  { value: "Bird", label: "Bird" },
+  { value: "Hamster", label: "Hamster" },
+  { value: "Guinea pig", label: "Guinea Pig" },
+  { value: "Ferret", label: "Ferret" },
+  { value: "Reptile", label: "Reptile" },
+  { value: "Fish", label: "Fish" },
+  { value: "Horse", label: "Horse" },
+  { value: "Goat", label: "Goat" },
+  { value: "Pig", label: "Pig" },
 ];
 
 /** Available neutered status options with display labels */
@@ -95,7 +95,7 @@ export const DATE_RANGE_FILTER_OPTIONS: Array<{
 
 /** Comprehensive breed options organized by species */
 export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
-  dog: [
+  Dog: [
     "Labrador Retriever",
     "Golden Retriever",
     "German Shepherd",
@@ -107,7 +107,7 @@ export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
     "Dachshund",
     "Siberian Husky",
   ],
-  cat: [
+  Cat: [
     "Domestic Shorthair",
     "Domestic Longhair",
     "Persian",
@@ -119,7 +119,7 @@ export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
     "Russian Blue",
     "Bengal",
   ],
-  rabbit: [
+  Rabbit: [
     "Holland Lop",
     "Mini Lop",
     "Netherland Dwarf",
@@ -129,7 +129,7 @@ export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
     "Angora",
     "Dutch",
   ],
-  bird: [
+  Bird: [
     "Budgerigar",
     "Cockatiel",
     "Canary",
@@ -140,7 +140,7 @@ export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
     "Macaw",
     "Finch",
   ],
-  hamster: [
+  Hamster: [
     "Syrian",
     "Dwarf Campbell's",
     "Dwarf Winter White",
@@ -148,7 +148,7 @@ export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
     "Chinese",
     "European",
   ],
-  "guinea pig": [
+  "Guinea pig": [
     "American",
     "Peruvian",
     "Abyssinian",
@@ -157,7 +157,7 @@ export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
     "Coronet",
     "Skinny Pig",
   ],
-  ferret: [
+  Ferret: [
     "Domestic Ferret",
     "Albino",
     "Sable",
@@ -165,7 +165,7 @@ export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
     "Cinnamon",
     "Chocolate",
   ],
-  reptile: [
+  Reptile: [
     "Ball Python",
     "Bearded Dragon",
     "Leopard Gecko",
@@ -175,7 +175,7 @@ export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
     "Iguana",
     "Chameleon",
   ],
-  fish: [
+  Fish: [
     "Goldfish",
     "Betta",
     "Guppy",
@@ -186,7 +186,7 @@ export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
     "Barb",
     "Cichlid",
   ],
-  horse: [
+  Horse: [
     "Quarter Horse",
     "Thoroughbred",
     "Arabian",
@@ -196,7 +196,7 @@ export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
     "Mustang",
     "Clydesdale",
   ],
-  goat: [
+  Goat: [
     "Nigerian Dwarf",
     "Boer",
     "Nubian",
@@ -205,7 +205,7 @@ export const ANIMAL_BREED_OPTIONS: Record<AnimalSpecies, string[]> = {
     "Saanen",
     "LaMancha",
   ],
-  pig: [
+  Pig: [
     "Pot-bellied Pig",
     "Mini Pig",
     "Kunekune",

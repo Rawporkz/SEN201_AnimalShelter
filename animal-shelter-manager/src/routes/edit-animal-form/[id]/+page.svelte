@@ -6,7 +6,7 @@ Allows staff to edit existing animals in the shelter system.
 -->
 
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import { X, ImagePlus, Save, Trash2 } from "@lucide/svelte";
   import { goto } from "$app/navigation";
   import { convertFileSrc } from "@tauri-apps/api/core";
@@ -97,12 +97,17 @@ Allows staff to edit existing animals in the shelter system.
   /** Whether the delete confirmation modal is open. */
   let isDeleteModalOpen: boolean = $state(false);
 
-  onMount(() => {
+  onMount(async () => {
     if (animal) {
       animalName = animal.name;
       selectedMonth = monthOptions[animal.birthMonth || 0];
       selectedYear = animal.birthYear?.toString() || "Unknown";
-      selectedSpecies = animal.specie;
+      selectedSpecies =
+        ANIMAL_SPECIES_OPTIONS.find((option) => option.value === animal.specie)
+          ?.label || "";
+
+      await tick();
+
       selectedBreed = animal.breed;
       selectedSex = animal.sex;
       selectedNeuteredStatus = animal.neutered ? "Yes" : "No";
