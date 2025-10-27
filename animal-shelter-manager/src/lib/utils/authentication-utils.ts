@@ -62,24 +62,69 @@ export interface UserCredentials {
  * Validates if a username is in valid format.
  *
  * @param username - The username to validate
- * @returns boolean - True if username is valid format, false otherwise
+ * @returns ValidationResult - An object with `isValid` and `errorMessage`
  */
-export function validateUsername(username: string): boolean {
-  /** Username must not be empty and have at least 3 characters */
+export function validateUsername(username: string): ValidationResult {
   const trimmedUsername: string = username.trim();
-  return trimmedUsername.length >= 3;
+  if (trimmedUsername.length < 3) {
+    return {
+      isValid: false,
+      errorMessage: "Username must be at least 3 characters long.",
+    };
+  }
+  if (!/^[a-zA-Z0-9]+$/.test(trimmedUsername)) {
+    return {
+      isValid: false,
+      errorMessage: "Username can only contain alphanumeric characters.",
+    };
+  }
+  return {
+    isValid: true,
+    errorMessage: "",
+  };
 }
 
 /**
  * Validates if a password meets the minimum requirements.
  *
  * @param password - The password to validate
- * @returns boolean - True if password meets requirements, false otherwise
+ * @returns ValidationResult - An object with `isValid` and `errorMessage`
  */
-export function validatePassword(password: string): boolean {
-  /** Password must be at least 6 characters long */
-  const minLength: number = 6;
-  return password.length >= minLength;
+export function validatePassword(password: string): ValidationResult {
+  if (password.length < 8) {
+    return {
+      isValid: false,
+      errorMessage: "Password must be at least 8 characters long.",
+    };
+  }
+  if (!/\d/.test(password)) {
+    return {
+      isValid: false,
+      errorMessage: "Password must contain at least one number.",
+    };
+  }
+  if (!/[a-z]/.test(password)) {
+    return {
+      isValid: false,
+      errorMessage: "Password must contain at least one lowercase letter.",
+    };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return {
+      isValid: false,
+      errorMessage: "Password must contain at least one uppercase letter.",
+    };
+  }
+  if (!/[^a-zA-Z0-9]/.test(password)) {
+    return {
+      isValid: false,
+      errorMessage: "Password must contain at least one special character.",
+    };
+  }
+  return {
+    isValid: true,
+    errorMessage: "",
+  };
 }
 
 /**
@@ -92,19 +137,15 @@ export function validateCredentials(
   credentials: UserCredentials,
 ): ValidationResult {
   // Check username format
-  if (!validateUsername(credentials.username)) {
-    return {
-      isValid: false,
-      errorMessage: "Username must be at least 3 characters long.",
-    };
+  const usernameValidation = validateUsername(credentials.username);
+  if (!usernameValidation.isValid) {
+    return usernameValidation;
   }
 
   // Check password format
-  if (!validatePassword(credentials.password)) {
-    return {
-      isValid: false,
-      errorMessage: "Password must be at least 6 characters long.",
-    };
+  const passwordValidation = validatePassword(credentials.password);
+  if (!passwordValidation.isValid) {
+    return passwordValidation;
   }
 
   // Check role validity
