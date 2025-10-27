@@ -50,7 +50,7 @@ async fn init_file_service_once(
         // Initialize FileService with application app data directory
         let app_data_dir = app_handle
             .path()
-            .app_data_dir()
+            .app_local_data_dir()
             .map_err(|e| e.to_string())?;
         match FileService::new(app_data_dir) {
             Ok(service) => state.file_service = Some(service),
@@ -75,7 +75,7 @@ async fn init_database_service_once(
         // Initialize DatabaseService with application app data directory
         let app_data_dir = app_handle
             .path()
-            .app_data_dir()
+            .app_local_data_dir()
             .map_err(|e| e.to_string())?;
         let db_path = app_data_dir.join("animal_shelter.db");
 
@@ -102,7 +102,7 @@ async fn init_authentication_service_once(
         // Initialize AuthenticationService with its own database in app data directory
         let app_data_dir = app_handle
             .path()
-            .app_data_dir()
+            .app_local_data_dir()
             .map_err(|e| e.to_string())?;
         let auth_db_path = app_data_dir.join("authentication.db");
 

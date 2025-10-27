@@ -7,6 +7,7 @@
 
 import { invoke } from "@tauri-apps/api/core";
 import { error } from "@tauri-apps/plugin-log";
+import { type FilterSelections } from "$lib/utils/filter-utils";
 
 // ==================== ENUMS ====================
 
@@ -117,8 +118,6 @@ export interface AdoptionRequest {
   /** Country of the requester */
   country: string;
 }
-
-import type { FilterSelections } from "$lib/utils/filter-utils";
 
 // ==================== ANIMAL FUNCTIONS ====================
 
