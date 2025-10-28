@@ -15,8 +15,8 @@
         "title": "Animal Shelter Manager",
         "width": 1280,
         "height": 900,
-        "minWidth": 1280,
-        "minHeight": 900,
+        "minWidth": 1080,
+        "minHeight": 800,
         "resizable": true
       }
     ],
@@ -24,9 +24,7 @@
       "csp": "default-src 'self' ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost",
       "assetProtocol": {
         "enable": true,
-        "scope": [
-          "$APPDATA/**"
-        ]
+        "scope": ["$APPDATA/**"]
       }
     }
   },
