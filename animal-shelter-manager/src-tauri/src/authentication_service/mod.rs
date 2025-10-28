@@ -42,10 +42,24 @@ impl AuthenticationService {
     /// * `Result<AuthenticationService>` - New authentication service instance or error
     pub fn new<P: AsRef<Path>>(db_path: P) -> Result<Self> {
         // Create database connection
-        let connection = Connection::open(db_path.as_ref()).context(format!(
-            "Failed to open authentication database at path: {:?}",
-            db_path.as_ref()
-        ))?;
+        // let connection = Connection::open(db_path.as_ref()).context(format!(
+        //     "Failed to open authentication database at path: {:?}",
+        //     db_path.as_ref()
+        // ))?;
+        let connection = match Connection::open(db_path.as_ref()) {
+            Ok(conn) => conn,
+            Err(e) => {
+                log::error!(
+                    "Error opening authentication database at path {:?}: {}",
+                    db_path.as_ref(),
+                    e
+                );
+                bail!(
+                    "Failed to open authentication database at path: {:?}",
+                    db_path.as_ref(),
+                );
+            }
+        };
 
         // Create service instance
         let service = AuthenticationService {
