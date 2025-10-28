@@ -22,7 +22,7 @@ use file_service::FileService;
 use std::collections::HashMap;
 use std::path::PathBuf;
 use tauri::{AppHandle, Manager, State};
-use tokio::sync::Mutex;
+use tokio::{fs, sync::Mutex};
 
 /// Global state of the app
 #[derive(Default)]
@@ -105,6 +105,15 @@ async fn init_authentication_service_once(
             .app_data_dir()
             .map_err(|e| e.to_string())?;
         let auth_db_path = app_data_dir.join("authentication.db");
+
+        // test creating a file in app_data_dir
+        let test_file_path = app_data_dir.join("test_file.txt");
+        if let Err(e) = fs::File::create(&test_file_path).await {
+            return Err(format!(
+                "Failed to create test file in app data directory: {}",
+                e
+            ));
+        }
 
         match AuthenticationService::new(auth_db_path) {
             Ok(service) => state.authentication_service = Some(service),
