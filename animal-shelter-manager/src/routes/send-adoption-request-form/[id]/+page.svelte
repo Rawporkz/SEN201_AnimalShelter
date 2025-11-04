@@ -138,7 +138,7 @@ This file defines the page for sending an adoption request for a specific animal
       isApplicantEmailInvalid = true;
       isValid = false;
     }
-    if (!applicantTelNumber.trim()) {
+    if (!applicantTelNumber.trim() || !/^[0-9]+$/.test(applicantTelNumber.trim())) {
       isApplicantTelNumberInvalid = true;
       isValid = false;
     }
