@@ -7,9 +7,6 @@
 @use "../../lib/styles/colors.scss" as colors;
 @use "sass:color";
 
-// Height for input fields and buttons
-$field-height: 56px;
-
 .container {
   min-height: 100vh;
   background: colors.$blue-main;
@@ -62,7 +59,7 @@ $field-height: 56px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   align-items: stretch;
-  height: $field-height;
+  height: 56px;
   background: white;
   border: 2px solid colors.$blue-main;
   border-radius: 20px;
@@ -105,7 +102,7 @@ $field-height: 56px;
 }
 
 .auth-form-field-input {
-  height: $field-height;
+  height: 56px;
   padding: 0 16px;
   border: 1px solid colors.$grey-border;
   border-radius: 20px;

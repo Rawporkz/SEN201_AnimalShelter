@@ -1,0 +1,159 @@
+//
+// FormDropdownButton/style.scss
+//
+// Styles for FormDropdownButton component with form-themed styling.
+//
+
+@use "../../styles/colors.scss" as colors;
+@use "sass:color" as color;
+
+.dropdown-container {
+  display: inline-block;
+  margin: 10px;
+}
+
+.dropdown-label {
+  font-style: normal;
+  display: block;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: colors.$grey-border;
+  margin-bottom: 5px;
+}
+
+.dropdown {
+  position: relative;
+  width: 100%;
+
+  &.disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+.dropdown.disabled .dropdown-button {
+  background-color: colors.$grey-light;
+  border: 2px solid colors.$grey-light;
+  border-radius: 10px;
+  color: colors.$grey-border;
+}
+
+.dropdown-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px;
+  border: 2px solid colors.$grey-light;
+  border-radius: 10px;
+  background-color: white;
+  font-size: 14px;
+  color: colors.$grey-text;
+  cursor: pointer;
+  box-sizing: border-box;
+
+  &.active {
+    border-radius: 10px 10px 0 0;
+    border-bottom: 2px solid colors.$grey-light;
+  }
+
+  &.chosen {
+    border-color: colors.$blue-main;
+    color: black;
+  }
+
+  &.error-border {
+    border-color: colors.$red-vibrant;
+  }
+
+  &:disabled {
+    background-color: colors.$grey-light;
+    border-color: colors.$grey-light;
+    color: colors.$grey-border;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .button-text {
+    flex: 1;
+    text-align: left;
+  }
+
+  .chevron {
+    flex-shrink: 0;
+    transition: transform 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.rotated {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.dropdown-options-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  width: 100%;
+  background-color: white;
+  border-left: 2px solid colors.$grey-light;
+  border-right: 2px solid colors.$grey-light;
+  border-bottom: 2px solid colors.$grey-light;
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+  z-index: 2147483647;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+  &.scrollable {
+    max-height: var(--max-height);
+    overflow-y: auto;
+
+    scrollbar-width: thin;
+    scrollbar-color: colors.$grey-light transparent;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background-color: colors.$grey-light;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background-color: colors.$grey-border;
+    }
+  }
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border: 0;
+  background-color: white;
+  font-size: 14px;
+  color: colors.$grey-text;
+  cursor: pointer;
+  min-height: 40px;
+  box-sizing: border-box;
+  width: 100%;
+
+  &:hover {
+    background: color.scale(white, $lightness: -10%);
+  }
+}
+
+.horizontal-divider {
+  height: 1px;
+  background-color: color.adjust(colors.$grey-light, $alpha: -0.2);
+}

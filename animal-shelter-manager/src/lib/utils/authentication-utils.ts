@@ -1,5 +1,5 @@
 /**
- * authentication-utils.ts
+ * lib/utils/authentication-utils.ts
  *
  * This module contains utility functions for authentication-related operations
  * that communicate with the Tauri backend for user login and account creation.
@@ -10,11 +10,34 @@ import { info, error } from "@tauri-apps/plugin-log";
 
 // ==================== TYPES ====================
 
-/** User role type matching the Rust backend enum */
-export type UserRole = "staff" | "customer";
+/** User role enum type */
+export enum UserRole {
+  STAFF = "staff",
+  CUSTOMER = "customer",
+}
 
-/** Login result enum matching Tauri backend */
-export type LoginResult = "success" | "invalid-password" | "user-not-found";
+/** Login result enum type */
+export enum LoginResult {
+  SUCCESS = "success",
+  INVALID_PASSWORD = "invalid-password",
+  USER_NOT_FOUND = "user-not-found",
+}
+
+/** Current user type containing username and role */
+export interface CurrentUser {
+  /** Username of the current user */
+  username: string;
+  /** Role of the current user */
+  role: UserRole;
+}
+
+/** Validation result type */
+export interface ValidationResult {
+  /** Indicates if the input is valid */
+  isValid: boolean;
+  /** Error message if validation fails */
+  errorMessage: string;
+}
 
 // ==================== INTERFACES ====================
 
@@ -39,50 +62,90 @@ export interface UserCredentials {
  * Validates if a username is in valid format.
  *
  * @param username - The username to validate
- * @returns boolean - True if username is valid format, false otherwise
+ * @returns ValidationResult - An object with `isValid` and `errorMessage`
  */
-export function validateUsername(username: string): boolean {
-  /** Username must not be empty and have at least 3 characters */
+export function validateUsername(username: string): ValidationResult {
   const trimmedUsername: string = username.trim();
-  return trimmedUsername.length >= 3;
+  if (trimmedUsername.length < 3) {
+    return {
+      isValid: false,
+      errorMessage: "Username must be at least 3 characters long.",
+    };
+  }
+  if (!/^[a-zA-Z0-9]+$/.test(trimmedUsername)) {
+    return {
+      isValid: false,
+      errorMessage: "Username can only contain alphanumeric characters.",
+    };
+  }
+  return {
+    isValid: true,
+    errorMessage: "",
+  };
 }
 
 /**
  * Validates if a password meets the minimum requirements.
  *
  * @param password - The password to validate
- * @returns boolean - True if password meets requirements, false otherwise
+ * @returns ValidationResult - An object with `isValid` and `errorMessage`
  */
-export function validatePassword(password: string): boolean {
-  /** Password must be at least 6 characters long */
-  const minLength: number = 6;
-  return password.length >= minLength;
+export function validatePassword(password: string): ValidationResult {
+  if (password.length < 8) {
+    return {
+      isValid: false,
+      errorMessage: "Password must be at least 8 characters long.",
+    };
+  }
+  if (!/\d/.test(password)) {
+    return {
+      isValid: false,
+      errorMessage: "Password must contain at least one number.",
+    };
+  }
+  if (!/[a-z]/.test(password)) {
+    return {
+      isValid: false,
+      errorMessage: "Password must contain at least one lowercase letter.",
+    };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return {
+      isValid: false,
+      errorMessage: "Password must contain at least one uppercase letter.",
+    };
+  }
+  if (!/[^a-zA-Z0-9]/.test(password)) {
+    return {
+      isValid: false,
+      errorMessage: "Password must contain at least one special character.",
+    };
+  }
+  return {
+    isValid: true,
+    errorMessage: "",
+  };
 }
 
 /**
  * Validates user credentials format before attempting authentication.
  *
  * @param credentials - The user credentials to validate
- * @returns object - Contains isValid boolean and error message if invalid
+ * @returns ValidationResult - Contains isValid boolean and error message if invalid
  */
-export function validateCredentials(credentials: UserCredentials): {
-  isValid: boolean;
-  errorMessage: string;
-} {
+export function validateCredentials(
+  credentials: UserCredentials,
+): ValidationResult {
   // Check username format
-  if (!validateUsername(credentials.username)) {
-    return {
-      isValid: false,
-      errorMessage: "Username must be at least 3 characters long.",
-    };
+  const usernameValidation = validateUsername(credentials.username);
+  if (!usernameValidation.isValid) {
+    return usernameValidation;
   }
 
   // Check password format
-  if (!validatePassword(credentials.password)) {
-    return {
-      isValid: false,
-      errorMessage: "Password must be at least 6 characters long.",
-    };
+  const passwordValidation = validatePassword(credentials.password);
+  if (!passwordValidation.isValid) {
+    return passwordValidation;
   }
 
   // Check role validity
@@ -207,14 +270,11 @@ export async function createUserAccount(
       };
     }
 
-    /** Convert role to match backend enum format (keep lowercase) */
-    const rustRole: string = credentials.role;
-
     // Create account via Tauri backend
     await invoke("sign_up", {
       username: credentials.username,
       password: credentials.password,
-      role: rustRole,
+      role: credentials.role,
     });
 
     return {
@@ -245,12 +305,12 @@ export async function createUserAccount(
 /**
  * Gets the current logged-in user information.
  *
- * @returns Promise<object | null> - Current user info or null if not logged in
+ * @returns Promise<CurrentUser | null> - Current user info or null if not logged in
  */
-export async function getCurrentUser(): Promise<object | null> {
+export async function getCurrentUser(): Promise<CurrentUser | null> {
   try {
-    const currentUser = await invoke("get_current_user");
-    return currentUser as object | null;
+    const currentUser: CurrentUser | null = await invoke("get_current_user");
+    return currentUser;
   } catch (e) {
     error(`Get current user error: ${e}`);
     return null;

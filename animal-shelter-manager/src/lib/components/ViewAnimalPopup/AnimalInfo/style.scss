@@ -18,6 +18,13 @@
   gap: 48px;
 }
 
+.close-button-wrapper {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+}
+
 .animal-profile-left {
   display: flex;
   flex-direction: column;

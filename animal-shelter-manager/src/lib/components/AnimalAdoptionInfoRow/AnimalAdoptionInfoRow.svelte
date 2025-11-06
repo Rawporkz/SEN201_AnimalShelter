@@ -1,15 +1,19 @@
 <!--
-  AnimalAdoptionInfoRow.svelte
+AnimalAdoptionInfoRow.svelte
 
-  Reusable component that displays both animal information and adopter/requester
-  information in a horizontal row layout.
+Reusable component that displays both animal information and adopter/requester
+information in a horizontal row layout.
 -->
 
 <script lang="ts">
-  import type { AnimalSummary, AdoptionRequest } from "$lib/utils/animal-utils";
-  import { formatTimestamp } from "$lib/utils/animal-utils";
+  import {
+    type AnimalSummary,
+    type AdoptionRequest,
+    formatTimestamp,
+  } from "$lib/utils/data-utils";
   import { ImageOff } from "@lucide/svelte";
   import type { Snippet } from "svelte";
+  import { convertFileSrc } from "@tauri-apps/api/core";
 
   // Props
   interface Props {
@@ -20,18 +24,18 @@
     /** Whether to show the "by" word between animal and adopter columns */
     showBySeparator?: boolean;
     /** Action buttons or components to display on the right side */
-    children?: Snippet;
+    actions?: Snippet;
   }
 
   const {
     animalSummary,
     adoptionRequest,
     showBySeparator = true,
-    children,
+    actions: actions,
   }: Props = $props();
 
   /** Flag to track if the animal has a valid image */
-  let hasValidImage: boolean = $state(!!animalSummary.image_path);
+  let hasValidImage: boolean = $state(!!animalSummary.imagePath);
 
   /**
    * Handles image load errors by showing the placeholder instead.
@@ -51,9 +55,9 @@
 <div class="animal-adoption-info-row">
   <div class="left-section">
     <div class="animal-image-container">
-      {#if animalSummary.image_path && hasValidImage}
+      {#if animalSummary.imagePath && hasValidImage}
         <img
-          src={animalSummary.image_path}
+          src={convertFileSrc(animalSummary.imagePath)}
           alt="Photo of {animalSummary.name}"
           class="animal-image"
           onerror={handleImageError}
@@ -78,7 +82,7 @@
         <div class="info-item">
           <span class="info-label">Since:</span>
           <span class="info-value"
-            >{formatTimestamp(animalSummary.admission_timestamp)}</span
+            >{formatTimestamp(animalSummary.admissionTimestamp)}</span
           >
         </div>
       </div>
@@ -102,16 +106,16 @@
         <div class="info-item">
           <span class="info-label">On:</span>
           <span class="info-value"
-            >{formatTimestamp(adoptionRequest.adoption_timestamp)}</span
+            >{formatTimestamp(adoptionRequest.adoptionTimestamp)}</span
           >
         </div>
       </div>
     </div>
   </div>
 
-  {#if children}
+  {#if actions}
     <div class="action-buttons">
-      {@render children()}
+      {@render actions()}
     </div>
   {/if}
 </div>

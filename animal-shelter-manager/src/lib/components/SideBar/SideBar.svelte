@@ -13,6 +13,8 @@ This file defines a reusable SideBar component.
     username?: string;
     /** The user role to display */
     role?: string;
+    /** The navigation items to display in the sidebar. */
+    navItems: string[];
     /** Optional callback function to handle sign out events */
     onSignOut?: (() => void) | undefined;
     /** Optional callback function to handle navigation events */
@@ -21,13 +23,11 @@ This file defines a reusable SideBar component.
 
   const {
     username = "Username",
-    role = "as Staff",
+    role = "Staff",
+    navItems,
     onSignOut = undefined,
     onNavigate = undefined,
   }: Props = $props();
-
-  // Array of navigation items
-  const navItems = ["All Animals", "Adoption Requests", "Adoption Reports"];
 
   /*
    * Handles the sign-out button click
@@ -57,7 +57,7 @@ This file defines a reusable SideBar component.
     </div>
     <div class="user-info">
       <h2>{username}</h2>
-      <p>{role}</p>
+      <p>as {role}</p>
     </div>
   </div>
 

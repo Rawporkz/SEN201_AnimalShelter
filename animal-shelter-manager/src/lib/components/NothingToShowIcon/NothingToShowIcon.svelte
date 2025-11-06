@@ -1,8 +1,8 @@
 <!--
-  NothingToShowIcon.svelte
+NothingToShowIcon.svelte
 
-  Reusable component that displays a "nothing to show" message with a crossed-out circle icon.
-  Used when there are no items or results to display in lists, tables, or search results.
+Reusable component that displays a "nothing to show" message with a crossed-out circle icon.
+Used when there are no items or results to display in lists, tables, or search results.
 -->
 
 <script lang="ts">

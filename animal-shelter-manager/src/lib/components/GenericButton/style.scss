@@ -1,0 +1,50 @@
+//
+// GenericButton/style.scss
+//
+// Styles for GenericButton component with configurable appearance.
+//
+
+@use "../../styles/colors.scss" as colors;
+
+.generic-button {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  gap: 8px;
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  &:active {
+    opacity: 0.8;
+  }
+
+  &:disabled,
+  &[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &:disabled:hover,
+  &[disabled]:hover {
+    opacity: 0.6;
+  }
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  font-size: 18px;
+  color: inherit;
+}
+
+.text {
+  flex-shrink: 0;
+}

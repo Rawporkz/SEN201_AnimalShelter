@@ -140,24 +140,21 @@ This file defines the authentication page of the application.
 
       // Handle authentication result
       if (result.success) {
-        info("Authentication successful!");
         goto("/");
       } else if (result.requiresAccountCreation) {
         // Username doesn't exist - navigate to create account page
-        info("Username doesn't exist, navigating to create account...");
         const params = new URLSearchParams({
           username: credentials.username,
           password: credentials.password,
           role: credentials.role,
         });
-        await goto(`/authentication/create-account?${params.toString()}`);
+        goto(`/authentication/create-account?${params.toString()}`);
       } else if (result.invalidPassword) {
         // Password is wrong - show error on password field
         warn(`Invalid password, showing password error: ${result.message}`);
         setPasswordError(result.message);
       } else {
         // General authentication error - show as general error
-        warn(`General authentication error: ${result.message}`);
         setGeneralError(result.message);
       }
     } catch (e) {

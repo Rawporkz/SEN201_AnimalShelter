@@ -1,33 +1,31 @@
 <!--
-  AnimalInfoRow.svelte
+AnimalInfoRow.svelte
 
-  Reusable component that displays animal information in a horizontal row layout,
-  showing animal image, name, ID, species/breed, sex, and admission date.
+Reusable component that displays animal information in a horizontal row layout,
+showing animal image, name, ID, species/breed, sex, and admission date.
 -->
 
 <script lang="ts">
-  import type { AnimalSummary } from "$lib/utils/animal-utils";
-  import {
-    formatTimestamp,
-    getStatusDisplayText,
-  } from "$lib/utils/animal-utils";
+  import type { AnimalSummary } from "$lib/utils/data-utils";
+  import { formatTimestamp } from "$lib/utils/data-utils";
   import { ImageOff } from "@lucide/svelte";
   import type { Snippet } from "svelte";
+  import { convertFileSrc } from "@tauri-apps/api/core";
 
   // Props
   interface Props {
     /** Animal summary data to display */
     animalSummary: AnimalSummary;
     /** Whether to show the status indicator next to the name */
-    showStatus?: boolean;
+    status?: Snippet;
     /** Action buttons or components to display on the right side */
-    children?: Snippet;
+    actions?: Snippet;
   }
 
-  const { animalSummary, showStatus = false, children }: Props = $props();
+  const { animalSummary, status: status, actions: actions }: Props = $props();
 
   /** Flag to track if the animal has a valid image */
-  let hasValidImage: boolean = $state(!!animalSummary.image_path);
+  let hasValidImage: boolean = $state(!!animalSummary.imagePath);
 
   /**
    * Handles image load errors by showing the placeholder instead.
@@ -46,9 +44,9 @@
 
 <div class="animal-info-row">
   <div class="animal-image-container">
-    {#if animalSummary.image_path && hasValidImage}
+    {#if animalSummary.imagePath && hasValidImage}
       <img
-        src={animalSummary.image_path}
+        src={convertFileSrc(animalSummary.imagePath)}
         alt="Photo of {animalSummary.name}"
         class="animal-image"
         onerror={handleImageError}
@@ -64,12 +62,8 @@
   <div class="animal-details">
     <div class="animal-name-container">
       <h2 class="animal-name">{animalSummary.name}</h2>
-      {#if showStatus && animalSummary.status}
-        <div class="status-indicator status-{animalSummary.status}">
-          <div class="status-tooltip">
-            {getStatusDisplayText(animalSummary.status)}
-          </div>
-        </div>
+      {#if status}
+        {@render status()}
       {/if}
     </div>
 
@@ -89,7 +83,7 @@
       <div class="info-item">
         <span class="info-label">Since:</span>
         <span class="info-value"
-          >{formatTimestamp(animalSummary.admission_timestamp)}</span
+          >{formatTimestamp(animalSummary.admissionTimestamp)}</span
         >
       </div>
 
@@ -100,9 +94,9 @@
     </div>
   </div>
 
-  {#if children}
+  {#if actions}
     <div class="action-buttons">
-      {@render children()}
+      {@render actions()}
     </div>
   {/if}
 </div>

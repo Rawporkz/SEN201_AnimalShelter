@@ -1,12 +1,13 @@
 <!--
-  FilterModal.svelte
+FilterModal.svelte
 
-  Modal component that presents available filtering criteria to users.
-  Allows users to select and configure different filter options for
-  data filtering throughout the application.
+Modal component that presents available filtering criteria to users.
+Allows users to select and configure different filter options for
+data filtering throughout the application.
 -->
 
 <script lang="ts">
+  import { info } from "@tauri-apps/plugin-log";
   import {
     FilterCriteria,
     FilterType,
@@ -14,7 +15,7 @@
     getFilterType,
     createEmptyFilterSelections,
     type FilterSelections,
-  } from "./filter-utils";
+  } from "$lib/utils/filter-utils";
   import {
     ANIMAL_STATUS_OPTIONS,
     ANIMAL_SEX_OPTIONS,
@@ -25,6 +26,7 @@
   import ChooseMultiFilter from "./ChooseMultiFilter/ChooseMuliFilter.svelte";
   import ChooseOneFilter from "./ChooseOneFilter/ChooseOneFilter.svelte";
   import NestedChooseManyFilter from "./NestedChooseManyFilter/NestedChooseManyFilter.svelte";
+  import ClosePopupButton from "../ClosePopupButton/ClosePopupButton.svelte";
 
   // Props
   interface Props {
@@ -35,14 +37,14 @@
     /** Current filter selections (for pre-populating the modal) */
     currentSelections?: FilterSelections | null;
     /** Callback function called when modal closes with filter selections */
-    onclose?: (selections: FilterSelections) => void;
+    onClose?: (selections: FilterSelections) => void;
   }
 
   const {
     isVisible = false,
     criteriaList = [],
     currentSelections = null,
-    onclose,
+    onClose: onClose,
   }: Props = $props();
 
   // Currently selected criteria for showing in the content area
@@ -68,8 +70,9 @@
    * Handles closing the modal and returning the current selections.
    */
   function handleClose(): void {
-    if (onclose) {
-      onclose(workingSelections);
+    if (onClose) {
+      info("Filter selections: " + JSON.stringify(workingSelections));
+      onClose(workingSelections);
     }
     resetModal();
   }
@@ -291,6 +294,9 @@
     tabindex="-1"
   >
     <div class="modal-container">
+      <div class="close-button-wrapper">
+        <ClosePopupButton onclick={handleClose} />
+      </div>
       <div class="modal-header">
         <h2 class="modal-title">Filters</h2>
       </div>

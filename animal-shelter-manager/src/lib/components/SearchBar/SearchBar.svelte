@@ -1,8 +1,8 @@
 <!--
-  SearchBar.svelte
+SearchBar.svelte
 
-  Reusable search search bar component with a search icon and placeholder text.
-  Provides a bindable value that parent components can use to handle search queries.
+Reusable search search bar component with a search icon and placeholder text.
+Provides a bindable value that parent components can use to handle search queries.
 -->
 
 <script lang="ts">

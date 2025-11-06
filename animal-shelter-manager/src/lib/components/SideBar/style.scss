@@ -11,14 +11,13 @@
   width: 100%;
   max-width: 276px;
   background: colors.$blue-main;
-  border-radius: 20px;
+  border-radius: 15px;
   padding: 9px 18px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   left: 85px;
   top: 73px;
-  height: 95%;
+  height: 100%;
 }
 
 .user-profile {
