@@ -2,10 +2,16 @@
 
 for `animal-shelter-manager/src/lib/utils/animal-utils.ts`
 
+Review date: 12th October 2025
+Roles:
+Author of code: Jira
+Reviewers: Non & Prue
+Scribe: Win
+
 ## Enum
 
-
 ### AnimalStatus
+
 ```ts
 /** Status of an animal in the shelter system */
 export enum AnimalStatus {
@@ -19,10 +25,12 @@ export enum AnimalStatus {
   PASSED_AWAY = "passed-away",
 }
 ```
+
 Prue asks why did we use enum.
 So, Jira answers that it's better than putting status as a string. Enum type makes sure that we can only put one of these 4 values as an animal's status.
 
 ### RequestStatus
+
 ```ts
 /** Status of an adoption request in the system */
 export enum RequestStatus {
@@ -34,12 +42,13 @@ export enum RequestStatus {
   APPROVED = "approved",
 }
 ```
+
 No problem with this enum. The 3 options are sufficient for all adoption requests.
 
 ## Interfaces
 
-
 ### Animal
+
 ```ts
 /** Represents an animal in the shelter system */
 export interface Animal {
@@ -67,11 +76,13 @@ export interface Animal {
   image_path?: string;
 }
 ```
+
 Non suggested to put in 3 more fields: adoption_timestamp, appearance, and bio, since we are missing that from this interface. He needs it for the `AdopterInfoModal`.
 
 Jira agrees with adding bio and appearance. But for adoption_timestamp, he suggests that we can just use the adoption_timestamp field in the `AdoptionRequest` interface instead. We can retrieve the associated adoption by matching the animal's ID and the adoption's animal_id field. I will add both the appearance and bio since
 
 ### AnimalSummary
+
 ```ts
 /** Simplified animal information for listing views */
 export interface AnimalSummary {
@@ -93,9 +104,11 @@ export interface AnimalSummary {
   status?: AnimalStatus;
 }
 ```
+
 Animal status should not be null-able
 
 ### AdoptionRequest
+
 ```ts
 /** Represents an adoption request in the system */
 export interface AdoptionRequest {
@@ -129,9 +142,11 @@ export interface AdoptionRequest {
   country: string;
 }
 ```
+
 Wants a country field for usage in AdopterInfoModal
 
 ### AdoptionRequestSummary
+
 ```ts
 /** Simplified adoption request information for listing views */
 export interface AdoptionRequestSummary {
@@ -147,9 +162,11 @@ export interface AdoptionRequestSummary {
   request_timestamp: number;
 }
 ```
+
 This is already good, no changes needed
 
 ## Animal Function
+
 ```ts
 /**
  * Retrieves all animals from the database.
@@ -226,19 +243,24 @@ export async function deleteAnimal(animalId: string): Promise<boolean> {
 ```
 
 ### getAllAnimals
+
 This function is called by the UI Components
 We shouldn't rely on UI on catching error. We should return an empty array if there is an error, handle the error internally by the function.
 
 ### getAnimalById
+
 Since this function already returns null when an animal is not found, we can also return null when an error occurs, so we don't have to throw errors
 
 ### createAnimal
+
 Log instead of throwing errors, because if UI call this function outside the try block, it will crash the application.
 
 ### updateAnimal & deleteAnimal
+
 Since the function already returns false, when the animal is not found, we should also return false if an error occurs, to avoid throwing errors.
 
 ## Adoption Request Function
+
 ```ts
 /**
  * Retrieves all adoption requests from the database.
@@ -264,7 +286,7 @@ export async function getAllAdoptionRequests(): Promise<
  * @throws Error if the operation fails
  */
 export async function getAdoptionRequestById(
-  requestId: string,
+  requestId: string
 ): Promise<AdoptionRequest | null> {
   try {
     return await invoke<AdoptionRequest | null>("get_adoption_request_by_id", {
@@ -272,7 +294,7 @@ export async function getAdoptionRequestById(
     });
   } catch (error) {
     throw new Error(
-      `Failed to get adoption request by ID ${requestId}: ${error}`,
+      `Failed to get adoption request by ID ${requestId}: ${error}`
     );
   }
 }
@@ -284,7 +306,7 @@ export async function getAdoptionRequestById(
  * @throws Error if the operation fails
  */
 export async function createAdoptionRequest(
-  request: AdoptionRequest,
+  request: AdoptionRequest
 ): Promise<void> {
   try {
     await invoke("create_adoption_request", { request });
@@ -301,7 +323,7 @@ export async function createAdoptionRequest(
  * @throws Error if the operation fails
  */
 export async function updateAdoptionRequest(
-  request: AdoptionRequest,
+  request: AdoptionRequest
 ): Promise<boolean> {
   try {
     return await invoke<boolean>("update_adoption_request", { request });
@@ -318,20 +340,22 @@ export async function updateAdoptionRequest(
  * @throws Error if the operation fails
  */
 export async function deleteAdoptionRequest(
-  requestId: string,
+  requestId: string
 ): Promise<boolean> {
   try {
     return await invoke<boolean>("delete_adoption_request", { requestId });
   } catch (error) {
     throw new Error(
-      `Failed to delete adoption request with ID ${requestId}: ${error}`,
+      `Failed to delete adoption request with ID ${requestId}: ${error}`
     );
   }
 }
 ```
+
 Implement updates that will be made in the animal function into the Adoption Request Function as well.
 
 ## File Function
+
 ```ts
 /**
  * Uploads a file selected by the user for animal images.
@@ -363,14 +387,17 @@ export async function deleteFile(filePath: string): Promise<void> {
 ```
 
 ### uploadAnimalImage
+
 Since this function already returns null when an animal is not found, we can also return null when an error occurs, so we don't have to throw errors
 
 ### deleteFile
+
 Log instead of throwing errors, because if UI call this function outside the try block, it will crash the application.
 
 ## Utility Function
 
 ### formatTimestamp
+
 ```ts
 /**
  * Formats a timestamp to a readable date string.
@@ -386,9 +413,11 @@ export function formatTimestamp(timestamp: number): string {
   return `${day}/${month}/${year}`;
 }
 ```
+
 No problem with this function
 
 ### calculateAge
+
 ```ts
 /**
  * Calculates age from birth year and month.
@@ -415,13 +444,17 @@ export function calculateAge(birthYear: number, birthMonth: number): string {
   } else if (ageMonths === 0) {
     return `${ageYears} year${ageYears !== 1 ? "s" : ""} old`;
   } else {
-    return `${ageYears} year${ageYears !== 1 ? "s" : ""}, ${ageMonths} month${ageMonths !== 1 ? "s" : ""} old`;
+    return `${ageYears} year${ageYears !== 1 ? "s" : ""}, ${ageMonths} month${
+      ageMonths !== 1 ? "s" : ""
+    } old`;
   }
 }
 ```
+
 No problem with this function
 
 ### getStatusDisplayText
+
 ```ts
 /**
  * Gets the display text for an animal status.
@@ -444,4 +477,5 @@ export function getStatusDisplayText(status: AnimalStatus): string {
   }
 }
 ```
+
 Default value of `"Unknown"` is a nice touch, in case we add more options to the status enum later and forget to update this function, it will return an `"Unknown"` instead of crashing.
